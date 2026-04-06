@@ -1,0 +1,29 @@
+# docker-compose.test.yml — Isolated test database
+# Used by Phase 10 contract and integration tests.
+# Run alongside (not instead of) docker-compose.yml:
+#   docker-compose -f docker-compose.test.yml up -d
+# Test DATABASE_URL: postgresql://vigil:vigil@localhost:5433/vigil_test
+
+services:
+  postgres-test:
+    image: postgres:16-alpine
+    container_name: vigil_postgres_test
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: vigil
+      POSTGRES_PASSWORD: vigil
+      POSTGRES_DB: vigil_test
+    ports:
+      - "5433:5432"
+    volumes:
+      - vigil_postgres_test_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vigil -d vigil_test"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  vigil_postgres_test_data:
+    name: vigil_postgres_test_data

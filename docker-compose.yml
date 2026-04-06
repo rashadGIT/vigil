@@ -1,0 +1,50 @@
+# docker-compose.yml — Local development environment
+# Provides Postgres 16 + Redis 7 for offline local dev (INFR-09).
+# Phase 5 adds the backend service referencing:
+#   depends_on:
+#     postgres:
+#       condition: service_healthy
+#     redis:
+#       condition: service_healthy
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: vigil_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: vigil
+      POSTGRES_PASSWORD: vigil
+      POSTGRES_DB: vigil_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - vigil_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vigil -d vigil_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    container_name: vigil_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - vigil_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  vigil_postgres_data:
+    name: vigil_postgres_data
+  vigil_redis_data:
+    name: vigil_redis_data
