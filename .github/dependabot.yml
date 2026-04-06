@@ -1,0 +1,45 @@
+version: 2
+updates:
+  # npm dependencies — weekly on Monday
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    target-branch: main
+    open-pull-requests-limit: 5
+    groups:
+      type-definitions:
+        patterns:
+          - "@types/*"
+      dev-tooling:
+        patterns:
+          - "eslint*"
+          - "@typescript-eslint/*"
+          - "prettier"
+          - "jest*"
+          - "@jest/*"
+          - "ts-jest"
+          - "playwright"
+          - "@playwright/*"
+          - "concurrently"
+    ignore:
+      # Ignore major version bumps for core frameworks — these require manual upgrades
+      - dependency-name: "next"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@nestjs/core"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@nestjs/common"
+        update-types: ["version-update:semver-major"]
+
+  # GitHub Actions — monthly
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    target-branch: main
+    open-pull-requests-limit: 3
