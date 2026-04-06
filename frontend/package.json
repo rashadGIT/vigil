@@ -1,0 +1,17 @@
+{
+  "name": "frontend",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "echo 'Phase 6: Next.js dev server'",
+    "build": "echo 'Phase 6: Next.js build'",
+    "start": "echo 'Phase 6: Next.js start'",
+    "lint": "echo 'Phase 6: ESLint'",
+    "test": "echo 'Phase 10: Jest tests'",
+    "test:watch": "echo 'Phase 10: Jest watch'",
+    "test:coverage": "echo 'Phase 10: Jest coverage'",
+    "test:e2e": "echo 'Phase 10: Playwright E2E'",
+    "test:e2e:ui": "echo 'Phase 10: Playwright UI'",
+    "type-check": "tsc --noEmit"
+  }
+}

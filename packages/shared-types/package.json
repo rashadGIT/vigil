@@ -1,0 +1,14 @@
+{
+  "name": "@vigil/shared-types",
+  "version": "0.0.1",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "echo 'Phase 3: ESLint'",
+    "test": "echo 'Phase 10: Jest tests'",
+    "type-check": "tsc --noEmit"
+  }
+}

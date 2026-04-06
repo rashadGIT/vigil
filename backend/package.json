@@ -1,0 +1,16 @@
+{
+  "name": "backend",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "echo 'Phase 5: NestJS dev server'",
+    "build": "echo 'Phase 5: NestJS build'",
+    "start": "echo 'Phase 5: NestJS start'",
+    "start:dev": "echo 'Phase 5: NestJS start:dev'",
+    "lint": "echo 'Phase 5: ESLint'",
+    "test": "echo 'Phase 10: Jest tests'",
+    "test:watch": "echo 'Phase 10: Jest watch'",
+    "test:coverage": "echo 'Phase 10: Jest coverage'",
+    "type-check": "tsc --noEmit"
+  }
+}

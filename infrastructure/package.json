@@ -1,0 +1,12 @@
+{
+  "name": "infrastructure",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "synth": "echo 'Phase 7: CDK synth'",
+    "deploy": "echo 'Phase 7: CDK deploy'",
+    "lint": "echo 'Phase 7: ESLint'",
+    "test": "echo 'Phase 10: Jest tests'",
+    "type-check": "tsc --noEmit"
+  }
+}
