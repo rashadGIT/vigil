@@ -1,2 +1,5 @@
-// Phase 3 will populate this file with all enums and interfaces
-export {};
+// Enums
+// (Plan 02 will add re-exports here)
+
+// Interfaces
+// (Plan 03 will add re-exports here)
