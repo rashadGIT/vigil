@@ -130,6 +130,9 @@ model Tenant {
   signatures          Signature[]
   priceListItems      PriceListItem[]
   caseLineItems       CaseLineItem[]
+  calendarEvents      CalendarEvent[]
+  calendarEventStaff  CalendarEventStaff[]
+  auditLogs           AuditLog[]
 
   @@map("tenants")
 }
@@ -146,7 +149,9 @@ model User {
   createdAt  DateTime  @default(now()) @map("created_at")
   updatedAt  DateTime  @updatedAt @map("updated_at")
 
-  tenant Tenant @relation(fields: [tenantId], references: [id])
+  tenant             Tenant               @relation(fields: [tenantId], references: [id])
+  calendarEventStaff CalendarEventStaff[]
+  auditLogs          AuditLog[]
 
   @@index([tenantId])
   @@map("users")
@@ -167,7 +172,7 @@ model Case {
   createdAt      DateTime   @default(now()) @map("created_at")
   updatedAt      DateTime   @updatedAt @map("updated_at")
 
-  tenant            Tenant            @relation(fields: [tenantId], references: [id])
+  tenant            Tenant             @relation(fields: [tenantId], references: [id])
   familyContacts    FamilyContact[]
   tasks             Task[]
   obituary          Obituary?
@@ -177,6 +182,7 @@ model Case {
   vendorAssignments VendorAssignment[]
   signatures        Signature[]
   caseLineItems     CaseLineItem[]
+  calendarEvents    CalendarEvent[]
 
   @@index([tenantId, status])
   @@index([tenantId, assignedToId])
@@ -402,4 +408,61 @@ model CaseLineItem {
 
   @@index([tenantId, caseId])
   @@map("case_line_items")
+}
+
+model CalendarEvent {
+  id        String    @id @default(cuid())
+  tenantId  String    @map("tenant_id")
+  caseId    String?   @map("case_id")
+  title     String
+  eventType EventType @map("event_type")
+  location  String?
+  startTime DateTime  @map("start_time")
+  endTime   DateTime  @map("end_time")
+  notes     String?
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  tenant Tenant               @relation(fields: [tenantId], references: [id])
+  case   Case?                @relation(fields: [caseId], references: [id])
+  staff  CalendarEventStaff[]
+
+  @@index([tenantId, startTime, endTime])
+  @@map("calendar_events")
+}
+
+// Join table per CAL-03 — staff assigned to events. Separate model, not array.
+model CalendarEventStaff {
+  id              String   @id @default(cuid())
+  tenantId        String   @map("tenant_id")
+  calendarEventId String   @map("calendar_event_id")
+  userId          String   @map("user_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  tenant        Tenant        @relation(fields: [tenantId], references: [id])
+  calendarEvent CalendarEvent @relation(fields: [calendarEventId], references: [id])
+  user          User          @relation(fields: [userId], references: [id])
+
+  @@unique([calendarEventId, userId])
+  @@index([tenantId, userId])
+  @@map("calendar_event_staff")
+}
+
+model AuditLog {
+  id            String      @id @default(cuid())
+  tenantId      String      @map("tenant_id")
+  userId        String      @map("user_id")
+  action        AuditAction
+  entityType    String      @map("entity_type")
+  entityId      String      @map("entity_id")
+  changedFields Json?       @map("changed_fields")
+  ipAddress     String?     @map("ip_address")
+  createdAt     DateTime    @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@index([tenantId, entityType, entityId])
+  @@index([tenantId, userId, createdAt(sort: Desc)])
+  @@map("audit_logs")
 }
