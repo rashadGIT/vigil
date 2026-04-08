@@ -117,14 +117,19 @@ model Tenant {
   updatedAt              DateTime @updatedAt @map("updated_at")
 
   // Back-relations (added incrementally as later models are defined)
-  users           User[]
-  cases           Case[]
-  familyContacts  FamilyContact[]
-  tasks           Task[]
-  obituaries      Obituary[]
-  documents       Document[]
-  payments        Payment[]
-  followUps       FollowUp[]
+  users               User[]
+  cases               Case[]
+  familyContacts      FamilyContact[]
+  tasks               Task[]
+  obituaries          Obituary[]
+  documents           Document[]
+  payments            Payment[]
+  followUps           FollowUp[]
+  vendors             Vendor[]
+  vendorAssignments   VendorAssignment[]
+  signatures          Signature[]
+  priceListItems      PriceListItem[]
+  caseLineItems       CaseLineItem[]
 
   @@map("tenants")
 }
@@ -162,13 +167,16 @@ model Case {
   createdAt      DateTime   @default(now()) @map("created_at")
   updatedAt      DateTime   @updatedAt @map("updated_at")
 
-  tenant         Tenant          @relation(fields: [tenantId], references: [id])
-  familyContacts FamilyContact[]
-  tasks          Task[]
-  obituary       Obituary?
-  documents      Document[]
-  payment        Payment?
-  followUps      FollowUp[]
+  tenant            Tenant            @relation(fields: [tenantId], references: [id])
+  familyContacts    FamilyContact[]
+  tasks             Task[]
+  obituary          Obituary?
+  documents         Document[]
+  payment           Payment?
+  followUps         FollowUp[]
+  vendorAssignments VendorAssignment[]
+  signatures        Signature[]
+  caseLineItems     CaseLineItem[]
 
   @@index([tenantId, status])
   @@index([tenantId, assignedToId])
@@ -287,4 +295,111 @@ model FollowUp {
   @@index([status, scheduledAt])
   @@index([tenantId, caseId])
   @@map("follow_ups")
+}
+
+// ============================================================
+// Supporting Phase 1 models (plan 04-02)
+// ============================================================
+
+model Vendor {
+  id          String     @id @default(cuid())
+  tenantId    String     @map("tenant_id")
+  name        String
+  type        VendorType
+  contactName String?    @map("contact_name")
+  email       String?
+  phone       String?
+  active      Boolean    @default(true)
+  deletedAt   DateTime?  @map("deleted_at")
+  archivedAt  DateTime?  @map("archived_at")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  tenant      Tenant             @relation(fields: [tenantId], references: [id])
+  assignments VendorAssignment[]
+
+  @@index([tenantId])
+  @@map("vendors")
+}
+
+// Join table — connects Vendors to Cases with role + status. No Phase 3 interface;
+// shape inferred from build plan VEND-02 + research §4.
+model VendorAssignment {
+  id        String   @id @default(cuid())
+  tenantId  String   @map("tenant_id")
+  caseId    String   @map("case_id")
+  vendorId  String   @map("vendor_id")
+  role      String?
+  status    String   @default("pending")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  case   Case   @relation(fields: [caseId], references: [id])
+  vendor Vendor @relation(fields: [vendorId], references: [id])
+
+  @@index([tenantId, caseId])
+  @@index([tenantId, vendorId])
+  @@map("vendor_assignments")
+}
+
+model Signature {
+  id            String            @id @default(cuid())
+  tenantId      String            @map("tenant_id")
+  caseId        String            @map("case_id")
+  contactId     String            @map("contact_id")
+  documentType  SignatureDocument @map("document_type")
+  token         String            @unique
+  signerName    String            @map("signer_name")
+  signerEmail   String?           @map("signer_email")
+  signerIp      String?           @map("signer_ip")
+  signedAt      DateTime?         @map("signed_at")
+  signatureData String?           @map("signature_data")
+  expiresAt     DateTime          @map("expires_at")
+  createdAt     DateTime          @default(now()) @map("created_at")
+  updatedAt     DateTime          @updatedAt @map("updated_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  case   Case   @relation(fields: [caseId], references: [id])
+
+  @@index([token])
+  @@map("signatures")
+}
+
+model PriceListItem {
+  id        String        @id @default(cuid())
+  tenantId  String        @map("tenant_id")
+  category  PriceCategory
+  name      String
+  price     Decimal       @db.Decimal(10, 2)
+  taxable   Boolean       @default(true)
+  active    Boolean       @default(true)
+  sortOrder Int           @default(0) @map("sort_order")
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+
+  tenant    Tenant         @relation(fields: [tenantId], references: [id])
+  lineItems CaseLineItem[]
+
+  @@index([tenantId, category])
+  @@map("price_list_items")
+}
+
+model CaseLineItem {
+  id              String   @id @default(cuid())
+  tenantId        String   @map("tenant_id")
+  caseId          String   @map("case_id")
+  priceListItemId String   @map("price_list_item_id")
+  quantity        Int      @default(1)
+  unitPrice       Decimal  @map("unit_price") @db.Decimal(10, 2)
+  total           Decimal  @db.Decimal(10, 2)
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  tenant        Tenant        @relation(fields: [tenantId], references: [id])
+  case          Case          @relation(fields: [caseId], references: [id])
+  priceListItem PriceListItem @relation(fields: [priceListItemId], references: [id])
+
+  @@index([tenantId, caseId])
+  @@map("case_line_items")
 }
