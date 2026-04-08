@@ -117,22 +117,29 @@ model Tenant {
   updatedAt              DateTime @updatedAt @map("updated_at")
 
   // Back-relations (added incrementally as later models are defined)
-  users               User[]
-  cases               Case[]
-  familyContacts      FamilyContact[]
-  tasks               Task[]
-  obituaries          Obituary[]
-  documents           Document[]
-  payments            Payment[]
-  followUps           FollowUp[]
-  vendors             Vendor[]
-  vendorAssignments   VendorAssignment[]
-  signatures          Signature[]
-  priceListItems      PriceListItem[]
-  caseLineItems       CaseLineItem[]
-  calendarEvents      CalendarEvent[]
-  calendarEventStaff  CalendarEventStaff[]
-  auditLogs           AuditLog[]
+  users                  User[]
+  cases                  Case[]
+  familyContacts         FamilyContact[]
+  tasks                  Task[]
+  obituaries             Obituary[]
+  documents              Document[]
+  payments               Payment[]
+  followUps              FollowUp[]
+  vendors                Vendor[]
+  vendorAssignments      VendorAssignment[]
+  signatures             Signature[]
+  priceListItems         PriceListItem[]
+  caseLineItems          CaseLineItem[]
+  calendarEvents         CalendarEvent[]
+  calendarEventStaff     CalendarEventStaff[]
+  auditLogs              AuditLog[]
+  decedentTracking       DecedentTracking[]
+  referralSources        ReferralSource[]
+  familyPortalAccess     FamilyPortalAccess[]
+  memorialPages          MemorialPage[]
+  locations              Location[]
+  faithTraditionTemplates FaithTraditionTemplate[]
+  analyticsSnapshots     AnalyticsSnapshot[]
 
   @@map("tenants")
 }
@@ -183,6 +190,7 @@ model Case {
   signatures        Signature[]
   caseLineItems     CaseLineItem[]
   calendarEvents    CalendarEvent[]
+  memorialPage      MemorialPage?
 
   @@index([tenantId, status])
   @@index([tenantId, assignedToId])
@@ -465,4 +473,121 @@ model AuditLog {
   @@index([tenantId, entityType, entityId])
   @@index([tenantId, userId, createdAt(sort: Desc)])
   @@map("audit_logs")
+}
+
+// ============================================================
+// Phase 2 stubs — schema only, no service code yet
+// ============================================================
+
+// Phase 2: Chain-of-custody status board for decedent tracking
+model DecedentTracking {
+  id        String   @id @default(cuid())
+  tenantId  String   @map("tenant_id")
+  caseId    String   @unique @map("case_id")
+  status    String   @default("pending_pickup")
+  location  String?
+  updatedBy String?  @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@map("decedent_tracking")
+}
+
+// Phase 2: Referral source tagging per case
+model ReferralSource {
+  id        String   @id @default(cuid())
+  tenantId  String   @map("tenant_id")
+  caseId    String   @map("case_id")
+  source    String
+  notes     String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId, source])
+  @@map("referral_sources")
+}
+
+// Phase 2: Family portal access tokens
+model FamilyPortalAccess {
+  id          String    @id @default(cuid())
+  tenantId    String    @map("tenant_id")
+  caseId      String    @map("case_id")
+  contactId   String    @map("contact_id")
+  accessToken String    @unique @map("access_token")
+  expiresAt   DateTime  @map("expires_at")
+  lastViewed  DateTime? @map("last_viewed")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@map("family_portal_access")
+}
+
+// Phase 2: Memorial/tribute page per case — public URL
+model MemorialPage {
+  id               String   @id @default(cuid())
+  tenantId         String   @map("tenant_id")
+  caseId           String   @unique @map("case_id")
+  slug             String   @unique
+  published        Boolean  @default(false)
+  photoUrls        String[] @map("photo_urls")
+  guestbookEntries Json     @default("[]") @map("guestbook_entries")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  case   Case   @relation(fields: [caseId], references: [id])
+
+  @@map("memorial_pages")
+}
+
+// ============================================================
+// Phase 3 stubs — schema only, no service code yet
+// ============================================================
+
+// Phase 3: Multi-location support — links multiple tenants under one owner group
+model Location {
+  id           String   @id @default(cuid())
+  ownerGroupId String   @map("owner_group_id")
+  tenantId     String   @unique @map("tenant_id")
+  displayName  String   @map("display_name")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@map("locations")
+}
+
+// Phase 3: Faith tradition task templates — overrides default service-type tasks per tenant
+model FaithTraditionTemplate {
+  id          String   @id @default(cuid())
+  tenantId    String   @map("tenant_id")
+  tradition   String
+  serviceType String   @map("service_type")
+  tasks       Json
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, tradition, serviceType])
+  @@map("faith_tradition_templates")
+}
+
+// Phase 3: Analytics snapshots — pre-computed for dashboard performance
+model AnalyticsSnapshot {
+  id          String   @id @default(cuid())
+  tenantId    String   @map("tenant_id")
+  period      String
+  periodStart DateTime @map("period_start")
+  metrics     Json
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId, periodStart])
+  @@map("analytics_snapshots")
 }
