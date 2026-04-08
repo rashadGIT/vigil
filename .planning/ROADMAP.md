@@ -6,7 +6,7 @@ Building Vigil from an empty directory to a fully-deployed, demo-able multi-tena
 
 ## Phases
 
-- [ ] **Phase 1: AWS Account Bootstrap** - IAM user + CDK bootstrap in us-east-2
+- [ ] **Phase 1: AWS Account Bootstrap** - Named vigil CLI profile (us-east-2) + CDK bootstrap
 - [ ] **Phase 2: Monorepo Foundation** - Root workspace, .env.example files, GitHub Actions CI/CD, Docker Compose
 - [ ] **Phase 3: Shared Types Package** - All TypeScript enums and interfaces in packages/shared-types
 - [ ] **Phase 4: Prisma Schema** - All tables, indexes, soft-delete fields, Phase 2/3 stubs, first migration
@@ -22,20 +22,19 @@ Building Vigil from an empty directory to a fully-deployed, demo-able multi-tena
 
 ### Phase 1: AWS Account Bootstrap
 **Wave**: 0
-**Goal**: AWS account accessible, IAM admin user created (never use root for CDK), CLI configured, CDK bootstrapped in us-east-2. Account ID captured for environments.ts.
+**Goal**: AWS account accessible via named `vigil` CLI profile targeting us-east-2. CDK bootstrapped in us-east-2. Account ID 887067305712 captured for environments.ts. IAM user Macbook (AdministratorAccess) is already configured — no new IAM user needed, no installs needed.
 **Depends on**: Nothing
 **Requirements**: [INFR-01]
 **Success Criteria** (what must be TRUE):
-  1. `aws sts get-caller-identity` returns Account ID, UserId, and ARN without error
-  2. `cdk bootstrap` completes — CDKToolkit stack visible in CloudFormation console
-  3. AWS credentials configured for us-east-2 region
+  1. `aws sts get-caller-identity --profile vigil` returns Account 887067305712 and Arn containing user/Macbook
+  2. `aws configure get region --profile vigil` returns us-east-2
+  3. CDKToolkit stack exists in us-east-2 with StackStatus CREATE_COMPLETE
 
-**Plans**: 3 plans
+**Plans**: 2 plans
 
 Plans:
-- [ ] 01-01: Create IAM admin user — AWS Console → IAM → Users → AdministratorAccess policy → generate access key
-- [ ] 01-02: Configure AWS CLI — `aws configure` with access key, us-east-2, json output
-- [ ] 01-03: Install CDK globally and run `cdk bootstrap aws://ACCOUNT_ID/us-east-2`
+- [ ] 01-01-PLAN.md — Create named `vigil` AWS CLI profile targeting us-east-2 (reuses Macbook user key; leaves default profile at us-east-1)
+- [ ] 01-02-PLAN.md — Bootstrap CDK in us-east-2 via `cdk bootstrap aws://887067305712/us-east-2 --profile vigil`; verify CDKToolkit stack is CREATE_COMPLETE
 
 ---
 
@@ -53,11 +52,11 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 02-01: Root workspace — package.json (workspaces: backend, frontend, packages/*, infrastructure), tsconfig.base.json, .eslintrc.js, .prettierrc, .gitignore
-- [ ] 02-02: .env.example files (3 total) — backend (Cognito, S3, SES, n8n placeholders, DEV_AUTH_BYPASS, EMAIL_PROVIDER=resend), frontend (Amplify config, NEXT_PUBLIC_DEV_AUTH_BYPASS), infrastructure
-- [ ] 02-03: GitHub Actions — ci.yml (type-check + lint + build in parallel), security.yml (npm audit + TruffleHog), dependabot.yml, SECURITY.md
-- [ ] 02-04: Docker Compose — docker-compose.yml (postgres:16-alpine port 5432 + redis:7-alpine port 6379, named volumes), docker-compose.test.yml (separate test DB)
-- [ ] 02-05: CronStubsService stub — backend/src/common/cron/cron-stubs.service.ts (logs pending follow-up counts daily; never runs in production; fills gap before n8n Wave 9)
+- [ ] 02-01-PLAN.md — Root workspace: package.json (workspaces: backend, frontend, packages/*, infrastructure), tsconfig.base.json, .eslintrc.js, .prettierrc, .gitignore, .nvmrc, and stub tsconfig.json + package.json for all 4 workspaces
+- [ ] 02-02-PLAN.md — .env.example files (3 total): backend (Cognito, S3, SES, n8n placeholders, DEV_AUTH_BYPASS=false, EMAIL_PROVIDER=resend), frontend (Amplify config, NEXT_PUBLIC_DEV_AUTH_BYPASS=false), infrastructure (CDK_DEFAULT_ACCOUNT=887067305712)
+- [ ] 02-03-PLAN.md — GitHub Actions: ci.yml (type-check + lint + build in parallel, --if-present), security.yml (npm audit + TruffleHog PR+push), dependabot.yml (npm weekly Monday, github-actions monthly), SECURITY.md
+- [ ] 02-04-PLAN.md — Docker Compose: docker-compose.yml (postgres:16-alpine port 5432 + redis:7-alpine port 6379, named volumes, healthchecks), docker-compose.test.yml (postgres:16-alpine port 5433, separate volume)
+- [ ] 02-05-PLAN.md — CronStubsService stub: backend/src/common/cron/cron-stubs.service.ts (shell file only, no NestJS imports, export {} for valid tsc, Phase 5 completion instructions as comments)
 
 ---
 
@@ -74,9 +73,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 03-01: Package scaffold — packages/shared-types/package.json, tsconfig.json, src/index.ts
-- [ ] 03-02: Enums — ServiceType, CaseStatus, UserRole, DocumentType, FollowUpTemplate, VendorType, SignatureDocument, PriceCategory, EventType, AuditAction
-- [ ] 03-03: Interfaces — ITenant, IUser, ICase, IFamilyContact, ITask, IObituary, IDocument, IPayment, IFollowUp, IVendor, ISignature, IPriceListItem, ICaseLineItem, ICalendarEvent, IAuditLog
+- [x] 03-01-PLAN.md — Package scaffold: update package.json and tsconfig.json for no-emit type-check-only mode, create enums/ and interfaces/ directories
+- [x] 03-02-PLAN.md — Enums: ServiceType, CaseStatus, UserRole, DocumentType, FollowUpTemplate, VendorType, SignatureDocument, PriceCategory, EventType, AuditAction (as const pattern)
+- [x] 03-03-PLAN.md — Interfaces: ITenant, IUser, ICase, IFamilyContact, ITask, IObituary, IDocument, IPayment, IFollowUp, IVendor, ISignature, IPriceListItem, ICaseLineItem, ICalendarEvent, IAuditLog
 
 ---
 
@@ -95,11 +94,11 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 04-01: Phase 1 core tables — Tenant (feature flags + googleReviewUrl), User (cognitoSub replaces passwordHash), Case (deletedAt + archivedAt + faithTradition?), FamilyContact, Task, Obituary, Document, Payment, FollowUp
-- [ ] 04-02: Phase 1 supporting tables — Vendor, VendorAssignment, Signature (token unique field), PriceListItem, CaseLineItem, CalendarEvent, CalendarEventStaff (join table), AuditLog
-- [ ] 04-03: Required indexes — Case (tenantId+status, tenantId+assignedTo, tenantId+createdAt desc), Task (tenantId+completed+dueDate), FollowUp (status+scheduledAt), CalendarEvent (tenantId+startTime+endTime), AuditLog (tenantId+entityType+entityId), Signature (token)
-- [ ] 04-04: Phase 2/3 stub tables — DecedentTracking, ReferralSource, FamilyPortalAccess, MemorialPage, FaithTraditionTemplate, Location, AnalyticsSnapshot
-- [ ] 04-05: Migration run + ECS migration task definition stub — `npx prisma migrate dev --name init` locally; document vigil-migrations task pattern for compute-stack.ts
+- [x] 04-01-PLAN.md — Phase 1 core tables — Tenant (feature flags + googleReviewUrl), User (cognitoSub replaces passwordHash), Case (deletedAt + archivedAt + faithTradition?), FamilyContact, Task, Obituary, Document, Payment, FollowUp
+- [x] 04-02-PLAN.md — Phase 1 supporting tables — Vendor, VendorAssignment, Signature (token unique field), PriceListItem, CaseLineItem, CalendarEvent, CalendarEventStaff (join table), AuditLog
+- [x] 04-03-PLAN.md — Required indexes — Case (tenantId+status, tenantId+assignedTo, tenantId+createdAt desc), Task (tenantId+completed+dueDate), FollowUp (status+scheduledAt), CalendarEvent (tenantId+startTime+endTime), AuditLog (tenantId+entityType+entityId), Signature (token)
+- [x] 04-04-PLAN.md — Phase 2/3 stub tables — DecedentTracking, ReferralSource, FamilyPortalAccess, MemorialPage, FaithTraditionTemplate, Location, AnalyticsSnapshot
+- [x] 04-05-PLAN.md — Migration run + ECS migration task definition stub — `npx prisma migrate dev --name init` locally; document vigil-migrations task pattern for compute-stack.ts
 
 ---
 
@@ -265,9 +264,9 @@ Plans:
 
 | Phase | Plans | Status | Completed |
 |-------|-------|--------|-----------|
-| 1. AWS Account Bootstrap | 0/3 | Not started | - |
-| 2. Monorepo Foundation | 0/5 | Not started | - |
-| 3. Shared Types Package | 0/3 | Not started | - |
+| 1. AWS Account Bootstrap | 2/2 | Complete | 2026-04-05 |
+| 2. Monorepo Foundation | 5/5 | Complete | 2026-04-06 |
+| 3. Shared Types Package | 0/3 | Planned | - |
 | 4. Prisma Schema | 0/5 | Not started | - |
 | 5. NestJS Backend Scaffold | 0/5 | Not started | - |
 | 6. Next.js Frontend Scaffold | 0/6 | Not started | - |
