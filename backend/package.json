@@ -12,5 +12,11 @@
     "test:watch": "echo 'Phase 10: Jest watch'",
     "test:coverage": "echo 'Phase 10: Jest coverage'",
     "type-check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "prisma": "^5.22.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0"
   }
 }

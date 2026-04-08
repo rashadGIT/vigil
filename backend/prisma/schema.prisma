@@ -1,0 +1,290 @@
+// Vigil — Prisma schema
+// Multi-tenant funeral operations DB. Every non-Tenant table has tenantId.
+// Two-stage soft delete (deletedAt + archivedAt) on Case, Document, Vendor, User per CASE-06.
+// Generated client consumed by NestJS PrismaService in Phase 5.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// Enums — mirror packages/shared-types/src/enums/ exactly
+// ============================================================
+
+enum UserRole {
+  admin
+  staff
+}
+
+enum CaseStatus {
+  new
+  in_progress
+  completed
+  archived
+}
+
+enum ServiceType {
+  burial
+  cremation
+  graveside
+  memorial
+}
+
+enum DocumentType {
+  obituary
+  death_cert
+  service_program
+  invoice
+  other
+}
+
+// FollowUpTemplate values are digit-prefixed in shared-types ('1_week', etc.).
+// Prisma enum identifiers cannot start with a digit, so each variant uses @map
+// to preserve the wire/db value while keeping a valid TypeScript identifier.
+enum FollowUpTemplate {
+  one_week  @map("1_week")
+  one_month @map("1_month")
+  six_month @map("6_month")
+  one_year  @map("1_year")
+}
+
+enum VendorType {
+  florist
+  clergy
+  musician
+  caterer
+  vault
+  livery
+  crematory
+  other
+}
+
+enum SignatureDocument {
+  authorization
+  service_contract
+  payment_agreement
+  other
+}
+
+enum PriceCategory {
+  professional_services
+  facilities
+  vehicles
+  merchandise
+  other
+}
+
+enum EventType {
+  visitation
+  service
+  committal
+  pickup
+  preparation
+  meeting
+  other
+}
+
+enum AuditAction {
+  create
+  update
+  delete
+  view_sensitive
+}
+
+// ============================================================
+// Core Phase 1 models
+// ============================================================
+
+model Tenant {
+  id                     String   @id @default(cuid())
+  name                   String
+  slug                   String   @unique
+  subdomain              String   @unique
+  planTier               String   @default("pilot") @map("plan_tier")
+  active                 Boolean  @default(true)
+  googleReviewUrl        String?  @map("google_review_url")
+  flagESignatures        Boolean  @default(false) @map("flag_e_signatures")
+  flagGplCompliance      Boolean  @default(false) @map("flag_gpl_compliance")
+  flagVendorCoordination Boolean  @default(false) @map("flag_vendor_coordination")
+  flagCalendar           Boolean  @default(false) @map("flag_calendar")
+  flagFamilyPortal       Boolean  @default(false) @map("flag_family_portal")
+  createdAt              DateTime @default(now()) @map("created_at")
+  updatedAt              DateTime @updatedAt @map("updated_at")
+
+  // Back-relations (added incrementally as later models are defined)
+  users           User[]
+  cases           Case[]
+  familyContacts  FamilyContact[]
+  tasks           Task[]
+  obituaries      Obituary[]
+  documents       Document[]
+  payments        Payment[]
+  followUps       FollowUp[]
+
+  @@map("tenants")
+}
+
+model User {
+  id         String    @id @default(cuid())
+  tenantId   String    @map("tenant_id")
+  email      String    @unique
+  name       String
+  role       UserRole  @default(staff)
+  cognitoSub String    @unique @map("cognito_sub")
+  active     Boolean   @default(true)
+  deletedAt  DateTime? @map("deleted_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@map("users")
+}
+
+model Case {
+  id             String      @id @default(cuid())
+  tenantId       String      @map("tenant_id")
+  deceasedName   String      @map("deceased_name")
+  deceasedDob    DateTime?   @map("deceased_dob")
+  deceasedDod    DateTime?   @map("deceased_dod")
+  serviceType    ServiceType @map("service_type")
+  status         CaseStatus  @default(new)
+  assignedToId   String?     @map("assigned_to_id")
+  faithTradition String?     @map("faith_tradition")
+  deletedAt      DateTime?  @map("deleted_at")
+  archivedAt     DateTime?  @map("archived_at")
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime   @updatedAt @map("updated_at")
+
+  tenant         Tenant          @relation(fields: [tenantId], references: [id])
+  familyContacts FamilyContact[]
+  tasks          Task[]
+  obituary       Obituary?
+  documents      Document[]
+  payment        Payment?
+  followUps      FollowUp[]
+
+  @@index([tenantId, status])
+  @@index([tenantId, assignedToId])
+  @@index([tenantId, createdAt(sort: Desc)])
+  @@map("cases")
+}
+
+model FamilyContact {
+  id               String   @id @default(cuid())
+  tenantId         String   @map("tenant_id")
+  caseId           String   @map("case_id")
+  name             String
+  relationship     String
+  email            String?
+  phone            String?
+  isPrimaryContact Boolean  @default(false) @map("is_primary_contact")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  tenant    Tenant     @relation(fields: [tenantId], references: [id])
+  case      Case       @relation(fields: [caseId], references: [id])
+  followUps FollowUp[]
+
+  @@index([tenantId])
+  @@map("family_contacts")
+}
+
+model Task {
+  id          String    @id @default(cuid())
+  tenantId    String    @map("tenant_id")
+  caseId      String    @map("case_id")
+  title       String
+  completed   Boolean   @default(false)
+  completedBy String?   @map("completed_by")
+  dueDate     DateTime? @map("due_date")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  case   Case   @relation(fields: [caseId], references: [id])
+
+  @@index([tenantId, completed, dueDate])
+  @@map("tasks")
+}
+
+model Obituary {
+  id        String   @id @default(cuid())
+  tenantId  String   @map("tenant_id")
+  caseId    String   @unique @map("case_id")
+  draftText String   @map("draft_text")
+  status    String   @default("draft")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  case   Case   @relation(fields: [caseId], references: [id])
+
+  @@index([tenantId])
+  @@map("obituaries")
+}
+
+model Document {
+  id           String       @id @default(cuid())
+  tenantId     String       @map("tenant_id")
+  caseId       String       @map("case_id")
+  documentType DocumentType @map("document_type")
+  fileName     String       @map("file_name")
+  s3Key        String       @map("s3_key")
+  uploadedById String?      @map("uploaded_by_id")
+  deletedAt    DateTime?    @map("deleted_at")
+  archivedAt   DateTime?    @map("archived_at")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  case   Case   @relation(fields: [caseId], references: [id])
+
+  @@index([tenantId])
+  @@map("documents")
+}
+
+model Payment {
+  id          String   @id @default(cuid())
+  tenantId    String   @map("tenant_id")
+  caseId      String   @unique @map("case_id")
+  totalAmount Decimal  @map("total_amount") @db.Decimal(10, 2)
+  amountPaid  Decimal  @default(0) @map("amount_paid") @db.Decimal(10, 2)
+  method      String
+  notes       String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  case   Case   @relation(fields: [caseId], references: [id])
+
+  @@index([tenantId])
+  @@map("payments")
+}
+
+model FollowUp {
+  id           String           @id @default(cuid())
+  tenantId     String           @map("tenant_id")
+  caseId       String           @map("case_id")
+  contactId    String           @map("contact_id")
+  templateType FollowUpTemplate @map("template_type")
+  status       String           @default("pending")
+  scheduledAt  DateTime         @map("scheduled_at")
+  sentAt       DateTime?        @map("sent_at")
+  createdAt    DateTime         @default(now()) @map("created_at")
+  updatedAt    DateTime         @updatedAt @map("updated_at")
+
+  tenant  Tenant        @relation(fields: [tenantId], references: [id])
+  case    Case          @relation(fields: [caseId], references: [id])
+  contact FamilyContact @relation(fields: [contactId], references: [id])
+
+  @@index([status, scheduledAt])
+  @@index([tenantId, caseId])
+  @@map("follow_ups")
+}
