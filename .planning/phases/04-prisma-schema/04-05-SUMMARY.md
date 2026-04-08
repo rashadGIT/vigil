@@ -123,3 +123,18 @@ None — this plan generates infrastructure artifacts (migration SQL, client typ
 ---
 *Phase: 04-prisma-schema*
 *Completed: 2026-04-08*
+
+## Self-Check: PASSED
+
+All files verified present on disk. All task commits verified in git log.
+
+| Check | Result |
+|-------|--------|
+| backend/prisma/migrations/20260408032002_init/migration.sql | FOUND |
+| backend/prisma/migrations/migration_lock.toml | FOUND |
+| backend/tsconfig.json (skipLibCheck) | FOUND |
+| .planning/phases/04-prisma-schema/ECS-MIGRATION-PATTERN.md | FOUND |
+| .planning/phases/04-prisma-schema/04-05-SUMMARY.md | FOUND |
+| Commit 50f4915 (chore: tsconfig skipLibCheck) | FOUND |
+| Commit de2bb9d (feat: migration + client generation) | FOUND |
+| Commit 856ad12 (docs: ECS migration pattern) | FOUND |
