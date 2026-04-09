@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
+import { DocumentsModule } from '../documents/documents.module';
 import { SignaturesController } from './signatures.controller';
 import { SignaturesService } from './signatures.service';
 
 @Module({
+  imports: [DocumentsModule],
   controllers: [SignaturesController],
   providers: [SignaturesService],
   exports: [SignaturesService],

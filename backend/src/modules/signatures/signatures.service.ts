@@ -2,10 +2,13 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { createHash, randomBytes } from 'node:crypto';
 import { PrismaService } from '../../common/prisma/prisma.service';
+import { PdfService } from '../documents/pdf.service';
+import { S3Service } from '../documents/s3.service';
 import { RequestSignatureDto } from './dto/request-signature.dto';
 import { SignDto } from './dto/sign.dto';
 
@@ -13,7 +16,13 @@ const TOKEN_LIFETIME_MS = 72 * 60 * 60 * 1000; // 72 hours (SIGN-01)
 
 @Injectable()
 export class SignaturesService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly logger = new Logger(SignaturesService.name);
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly pdfService: PdfService,
+    private readonly s3Service: S3Service,
+  ) {}
 
   async request(tenantId: string, caseId: string, dto: RequestSignatureDto) {
     const token = randomBytes(32).toString('base64url');
@@ -96,6 +105,16 @@ export class SignaturesService {
         ipAddress,
       },
     });
+
+    // Generate and store PDF receipt (SIGN-04)
+    try {
+      const receiptBuf = await this.pdfService.generateServiceProgram(sig.caseId, sig.tenantId);
+      const s3Key = `${sig.tenantId}/signatures/${sig.id}-receipt.pdf`;
+      await this.s3Service.uploadBuffer(s3Key, receiptBuf, 'application/pdf');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.logger.warn(`PDF receipt generation failed for signature ${sig.id}: ${msg}`);
+    }
 
     return { ok: true, signatureId: sig.id };
   }

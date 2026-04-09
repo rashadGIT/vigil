@@ -32,7 +32,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     return this.$extends({
       query: {
         $allModels: {
-          async $allOperations({ model, args, query }) {
+          async $allOperations({ model, operation, args, query }) {
             if (UNSCOPED_MODELS.has(model)) {
               return query(args);
             }
@@ -40,9 +40,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
             if ('where' in a && a.where && typeof a.where === 'object') {
               a.where = { ...(a.where as object), tenantId };
             } else if (
-              ['findFirst', 'findMany', 'findUnique', 'update', 'updateMany', 'delete', 'deleteMany', 'count', 'aggregate'].includes(
-                (arguments[0] as { operation?: string } | undefined)?.operation ?? '',
-              )
+              ['findFirst', 'findMany', 'findUnique', 'update', 'updateMany', 'delete', 'deleteMany', 'count', 'aggregate'].includes(operation)
             ) {
               a.where = { tenantId };
             }
