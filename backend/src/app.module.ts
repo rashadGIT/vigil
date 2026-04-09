@@ -19,6 +19,11 @@ import { CasesModule } from './modules/cases/cases.module';
 import { ContactsModule } from './modules/contacts/contacts.module';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { IntakeModule } from './modules/intake/intake.module';
+import { DocumentsModule } from './modules/documents/documents.module';
+import { PaymentsModule } from './modules/payments/payments.module';
+import { ObituariesModule } from './modules/obituaries/obituaries.module';
+import { PriceListModule } from './modules/price-list/price-list.module';
+import { SignaturesModule } from './modules/signatures/signatures.module';
 
 @Module({
   imports: [
@@ -35,6 +40,11 @@ import { IntakeModule } from './modules/intake/intake.module';
     ContactsModule,
     TasksModule,
     IntakeModule,
+    DocumentsModule,
+    PaymentsModule,
+    ObituariesModule,
+    PriceListModule,
+    SignaturesModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
