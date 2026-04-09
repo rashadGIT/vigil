@@ -1,0 +1,54 @@
+import { Injectable } from '@nestjs/common';
+import { FollowUpTemplate } from '@prisma/client';
+import { PrismaService } from '../../common/prisma/prisma.service';
+import { N8nService } from '../n8n/n8n.service';
+import { N8nEvent } from '../n8n/n8n-events.enum';
+
+const OFFSETS: Record<FollowUpTemplate, number> = {
+  one_week: 7,
+  one_month: 30,
+  six_month: 180,
+  one_year: 365,
+};
+
+@Injectable()
+export class FollowUpsService {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly n8n: N8nService,
+  ) {}
+
+  async scheduleForCase(tenantId: string, caseId: string, contactId: string, baseDate = new Date()) {
+    const scoped = this.prisma.forTenant(tenantId);
+    const templates = Object.keys(OFFSETS) as FollowUpTemplate[];
+
+    const created = await Promise.all(
+      templates.map((templateType) =>
+        scoped.followUp.create({
+          data: {
+            caseId,
+            contactId,
+            templateType,
+            scheduledAt: new Date(baseDate.getTime() + OFFSETS[templateType] * 24 * 3600 * 1000),
+          },
+        }),
+      ),
+    );
+
+    await this.n8n.trigger(N8nEvent.GRIEF_FOLLOWUP_SCHEDULE, {
+      tenantId,
+      caseId,
+      contactId,
+      followUpIds: created.map((f) => f.id),
+    });
+
+    return created;
+  }
+
+  findByCase(tenantId: string, caseId: string) {
+    return this.prisma.forTenant(tenantId).followUp.findMany({
+      where: { caseId },
+      orderBy: { scheduledAt: 'asc' },
+    });
+  }
+}
