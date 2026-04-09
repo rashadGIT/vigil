@@ -1,0 +1,129 @@
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { CaseStatus, Prisma } from '@prisma/client';
+import { PrismaService } from '../../common/prisma/prisma.service';
+import { CreateCaseDto } from './dto/create-case.dto';
+import { UpdateCaseDto } from './dto/update-case.dto';
+import { CaseFilterDto } from './dto/case-filter.dto';
+
+// Allowed status transitions (CASE-03)
+const ALLOWED_TRANSITIONS: Record<CaseStatus, CaseStatus[]> = {
+  new: [CaseStatus.in_progress, CaseStatus.archived],
+  in_progress: [CaseStatus.completed, CaseStatus.archived],
+  completed: [CaseStatus.archived],
+  archived: [],
+};
+
+@Injectable()
+export class CasesService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  create(tenantId: string, dto: CreateCaseDto) {
+    const data: Prisma.CaseUncheckedCreateInput = {
+      tenantId, // forTenant() also injects; explicit here for type clarity
+      deceasedName: dto.deceasedName,
+      deceasedDob: dto.deceasedDob ? new Date(dto.deceasedDob) : null,
+      deceasedDod: dto.deceasedDod ? new Date(dto.deceasedDod) : null,
+      serviceType: dto.serviceType,
+      assignedToId: dto.assignedToId ?? null,
+      faithTradition: dto.faithTradition ?? null,
+    };
+    return this.prisma.forTenant(tenantId).case.create({ data });
+  }
+
+  async findAll(tenantId: string, filter: CaseFilterDto) {
+    const now = new Date();
+    const cases = await this.prisma.forTenant(tenantId).case.findMany({
+      where: {
+        deletedAt: null,
+        ...(filter.status ? { status: filter.status } : {}),
+        ...(filter.assignedToId ? { assignedToId: filter.assignedToId } : {}),
+      },
+      include: {
+        tasks: {
+          where: { completed: false, dueDate: { lt: now } },
+          select: { id: true },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+    return cases.map((c) => ({
+      ...c,
+      overdueTaskCount: c.tasks.length,
+      tasks: undefined,
+    }));
+  }
+
+  async findOne(tenantId: string, id: string) {
+    const found = await this.prisma.forTenant(tenantId).case.findFirst({
+      where: { id, deletedAt: null },
+      include: {
+        familyContacts: true,
+        tasks: { orderBy: { createdAt: 'asc' } },
+        obituary: true,
+        documents: true,
+        payment: true,
+        signatures: true,
+        caseLineItems: { include: { priceListItem: true } },
+      },
+    });
+    if (!found) throw new NotFoundException(`Case ${id} not found`);
+    return found;
+  }
+
+  async update(tenantId: string, id: string, dto: UpdateCaseDto) {
+    await this.findOne(tenantId, id);
+    const { status, ...rest } = dto;
+    if (status) {
+      await this.assertValidTransition(tenantId, id, status);
+    }
+    return this.prisma.forTenant(tenantId).case.update({
+      where: { id },
+      data: {
+        ...rest,
+        ...(status ? { status } : {}),
+        deceasedDob: dto.deceasedDob ? new Date(dto.deceasedDob) : undefined,
+        deceasedDod: dto.deceasedDod ? new Date(dto.deceasedDod) : undefined,
+      },
+    });
+  }
+
+  async updateStatus(tenantId: string, id: string, status: CaseStatus) {
+    await this.assertValidTransition(tenantId, id, status);
+    return this.prisma.forTenant(tenantId).case.update({
+      where: { id },
+      data: { status },
+    });
+  }
+
+  /**
+   * Two-stage soft delete (CASE-06):
+   *  - Stage 1: set deletedAt (90-day recoverable window)
+   *  - Stage 2: n8n retention workflow (Phase 9) sets archivedAt at +90d
+   *  - Hard delete after 7 years (Phase 9 workflow 5)
+   */
+  async softDelete(tenantId: string, id: string) {
+    await this.findOne(tenantId, id);
+    return this.prisma.forTenant(tenantId).case.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
+  }
+
+  private async assertValidTransition(
+    tenantId: string,
+    id: string,
+    target: CaseStatus,
+  ): Promise<void> {
+    const current = await this.prisma.forTenant(tenantId).case.findFirst({
+      where: { id },
+      select: { status: true },
+    });
+    if (!current) throw new NotFoundException(`Case ${id} not found`);
+    const allowed = ALLOWED_TRANSITIONS[current.status];
+    if (!allowed.includes(target)) {
+      throw new BadRequestException(
+        `Invalid status transition: ${current.status} → ${target}`,
+      );
+    }
+  }
+}
