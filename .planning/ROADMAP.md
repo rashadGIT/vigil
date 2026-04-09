@@ -117,9 +117,9 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 05-01: App bootstrap — nest new backend --strict, main.ts (helmet, ValidationPipe whitelist+forbidNonWhitelisted, CORS two-config, Swagger dev-only, port 3001)
-- [ ] 05-02: Auth + common layer — CognitoAuthGuard (DEV_AUTH_BYPASS, x-dev-user header, cognitoSub sync), auth.service.ts (InitiateAuthCommand + AdminCreateUserCommand), @InternalOnly() guard, AuditLogInterceptor, ForTenantExtension, health controller
-- [ ] 05-03: Day 10 MVP modules — cases/ (CRUD + status transitions), contacts/, tasks/ (CRUD + template engine + overdue detection), intake.controller.ts (Prisma transaction: case + contact + tasks + follow-ups)
+- [x] 05-01: App bootstrap — nest new backend --strict, main.ts (helmet, ValidationPipe whitelist+forbidNonWhitelisted, CORS two-config, Swagger dev-only, port 3001)
+- [x] 05-02: Auth + common layer — CognitoAuthGuard (DEV_AUTH_BYPASS, x-dev-user header, cognitoSub sync), auth.service.ts (InitiateAuthCommand + AdminCreateUserCommand), @InternalOnly() guard, AuditLogInterceptor, ForTenantExtension, health controller
+- [x] 05-03: Day 10 MVP modules — cases/ (CRUD + status transitions), contacts/, tasks/ (CRUD + template engine + overdue detection), intake.controller.ts (Prisma transaction: case + contact + tasks + follow-ups)
 - [ ] 05-04: Document + compliance modules — documents/ (S3 presigned PUT/GET), payments/, obituaries/, price-list/ (GPL CRUD + line items), signatures/ (token + ESIGN audit trail), pdf.service.ts (pdfkit generateGpl + generateServiceProgram → Buffer → S3)
 - [ ] 05-05: Automation modules + stubs — vendors/, calendar/, follow-ups/, n8n/ (N8nService via HttpService, [PLACEHOLDER] warning), email/ (Resend↔SES via EMAIL_PROVIDER); Phase 2/3 empty stubs: tracking/, referrals/, family-portal/, memorial/, analytics/, multi-location/, ai-obituary/, chatbot/, multi-faith/
 
