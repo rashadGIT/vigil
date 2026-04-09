@@ -15,6 +15,10 @@ import { CronModule } from './common/cron/cron.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { HealthModule } from './modules/health/health.module';
+import { CasesModule } from './modules/cases/cases.module';
+import { ContactsModule } from './modules/contacts/contacts.module';
+import { TasksModule } from './modules/tasks/tasks.module';
+import { IntakeModule } from './modules/intake/intake.module';
 
 @Module({
   imports: [
@@ -27,6 +31,10 @@ import { HealthModule } from './modules/health/health.module';
     AuthModule,
     UsersModule,
     HealthModule,
+    CasesModule,
+    ContactsModule,
+    TasksModule,
+    IntakeModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
