@@ -1,4 +1,17 @@
-// TODO: Implemented in 06-03
+import { Sidebar } from '@/components/layout/sidebar';
+import { TopBar } from '@/components/layout/top-bar';
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  return <div>{children}</div>;
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Desktop sidebar — fixed left rail */}
+      <Sidebar />
+
+      {/* Main content area — offset on md+ to account for sidebar */}
+      <div className="flex flex-col md:pl-56">
+        <TopBar />
+        <main className="flex-1 p-4 md:p-6 lg:p-8">{children}</main>
+      </div>
+    </div>
+  );
 }
