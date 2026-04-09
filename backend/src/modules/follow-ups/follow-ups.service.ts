@@ -26,6 +26,7 @@ export class FollowUpsService {
       templates.map((templateType) =>
         scoped.followUp.create({
           data: {
+            tenantId,
             caseId,
             contactId,
             templateType,

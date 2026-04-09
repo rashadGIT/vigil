@@ -19,7 +19,7 @@ export class VendorsService {
   }
 
   create(tenantId: string, dto: UpsertVendorDto) {
-    return this.prisma.forTenant(tenantId).vendor.create({ data: dto });
+    return this.prisma.forTenant(tenantId).vendor.create({ data: { ...dto, tenantId } });
   }
 
   async update(tenantId: string, id: string, dto: UpsertVendorDto) {
@@ -37,7 +37,7 @@ export class VendorsService {
 
   async assignToCase(tenantId: string, caseId: string, dto: AssignVendorDto) {
     const assignment = await this.prisma.forTenant(tenantId).vendorAssignment.create({
-      data: { caseId, vendorId: dto.vendorId, role: dto.role ?? null },
+      data: { tenantId, caseId, vendorId: dto.vendorId, role: dto.role ?? null },
     });
     // VEND-03 — fire staff notification via n8n
     await this.n8n.trigger(N8nEvent.STAFF_NOTIFY, {

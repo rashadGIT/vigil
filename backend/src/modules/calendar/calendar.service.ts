@@ -46,6 +46,7 @@ export class CalendarService {
 
     return this.prisma.forTenant(tenantId).calendarEvent.create({
       data: {
+        tenantId,
         title: dto.title,
         eventType: dto.eventType,
         caseId: dto.caseId ?? null,
