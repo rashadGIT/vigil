@@ -10,6 +10,7 @@ export interface IVendor {
   phone: string | null;
   active: boolean;
   deletedAt: string | null;
+  archivedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }
