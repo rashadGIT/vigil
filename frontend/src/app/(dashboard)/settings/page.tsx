@@ -1,3 +1,2 @@
-export default function SettingsPage() {
-  return <div>TODO: 06-05</div>;
-}
+import { redirect } from 'next/navigation';
+export default function SettingsPage() { redirect('/settings/branding'); }
