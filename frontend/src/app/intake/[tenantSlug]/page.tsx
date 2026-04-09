@@ -1,10 +1,11 @@
 import { IntakeForm } from '@/components/intake/intake-form';
 
 interface IntakePageProps {
-  params: { tenantSlug: string };
+  params: Promise<{ tenantSlug: string }>;
 }
 
-export default function IntakePage({ params }: IntakePageProps) {
+export default async function IntakePage({ params }: IntakePageProps) {
+  const { tenantSlug } = await params;
   return (
     <div className="min-h-screen bg-background">
       {/* Mobile-first container — D-07 */}
@@ -17,7 +18,7 @@ export default function IntakePage({ params }: IntakePageProps) {
           </p>
         </div>
 
-        <IntakeForm tenantSlug={params.tenantSlug} />
+        <IntakeForm tenantSlug={tenantSlug} />
       </div>
     </div>
   );

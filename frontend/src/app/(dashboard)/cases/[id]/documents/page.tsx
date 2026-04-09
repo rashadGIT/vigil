@@ -1,5 +1,6 @@
 'use client';
 
+import { use } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { CaseWorkspaceTabs } from '@/components/cases/case-workspace-tabs';
 import { DocumentUpload } from '@/components/documents/document-upload';
@@ -38,13 +39,14 @@ function DocumentList({ caseId }: { caseId: string }) {
   );
 }
 
-export default function CaseDocumentsPage({ params }: { params: { id: string } }) {
+export default function CaseDocumentsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   return (
     <div>
-      <CaseWorkspaceTabs caseId={params.id} />
+      <CaseWorkspaceTabs caseId={id} />
       <div className="space-y-4">
-        <DocumentUpload caseId={params.id} />
-        <DocumentList caseId={params.id} />
+        <DocumentUpload caseId={id} />
+        <DocumentList caseId={id} />
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { CheckCircle2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,12 +12,13 @@ import { publicApiClient } from '@/lib/api/public-client';
 import type { ISignature } from '@vigil/shared-types';
 
 interface SignPageProps {
-  params: { token: string };
+  params: Promise<{ token: string }>;
 }
 
 type PageState = 'loading' | 'ready' | 'signing' | 'signed' | 'expired' | 'error';
 
 export default function SignPage({ params }: SignPageProps) {
+  const { token } = use(params);
   const [state, setState] = useState<PageState>('loading');
   const [signatureRequest, setSignatureRequest] = useState<{ signerName: string; documentType: string; caseId: string } | null>(null);
   const [signerName, setSignerName] = useState('');
@@ -25,7 +26,7 @@ export default function SignPage({ params }: SignPageProps) {
   const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
-    publicApiClient.get<ISignature>(`/signatures/token/${params.token}`)
+    publicApiClient.get<ISignature>(`/signatures/token/${token}`)
       .then((res) => {
         const sig = res.data;
         if (sig.signedAt) {
@@ -41,13 +42,13 @@ export default function SignPage({ params }: SignPageProps) {
         setState(status === 404 || status === 410 ? 'expired' : 'error');
         setErrorMsg('This signature link is invalid or has expired.');
       });
-  }, [params.token]);
+  }, [token]);
 
   async function handleSign() {
     if (!signatureDataUrl || !signerName.trim()) return;
     setState('signing');
     try {
-      await publicApiClient.post(`/signatures/${params.token}/sign`, {
+      await publicApiClient.post(`/signatures/${token}/sign`, {
         signatureDataUrl,
         signerName: signerName.trim(),
       });

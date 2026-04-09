@@ -1,5 +1,6 @@
 'use client';
 
+import { use } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
@@ -54,11 +55,12 @@ function ObituaryEditor({ caseId }: { caseId: string }) {
   );
 }
 
-export default function CaseObituaryPage({ params }: { params: { id: string } }) {
+export default function CaseObituaryPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   return (
     <div>
-      <CaseWorkspaceTabs caseId={params.id} />
-      <ObituaryEditor caseId={params.id} />
+      <CaseWorkspaceTabs caseId={id} />
+      <ObituaryEditor caseId={id} />
     </div>
   );
 }

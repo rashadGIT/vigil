@@ -1,5 +1,6 @@
 'use client';
 
+import { use } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { CaseWorkspaceTabs } from '@/components/cases/case-workspace-tabs';
 import { Badge } from '@/components/ui/badge';
@@ -33,15 +34,16 @@ function FollowUpList({ caseId }: { caseId: string }) {
   );
 }
 
-export default function CaseFollowUpsPage({ params }: { params: { id: string } }) {
+export default function CaseFollowUpsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   return (
     <div>
-      <CaseWorkspaceTabs caseId={params.id} />
+      <CaseWorkspaceTabs caseId={id} />
       <div>
         <p className="text-xs text-muted-foreground mb-4">
           Grief follow-ups are automatically scheduled by n8n workflows. Read-only display.
         </p>
-        <FollowUpList caseId={params.id} />
+        <FollowUpList caseId={id} />
       </div>
     </div>
   );

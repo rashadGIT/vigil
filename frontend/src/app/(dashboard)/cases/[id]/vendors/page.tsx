@@ -1,5 +1,6 @@
 'use client';
 
+import { use } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -87,11 +88,12 @@ function VendorList({ caseId }: { caseId: string }) {
   );
 }
 
-export default function CaseVendorsPage({ params }: { params: { id: string } }) {
+export default function CaseVendorsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   return (
     <div>
-      <CaseWorkspaceTabs caseId={params.id} />
-      <VendorList caseId={params.id} />
+      <CaseWorkspaceTabs caseId={id} />
+      <VendorList caseId={id} />
     </div>
   );
 }
