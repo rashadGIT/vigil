@@ -120,8 +120,8 @@ Plans:
 - [x] 05-01: App bootstrap — nest new backend --strict, main.ts (helmet, ValidationPipe whitelist+forbidNonWhitelisted, CORS two-config, Swagger dev-only, port 3001)
 - [x] 05-02: Auth + common layer — CognitoAuthGuard (DEV_AUTH_BYPASS, x-dev-user header, cognitoSub sync), auth.service.ts (InitiateAuthCommand + AdminCreateUserCommand), @InternalOnly() guard, AuditLogInterceptor, ForTenantExtension, health controller
 - [x] 05-03: Day 10 MVP modules — cases/ (CRUD + status transitions), contacts/, tasks/ (CRUD + template engine + overdue detection), intake.controller.ts (Prisma transaction: case + contact + tasks + follow-ups)
-- [ ] 05-04: Document + compliance modules — documents/ (S3 presigned PUT/GET), payments/, obituaries/, price-list/ (GPL CRUD + line items), signatures/ (token + ESIGN audit trail), pdf.service.ts (pdfkit generateGpl + generateServiceProgram → Buffer → S3)
-- [ ] 05-05: Automation modules + stubs — vendors/, calendar/, follow-ups/, n8n/ (N8nService via HttpService, [PLACEHOLDER] warning), email/ (Resend↔SES via EMAIL_PROVIDER); Phase 2/3 empty stubs: tracking/, referrals/, family-portal/, memorial/, analytics/, multi-location/, ai-obituary/, chatbot/, multi-faith/
+- [x] 05-04: Document + compliance modules — documents/ (S3 presigned PUT/GET), payments/, obituaries/, price-list/ (GPL CRUD + line items), signatures/ (token + ESIGN audit trail), pdf.service.ts (pdfkit generateGpl + generateServiceProgram → Buffer → S3)
+- [x] 05-05: Automation modules + stubs — vendors/, calendar/, follow-ups/, n8n/ (N8nService via HttpService, [PLACEHOLDER] warning), email/ (Resend↔SES via EMAIL_PROVIDER); Phase 2/3 empty stubs: tracking/, referrals/, family-portal/, memorial/, analytics/, multi-location/, ai-obituary/, chatbot/, multi-faith/
 
 ---
 
@@ -140,12 +140,12 @@ Plans:
 **Plans**: 6 plans
 
 Plans:
-- [ ] 06-01: App bootstrap — create-next-app (TypeScript, App Router, Tailwind), shadcn/ui init, middleware.ts (auth guard + tenant slug extraction), Amplify config in src/lib/auth/amplify-config.ts
-- [ ] 06-02: Auth flow — login page, auth.store.ts (Zustand: user + tenantId + tokens), client.ts (axios interceptor: DEV_AUTH_BYPASS header injection when NEXT_PUBLIC_DEV_AUTH_BYPASS=true)
-- [ ] 06-03: Day 10 MVP pages — case dashboard (DataTable: status/assigned/overdue), case workspace (tabbed shell), intake form (public, mobile-first), task checklist component
-- [ ] 06-04: Full Phase 1 pages — all workspace tabs (documents, payments, signatures, vendors, calendar), price-list/page.tsx, vendors/page.tsx, all settings pages (branding, staff, templates)
-- [ ] 06-05: Public routes + PWA stub — sign/[token]/page.tsx, memorial/[caseId]/page.tsx (Phase 2 stub), public/manifest.json, public/sw.js (shell), PwaRegister client component (NEXT_PUBLIC_ENABLE_PWA=false default), Phase 3 route stubs (analytics/, multi-location/, settings/faith-traditions/)
-- [ ] 06-06: Mobile-responsive pass — sm:/md:/lg: prefixes throughout; sidebar collapses below md:; DataTables overflow-x-auto; full-width inputs on mobile
+- [x] 06-01: App bootstrap — create-next-app (TypeScript, App Router, Tailwind), shadcn/ui init, middleware.ts (auth guard + tenant slug extraction), Amplify config in src/lib/auth/amplify-config.ts
+- [x] 06-02: Auth flow — login page, auth.store.ts (Zustand: user + tenantId + tokens), client.ts (axios interceptor: DEV_AUTH_BYPASS header injection when NEXT_PUBLIC_DEV_AUTH_BYPASS=true)
+- [x] 06-03: Day 10 MVP pages — case dashboard (DataTable: status/assigned/overdue), case workspace (tabbed shell), intake form (public, mobile-first), task checklist component
+- [x] 06-04: Full Phase 1 pages — all workspace tabs (documents, payments, signatures, vendors, calendar), price-list/page.tsx, vendors/page.tsx, all settings pages (branding, staff, templates)
+- [x] 06-05: Public routes + PWA stub — sign/[token]/page.tsx, memorial/[caseId]/page.tsx (Phase 2 stub), public/manifest.json, public/sw.js (shell), PwaRegister client component (NEXT_PUBLIC_ENABLE_PWA=false default), Phase 3 route stubs (analytics/, multi-location/, settings/faith-traditions/)
+- [x] 06-06: Mobile-responsive pass — sm:/md:/lg: prefixes throughout; sidebar collapses below md:; DataTables overflow-x-auto; full-width inputs on mobile
 
 ---
 
