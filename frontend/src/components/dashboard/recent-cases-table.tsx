@@ -25,7 +25,10 @@ export function RecentCasesTable() {
 
   // D-11: Empty state
   if (cases.length === 0) {
-    const intakeUrl = `${window.location.origin}/intake/${process.env.NEXT_PUBLIC_DEV_AUTH_BYPASS === 'true' ? 'sunrise' : '[slug]'}`;
+    const slug = process.env.NEXT_PUBLIC_DEV_AUTH_BYPASS === 'true' ? 'sunrise' : '[slug]';
+    const intakeUrl = typeof window !== 'undefined'
+      ? `${window.location.origin}/intake/${slug}`
+      : `/intake/${slug}`;
     return (
       <div className="rounded-md border p-8 text-center space-y-3">
         <p className="text-muted-foreground">No cases yet.</p>

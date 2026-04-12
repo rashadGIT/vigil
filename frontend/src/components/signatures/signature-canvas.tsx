@@ -1,7 +1,8 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import type ReactSignatureCanvas from 'react-signature-canvas';
 import { Button } from '@/components/ui/button';
 
 // Dynamic import prevents SSR error — react-signature-canvas accesses document
@@ -18,30 +19,29 @@ interface SignatureCanvasProps {
 }
 
 export function SignatureCapture({ onSave }: SignatureCanvasProps) {
-  const [canvasInstance, setCanvasInstance] = useState<any>(null);
+  const canvasRef = useRef<ReactSignatureCanvas | null>(null);
   const [isEmpty, setIsEmpty] = useState(true);
 
   function handleSave() {
-    if (canvasInstance && !canvasInstance.isEmpty()) {
-      onSave(canvasInstance.getTrimmedCanvas().toDataURL('image/png'));
+    const canvas = canvasRef.current;
+    if (canvas && !canvas.isEmpty()) {
+      onSave(canvas.getTrimmedCanvas().toDataURL('image/png'));
     }
   }
 
   function handleClear() {
-    if (canvasInstance) {
-      canvasInstance.clear();
-      setIsEmpty(true);
-    }
+    canvasRef.current?.clear();
+    setIsEmpty(true);
   }
 
   return (
     <div className="space-y-3">
       <div className="border rounded-md overflow-hidden bg-white">
         <SignatureCanvasComponent
+          ref={canvasRef}
           penColor="black"
           canvasProps={{ className: 'w-full h-40', width: 600, height: 160 }}
           onEnd={() => setIsEmpty(false)}
-          {...({ ref: (ref: any) => setCanvasInstance(ref) } as any)}
         />
       </div>
       <div className="flex gap-2">

@@ -183,9 +183,9 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 08-01: Foundation + Network stacks — Route53 hosted zone, ACM wildcard cert (DNS validation), SES domain + DKIM; VPC (10.0.0.0/16, 2 AZs, public + isolated subnets, NO NAT Gateway), IGW, S3 Gateway endpoint, 4 security groups (sg-alb/sg-ecs/sg-rds/sg-redis)
-- [ ] 08-02: Auth stack — Cognito User Pool (selfSignUpEnabled: false, custom:tenantId + custom:role, RETAIN), App Client (USER_PASSWORD_AUTH + REFRESH_TOKEN, 15-min access, 30-day refresh, enableTokenRevocation)
-- [ ] 08-03: Data stack — RDS PostgreSQL 16 (db.t4g.micro, Performance Insights 7-day free, isolated subnet, RETAIN), ElastiCache Redis (cache.t4g.micro, isolated subnet, omit early stage), 2 S3 buckets (Glacier lifecycle after 90 days), 5 Secrets Manager secrets
+- [x] 08-01: Foundation + Network stacks — Route53 hosted zone, ACM wildcard cert (DNS validation), SES domain + DKIM; VPC (10.0.0.0/16, 2 AZs, public + isolated subnets, NO NAT Gateway), IGW, S3 Gateway endpoint, 4 security groups (sg-alb/sg-ecs/sg-rds/sg-redis)
+- [x] 08-02: Auth stack — Cognito User Pool (selfSignUpEnabled: false, custom:tenantId + custom:role, RETAIN), App Client (USER_PASSWORD_AUTH + REFRESH_TOKEN, 15-min access, 30-day refresh, enableTokenRevocation)
+- [x] 08-03: Data stack — RDS PostgreSQL 16 (db.t4g.micro, Performance Insights 7-day free, isolated subnet, RETAIN), ElastiCache Redis (cache.t4g.micro, isolated subnet, omit early stage), 2 S3 buckets (Glacier lifecycle after 90 days), 5 Secrets Manager secrets
 - [ ] 08-04: Compute stack — ECR repo, ECS Fargate (512 CPU/1024MB, public subnet, assignPublicIp: true, min 1/max 10), ALB + HTTPS, Route53 A record api.vigilhq.com, vigil-migrations task definition, GitHub Actions OIDC, 5 IAM roles
 - [ ] 08-05: Amplify + Observability stacks — Amplify Hosting (GitHub main → app.vigilhq.com, wildcard *.vigilhq.com), CloudWatch log groups + 6 alarms + SNS → email, Sentry DSN in Secrets Manager; BetterUptime configured manually post-deploy
 

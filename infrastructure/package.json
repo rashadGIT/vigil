@@ -3,10 +3,20 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "synth": "echo 'Phase 7: CDK synth'",
-    "deploy": "echo 'Phase 7: CDK deploy'",
-    "lint": "echo 'Phase 7: ESLint'",
+    "synth": "cdk synth",
+    "deploy": "cdk deploy --all --profile vigil",
+    "deploy:foundation": "cdk deploy VigilFoundationStack --profile vigil",
+    "lint": "echo 'Phase 10: ESLint'",
     "test": "echo 'Phase 10: Jest tests'",
     "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@aws-cdk/aws-amplify-alpha": "^2.248.0-alpha.0",
+    "aws-cdk-lib": "^2.248.0",
+    "constructs": "^10.6.0"
+  },
+  "devDependencies": {
+    "aws-cdk": "^2.1118.0",
+    "ts-node": "^10.9.2"
   }
 }

@@ -4,7 +4,7 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "outDir": "./cdk.out",
-    "rootDir": "./lib"
+    "rootDir": "."
   },
   "include": ["lib/**/*", "bin/**/*"],
   "exclude": ["node_modules", "cdk.out"]

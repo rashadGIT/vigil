@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { ExternalLink } from 'lucide-react';
 import { getCaseDocuments, getDocumentDownloadUrl } from '@/lib/api/documents';
 import { formatDate } from '@/lib/utils/format-date';
+import { toast } from 'sonner';
 
 function DocumentList({ caseId }: { caseId: string }) {
   const { data: docs = [], isLoading } = useQuery({
@@ -28,8 +29,12 @@ function DocumentList({ caseId }: { caseId: string }) {
             <p className="text-xs text-muted-foreground">{doc.documentType} &middot; {formatDate(doc.createdAt)}</p>
           </div>
           <Button variant="ghost" size="sm" onClick={async () => {
-            const url = await getDocumentDownloadUrl(doc.id);
-            window.open(url, '_blank');
+            try {
+              const url = await getDocumentDownloadUrl(doc.id);
+              window.open(url, '_blank');
+            } catch {
+              toast.error('Failed to get download link. Please try again.');
+            }
           }}>
             <ExternalLink className="h-4 w-4" />
           </Button>
