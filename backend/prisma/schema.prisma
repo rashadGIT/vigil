@@ -211,7 +211,7 @@ model FamilyContact {
   updatedAt        DateTime @updatedAt @map("updated_at")
 
   tenant    Tenant     @relation(fields: [tenantId], references: [id])
-  case      Case       @relation(fields: [caseId], references: [id])
+  case      Case       @relation(fields: [caseId], references: [id], onDelete: Cascade)
   followUps FollowUp[]
 
   @@index([tenantId])
@@ -230,7 +230,7 @@ model Task {
   updatedAt   DateTime  @updatedAt @map("updated_at")
 
   tenant Tenant @relation(fields: [tenantId], references: [id])
-  case   Case   @relation(fields: [caseId], references: [id])
+  case   Case   @relation(fields: [caseId], references: [id], onDelete: Cascade)
 
   @@index([tenantId, completed, dueDate])
   @@map("tasks")
@@ -246,7 +246,7 @@ model Obituary {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   tenant Tenant @relation(fields: [tenantId], references: [id])
-  case   Case   @relation(fields: [caseId], references: [id])
+  case   Case   @relation(fields: [caseId], references: [id], onDelete: Cascade)
 
   @@index([tenantId])
   @@map("obituaries")
@@ -267,7 +267,7 @@ model Document {
   updatedAt    DateTime     @updatedAt @map("updated_at")
 
   tenant Tenant @relation(fields: [tenantId], references: [id])
-  case   Case   @relation(fields: [caseId], references: [id])
+  case   Case   @relation(fields: [caseId], references: [id], onDelete: Cascade)
 
   @@index([tenantId])
   @@map("documents")
@@ -285,7 +285,7 @@ model Payment {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   tenant Tenant @relation(fields: [tenantId], references: [id])
-  case   Case   @relation(fields: [caseId], references: [id])
+  case   Case   @relation(fields: [caseId], references: [id], onDelete: Cascade)
 
   @@index([tenantId])
   @@map("payments")
@@ -304,8 +304,8 @@ model FollowUp {
   updatedAt    DateTime         @updatedAt @map("updated_at")
 
   tenant  Tenant        @relation(fields: [tenantId], references: [id])
-  case    Case          @relation(fields: [caseId], references: [id])
-  contact FamilyContact @relation(fields: [contactId], references: [id])
+  case    Case          @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  contact FamilyContact @relation(fields: [contactId], references: [id], onDelete: Cascade)
 
   @@index([status, scheduledAt])
   @@index([tenantId, caseId])
@@ -350,7 +350,7 @@ model VendorAssignment {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   tenant Tenant @relation(fields: [tenantId], references: [id])
-  case   Case   @relation(fields: [caseId], references: [id])
+  case   Case   @relation(fields: [caseId], references: [id], onDelete: Cascade)
   vendor Vendor @relation(fields: [vendorId], references: [id])
 
   @@index([tenantId, caseId])
@@ -377,7 +377,7 @@ model Signature {
   updatedAt           DateTime          @updatedAt @map("updated_at")
 
   tenant Tenant @relation(fields: [tenantId], references: [id])
-  case   Case   @relation(fields: [caseId], references: [id])
+  case   Case   @relation(fields: [caseId], references: [id], onDelete: Cascade)
 
   @@index([token])
   @@map("signatures")
@@ -414,7 +414,7 @@ model CaseLineItem {
   updatedAt       DateTime @updatedAt @map("updated_at")
 
   tenant        Tenant        @relation(fields: [tenantId], references: [id])
-  case          Case          @relation(fields: [caseId], references: [id])
+  case          Case          @relation(fields: [caseId], references: [id], onDelete: Cascade)
   priceListItem PriceListItem @relation(fields: [priceListItemId], references: [id])
 
   @@index([tenantId, caseId])
@@ -435,7 +435,7 @@ model CalendarEvent {
   updatedAt DateTime  @updatedAt @map("updated_at")
 
   tenant Tenant               @relation(fields: [tenantId], references: [id])
-  case   Case?                @relation(fields: [caseId], references: [id])
+  case   Case?                @relation(fields: [caseId], references: [id], onDelete: Cascade)
   staff  CalendarEventStaff[]
 
   @@index([tenantId, startTime, endTime])
@@ -542,7 +542,7 @@ model MemorialPage {
   updatedAt        DateTime @updatedAt @map("updated_at")
 
   tenant Tenant @relation(fields: [tenantId], references: [id])
-  case   Case   @relation(fields: [caseId], references: [id])
+  case   Case   @relation(fields: [caseId], references: [id], onDelete: Cascade)
 
   @@map("memorial_pages")
 }
