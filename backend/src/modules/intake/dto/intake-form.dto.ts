@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import {
+  IsDefined,
   IsDateString,
   IsEmail,
   IsEnum,
@@ -47,6 +48,7 @@ export class IntakeFormDto {
   @IsEnum(ServiceType)
   serviceType!: ServiceType;
 
+  @IsDefined()
   @ValidateNested()
   @Type(() => IntakeContactDto)
   primaryContact!: IntakeContactDto;
