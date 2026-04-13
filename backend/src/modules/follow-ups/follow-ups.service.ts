@@ -52,4 +52,12 @@ export class FollowUpsService {
       orderBy: { scheduledAt: 'asc' },
     });
   }
+
+  async markAllComplete(tenantId: string, caseId: string): Promise<{ updatedCount: number }> {
+    const result = await this.prisma.forTenant(tenantId).followUp.updateMany({
+      where: { caseId, status: 'pending' },
+      data: { status: 'sent', sentAt: new Date() },
+    });
+    return { updatedCount: result.count };
+  }
 }

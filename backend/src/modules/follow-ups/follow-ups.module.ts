@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { FollowUpsController } from './follow-ups.controller';
+import { InternalFollowUpsController } from './internal-follow-ups.controller';
 import { FollowUpsService } from './follow-ups.service';
 
 @Module({
-  controllers: [FollowUpsController],
+  controllers: [FollowUpsController, InternalFollowUpsController],
   providers: [FollowUpsService],
   exports: [FollowUpsService],
 })

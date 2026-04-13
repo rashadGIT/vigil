@@ -109,6 +109,54 @@ export class CasesService {
     });
   }
 
+  /**
+   * Cross-tenant hard delete of cases archived over 7 years ago.
+   * This is the ONLY legitimate cross-tenant query in the codebase.
+   * Called by n8n Workflow 5 (Data Retention Cleanup) via @InternalOnly() guard.
+   * Bypasses forTenant() intentionally — retention is a global operation.
+   */
+  async hardDeleteExpiredCases(): Promise<{ deletedCount: number }> {
+    const cutoff = new Date();
+    cutoff.setFullYear(cutoff.getFullYear() - 7);
+    const result = await this.prisma.case.deleteMany({
+      where: {
+        archivedAt: { not: null, lt: cutoff },
+      },
+    });
+    return { deletedCount: result.count };
+  }
+
+  /**
+   * Cross-tenant overdue task summary for daily digest email.
+   * Called by n8n Workflow 2 CRON path via @InternalOnly() guard.
+   */
+  async getOverdueTaskSummary(): Promise<Array<{ tenantId: string; overdueCount: number; caseIds: string[] }>> {
+    const now = new Date();
+    const overdueTasks = await this.prisma.task.findMany({
+      where: {
+        completed: false,
+        dueDate: { lt: now },
+      },
+      select: {
+        case: { select: { id: true, tenantId: true } },
+      },
+    });
+
+    // Group by tenantId
+    const byTenant = new Map<string, Set<string>>();
+    for (const t of overdueTasks) {
+      const tid = t.case.tenantId;
+      if (!byTenant.has(tid)) byTenant.set(tid, new Set());
+      byTenant.get(tid)!.add(t.case.id);
+    }
+
+    return Array.from(byTenant.entries()).map(([tenantId, caseIdSet]) => ({
+      tenantId,
+      overdueCount: caseIdSet.size,
+      caseIds: Array.from(caseIdSet),
+    }));
+  }
+
   private async assertValidTransition(
     tenantId: string,
     id: string,
