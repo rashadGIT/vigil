@@ -1,0 +1,36 @@
+{
+  "version": "53.0.0",
+  "files": {
+    "d75c48c9f82cde63e9bf414df335e84e8ac24f11eb34889be255b702aec71e50": {
+      "displayName": "VigilComputeStack/Custom::AWSCDKOpenIdConnectProviderCustomResourceProvider Code",
+      "source": {
+        "path": "asset.d75c48c9f82cde63e9bf414df335e84e8ac24f11eb34889be255b702aec71e50",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "887067305712-us-east-2-48fe97e6": {
+          "bucketName": "cdk-hnb659fds-assets-887067305712-us-east-2",
+          "objectKey": "d75c48c9f82cde63e9bf414df335e84e8ac24f11eb34889be255b702aec71e50.zip",
+          "region": "us-east-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::887067305712:role/cdk-hnb659fds-file-publishing-role-887067305712-us-east-2"
+        }
+      }
+    },
+    "751b3cc41da79d3ca3c505a1fbe576d18b93b93b71c13001768e8090b1769c30": {
+      "displayName": "VigilComputeStack Template",
+      "source": {
+        "path": "VigilComputeStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "887067305712-us-east-2-4d18231a": {
+          "bucketName": "cdk-hnb659fds-assets-887067305712-us-east-2",
+          "objectKey": "751b3cc41da79d3ca3c505a1fbe576d18b93b93b71c13001768e8090b1769c30.json",
+          "region": "us-east-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::887067305712:role/cdk-hnb659fds-file-publishing-role-887067305712-us-east-2"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

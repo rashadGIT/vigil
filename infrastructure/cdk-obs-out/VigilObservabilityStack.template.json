@@ -1,0 +1,275 @@
+{
+ "Resources": {
+  "VigilEcsAgentLogs942065D0": {
+   "Type": "AWS::Logs::LogGroup",
+   "Properties": {
+    "LogGroupName": "/vigil/ecs-agent",
+    "RetentionInDays": 7
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "VigilObservabilityStack/VigilEcsAgentLogs/Resource"
+   }
+  },
+  "VigilAlertsTopic34DD5453": {
+   "Type": "AWS::SNS::Topic",
+   "Properties": {
+    "DisplayName": "Vigil Infrastructure Alerts",
+    "TopicName": "vigil-alerts"
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilObservabilityStack/VigilAlertsTopic/Resource"
+   }
+  },
+  "VigilAlertsTopicrashadbarnettaigmailcomDC93ED75": {
+   "Type": "AWS::SNS::Subscription",
+   "Properties": {
+    "Endpoint": "rashadbarnett.ai@gmail.com",
+    "Protocol": "email",
+    "TopicArn": {
+     "Ref": "VigilAlertsTopic34DD5453"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilObservabilityStack/VigilAlertsTopic/rashadbarnett.ai@gmail.com/Resource"
+   }
+  },
+  "EcsCpuHighAlarm6A539C16": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "VigilAlertsTopic34DD5453"
+     }
+    ],
+    "AlarmDescription": "ECS CPU > 80% for 5 minutes",
+    "ComparisonOperator": "GreaterThanThreshold",
+    "Dimensions": [
+     {
+      "Name": "ClusterName",
+      "Value": {
+       "Fn::ImportValue": "VigilComputeStack:ExportsOutputRefVigilEcsCluster6A02CA96A92FAA6C"
+      }
+     },
+     {
+      "Name": "ServiceName",
+      "Value": {
+       "Fn::ImportValue": "VigilComputeStack:ExportsOutputFnGetAttVigilFargateService3B33BF76NameAC9B96B9"
+      }
+     }
+    ],
+    "EvaluationPeriods": 5,
+    "MetricName": "CPUUtilization",
+    "Namespace": "AWS/ECS",
+    "Period": 60,
+    "Statistic": "Average",
+    "Threshold": 80
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilObservabilityStack/EcsCpuHighAlarm/Resource"
+   }
+  },
+  "EcsMemoryHighAlarmF24D1CCC": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "VigilAlertsTopic34DD5453"
+     }
+    ],
+    "AlarmDescription": "ECS memory > 85% for 5 minutes",
+    "ComparisonOperator": "GreaterThanThreshold",
+    "Dimensions": [
+     {
+      "Name": "ClusterName",
+      "Value": {
+       "Fn::ImportValue": "VigilComputeStack:ExportsOutputRefVigilEcsCluster6A02CA96A92FAA6C"
+      }
+     },
+     {
+      "Name": "ServiceName",
+      "Value": {
+       "Fn::ImportValue": "VigilComputeStack:ExportsOutputFnGetAttVigilFargateService3B33BF76NameAC9B96B9"
+      }
+     }
+    ],
+    "EvaluationPeriods": 5,
+    "MetricName": "MemoryUtilization",
+    "Namespace": "AWS/ECS",
+    "Period": 60,
+    "Statistic": "Average",
+    "Threshold": 85
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilObservabilityStack/EcsMemoryHighAlarm/Resource"
+   }
+  },
+  "Alb5xxAlarm99BFF946": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "VigilAlertsTopic34DD5453"
+     }
+    ],
+    "AlarmDescription": "ALB 5xx error count > 5 in 5 minutes",
+    "ComparisonOperator": "GreaterThanThreshold",
+    "Dimensions": [
+     {
+      "Name": "LoadBalancer",
+      "Value": {
+       "Fn::ImportValue": "VigilComputeStack:ExportsOutputFnGetAttVigilFargateServiceLBBF7A1435LoadBalancerFullNameE5C7CBEE"
+      }
+     }
+    ],
+    "EvaluationPeriods": 5,
+    "MetricName": "HTTPCode_Target_5XX_Count",
+    "Namespace": "AWS/ApplicationELB",
+    "Period": 60,
+    "Statistic": "Sum",
+    "Threshold": 5
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilObservabilityStack/Alb5xxAlarm/Resource"
+   }
+  },
+  "AlbResponseTimeAlarm5F2031E2": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "VigilAlertsTopic34DD5453"
+     }
+    ],
+    "AlarmDescription": "ALB target response time > 3s for 5 minutes",
+    "ComparisonOperator": "GreaterThanThreshold",
+    "Dimensions": [
+     {
+      "Name": "LoadBalancer",
+      "Value": {
+       "Fn::ImportValue": "VigilComputeStack:ExportsOutputFnGetAttVigilFargateServiceLBBF7A1435LoadBalancerFullNameE5C7CBEE"
+      }
+     }
+    ],
+    "EvaluationPeriods": 5,
+    "MetricName": "TargetResponseTime",
+    "Namespace": "AWS/ApplicationELB",
+    "Period": 60,
+    "Statistic": "Average",
+    "Threshold": 3
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilObservabilityStack/AlbResponseTimeAlarm/Resource"
+   }
+  },
+  "RdsCpuHighAlarmC6780032": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "VigilAlertsTopic34DD5453"
+     }
+    ],
+    "AlarmDescription": "RDS CPU > 80% for 5 minutes",
+    "ComparisonOperator": "GreaterThanThreshold",
+    "Dimensions": [
+     {
+      "Name": "DBInstanceIdentifier",
+      "Value": {
+       "Fn::ImportValue": "VigilDataStack:ExportsOutputRefVigilRds58E5085DE1E88ABC"
+      }
+     }
+    ],
+    "EvaluationPeriods": 5,
+    "MetricName": "CPUUtilization",
+    "Namespace": "AWS/RDS",
+    "Period": 60,
+    "Statistic": "Average",
+    "Threshold": 80
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilObservabilityStack/RdsCpuHighAlarm/Resource"
+   }
+  },
+  "RdsFreeStorageLowAlarm2769C79D": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "VigilAlertsTopic34DD5453"
+     }
+    ],
+    "AlarmDescription": "RDS free storage < 2 GB",
+    "ComparisonOperator": "LessThanThreshold",
+    "Dimensions": [
+     {
+      "Name": "DBInstanceIdentifier",
+      "Value": {
+       "Fn::ImportValue": "VigilDataStack:ExportsOutputRefVigilRds58E5085DE1E88ABC"
+      }
+     }
+    ],
+    "EvaluationPeriods": 1,
+    "MetricName": "FreeStorageSpace",
+    "Namespace": "AWS/RDS",
+    "Period": 300,
+    "Statistic": "Average",
+    "Threshold": 2147483648
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilObservabilityStack/RdsFreeStorageLowAlarm/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/02OywrCMBBFv8V9OkpR0KW4cCMI1r2kSa3TppmQh12E/LuJRXA15557F1NDvd3DZsVnVwk5VgpbiI3nYmRZPaKi3kG8UH+2FAw7PfWPE3M6V3cyKIpfoAmtExaNR9LF/ufEhKIgZ+7FC+JRcTuVyRdSKngN3gSfmCbZweDW73oHh/zd4BArG7THqYPbcj+brJ9wugAAAA=="
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilObservabilityStack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "AlertsTopicArn": {
+   "Value": {
+    "Ref": "VigilAlertsTopic34DD5453"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

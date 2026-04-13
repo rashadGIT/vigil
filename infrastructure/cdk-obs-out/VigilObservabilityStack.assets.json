@@ -1,0 +1,21 @@
+{
+  "version": "53.0.0",
+  "files": {
+    "cfd6b63c98610a8d0e24f19374794764923dbcfafb0544cab4237a3226d39002": {
+      "displayName": "VigilObservabilityStack Template",
+      "source": {
+        "path": "VigilObservabilityStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "887067305712-us-east-2-9e1967c8": {
+          "bucketName": "cdk-hnb659fds-assets-887067305712-us-east-2",
+          "objectKey": "cfd6b63c98610a8d0e24f19374794764923dbcfafb0544cab4237a3226d39002.json",
+          "region": "us-east-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::887067305712:role/cdk-hnb659fds-file-publishing-role-887067305712-us-east-2"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

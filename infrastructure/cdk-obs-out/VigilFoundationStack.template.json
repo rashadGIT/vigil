@@ -1,0 +1,104 @@
+{
+ "Resources": {
+  "VigilWildcardCert4BBA2E00": {
+   "Type": "AWS::CertificateManager::Certificate",
+   "Properties": {
+    "DomainName": "vigil.automagicly.ai",
+    "DomainValidationOptions": [
+     {
+      "DomainName": "vigil.automagicly.ai",
+      "HostedZoneId": "Z09382723RAE7AUP3G3OS"
+     }
+    ],
+    "SubjectAlternativeNames": [
+     "*.vigil.automagicly.ai"
+    ],
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "VigilFoundationStack/VigilWildcardCert"
+     }
+    ],
+    "ValidationMethod": "DNS"
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilFoundationStack/VigilWildcardCert/Resource"
+   }
+  },
+  "VigilSesIdentity73CA21BA": {
+   "Type": "AWS::SES::EmailIdentity",
+   "Properties": {
+    "EmailIdentity": "vigil.automagicly.ai"
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilFoundationStack/VigilSesIdentity/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/1WOwQrCMBBEv8V7skpQ0HPx4EmoHyAx2cq2TVqSjSIh/26KB/U0zJt3GAVqu4fNSj+jNHaQI90gX1ibQbQYpxQMirpds8HA1JHRjE57fccAufky0XT+pxYRMUI+Ok3jyaJn4tei/IFSFnROPCcuwk8WoY/rh9rBoT7qI5EMqZoOof3kG2FLh56uAAAA"
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilFoundationStack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "HostedZoneId": {
+   "Value": "Z09382723RAE7AUP3G3OS"
+  },
+  "CertificateArn": {
+   "Value": {
+    "Ref": "VigilWildcardCert4BBA2E00"
+   }
+  },
+  "SesIdentityName": {
+   "Value": {
+    "Ref": "VigilSesIdentity73CA21BA"
+   }
+  },
+  "ExportsOutputRefVigilWildcardCert4BBA2E00370A2AFE": {
+   "Value": {
+    "Ref": "VigilWildcardCert4BBA2E00"
+   },
+   "Export": {
+    "Name": "VigilFoundationStack:ExportsOutputRefVigilWildcardCert4BBA2E00370A2AFE"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

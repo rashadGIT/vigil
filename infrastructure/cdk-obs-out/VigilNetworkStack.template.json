@@ -1,0 +1,625 @@
+{
+ "Resources": {
+  "VigilVpc441DE1E5": {
+   "Type": "AWS::EC2::VPC",
+   "Properties": {
+    "CidrBlock": "10.0.0.0/16",
+    "EnableDnsHostnames": true,
+    "EnableDnsSupport": true,
+    "InstanceTenancy": "default",
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "VigilNetworkStack/VigilVpc"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilNetworkStack/VigilVpc/Resource"
+   }
+  },
+  "VigilVpcpublicSubnet1SubnetA5B6D223": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "us-east-2a",
+    "CidrBlock": "10.0.0.0/24",
+    "MapPublicIpOnLaunch": true,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "public"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Public"
+     },
+     {
+      "Key": "Name",
+      "Value": "VigilNetworkStack/VigilVpc/publicSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "VigilVpc441DE1E5"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilNetworkStack/VigilVpc/publicSubnet1/Subnet"
+   }
+  },
+  "VigilVpcpublicSubnet1RouteTable26965670": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "VigilNetworkStack/VigilVpc/publicSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "VigilVpc441DE1E5"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilNetworkStack/VigilVpc/publicSubnet1/RouteTable"
+   }
+  },
+  "VigilVpcpublicSubnet1RouteTableAssociation1D33AE71": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "VigilVpcpublicSubnet1RouteTable26965670"
+    },
+    "SubnetId": {
+     "Ref": "VigilVpcpublicSubnet1SubnetA5B6D223"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilNetworkStack/VigilVpc/publicSubnet1/RouteTableAssociation"
+   }
+  },
+  "VigilVpcpublicSubnet1DefaultRouteFBB694CD": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationCidrBlock": "0.0.0.0/0",
+    "GatewayId": {
+     "Ref": "VigilVpcIGW3BF538BB"
+    },
+    "RouteTableId": {
+     "Ref": "VigilVpcpublicSubnet1RouteTable26965670"
+    }
+   },
+   "DependsOn": [
+    "VigilVpcVPCGW0411B993"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "VigilNetworkStack/VigilVpc/publicSubnet1/DefaultRoute"
+   }
+  },
+  "VigilVpcpublicSubnet2SubnetBFCD1817": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "us-east-2b",
+    "CidrBlock": "10.0.1.0/24",
+    "MapPublicIpOnLaunch": true,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "public"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Public"
+     },
+     {
+      "Key": "Name",
+      "Value": "VigilNetworkStack/VigilVpc/publicSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "VigilVpc441DE1E5"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilNetworkStack/VigilVpc/publicSubnet2/Subnet"
+   }
+  },
+  "VigilVpcpublicSubnet2RouteTable41A3C74A": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "VigilNetworkStack/VigilVpc/publicSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "VigilVpc441DE1E5"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilNetworkStack/VigilVpc/publicSubnet2/RouteTable"
+   }
+  },
+  "VigilVpcpublicSubnet2RouteTableAssociation852D90FD": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "VigilVpcpublicSubnet2RouteTable41A3C74A"
+    },
+    "SubnetId": {
+     "Ref": "VigilVpcpublicSubnet2SubnetBFCD1817"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilNetworkStack/VigilVpc/publicSubnet2/RouteTableAssociation"
+   }
+  },
+  "VigilVpcpublicSubnet2DefaultRoute4AE3CD55": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationCidrBlock": "0.0.0.0/0",
+    "GatewayId": {
+     "Ref": "VigilVpcIGW3BF538BB"
+    },
+    "RouteTableId": {
+     "Ref": "VigilVpcpublicSubnet2RouteTable41A3C74A"
+    }
+   },
+   "DependsOn": [
+    "VigilVpcVPCGW0411B993"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "VigilNetworkStack/VigilVpc/publicSubnet2/DefaultRoute"
+   }
+  },
+  "VigilVpcisolatedSubnet1SubnetCBAA3C01": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "us-east-2a",
+    "CidrBlock": "10.0.2.0/24",
+    "MapPublicIpOnLaunch": false,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "isolated"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Isolated"
+     },
+     {
+      "Key": "Name",
+      "Value": "VigilNetworkStack/VigilVpc/isolatedSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "VigilVpc441DE1E5"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilNetworkStack/VigilVpc/isolatedSubnet1/Subnet"
+   }
+  },
+  "VigilVpcisolatedSubnet1RouteTable2206F6FE": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "VigilNetworkStack/VigilVpc/isolatedSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "VigilVpc441DE1E5"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilNetworkStack/VigilVpc/isolatedSubnet1/RouteTable"
+   }
+  },
+  "VigilVpcisolatedSubnet1RouteTableAssociationDDE5FD49": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "VigilVpcisolatedSubnet1RouteTable2206F6FE"
+    },
+    "SubnetId": {
+     "Ref": "VigilVpcisolatedSubnet1SubnetCBAA3C01"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilNetworkStack/VigilVpc/isolatedSubnet1/RouteTableAssociation"
+   }
+  },
+  "VigilVpcisolatedSubnet2Subnet24AD2F0A": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "us-east-2b",
+    "CidrBlock": "10.0.3.0/24",
+    "MapPublicIpOnLaunch": false,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "isolated"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Isolated"
+     },
+     {
+      "Key": "Name",
+      "Value": "VigilNetworkStack/VigilVpc/isolatedSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "VigilVpc441DE1E5"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilNetworkStack/VigilVpc/isolatedSubnet2/Subnet"
+   }
+  },
+  "VigilVpcisolatedSubnet2RouteTableECDFC19C": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "VigilNetworkStack/VigilVpc/isolatedSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "VigilVpc441DE1E5"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilNetworkStack/VigilVpc/isolatedSubnet2/RouteTable"
+   }
+  },
+  "VigilVpcisolatedSubnet2RouteTableAssociationF02F313F": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "VigilVpcisolatedSubnet2RouteTableECDFC19C"
+    },
+    "SubnetId": {
+     "Ref": "VigilVpcisolatedSubnet2Subnet24AD2F0A"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilNetworkStack/VigilVpc/isolatedSubnet2/RouteTableAssociation"
+   }
+  },
+  "VigilVpcIGW3BF538BB": {
+   "Type": "AWS::EC2::InternetGateway",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "VigilNetworkStack/VigilVpc"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilNetworkStack/VigilVpc/IGW"
+   }
+  },
+  "VigilVpcVPCGW0411B993": {
+   "Type": "AWS::EC2::VPCGatewayAttachment",
+   "Properties": {
+    "InternetGatewayId": {
+     "Ref": "VigilVpcIGW3BF538BB"
+    },
+    "VpcId": {
+     "Ref": "VigilVpc441DE1E5"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilNetworkStack/VigilVpc/VPCGW"
+   }
+  },
+  "VigilVpcS3GatewayEndpoint05533A28": {
+   "Type": "AWS::EC2::VPCEndpoint",
+   "Properties": {
+    "RouteTableIds": [
+     {
+      "Ref": "VigilVpcpublicSubnet1RouteTable26965670"
+     },
+     {
+      "Ref": "VigilVpcpublicSubnet2RouteTable41A3C74A"
+     },
+     {
+      "Ref": "VigilVpcisolatedSubnet1RouteTable2206F6FE"
+     },
+     {
+      "Ref": "VigilVpcisolatedSubnet2RouteTableECDFC19C"
+     }
+    ],
+    "ServiceName": {
+     "Fn::Join": [
+      "",
+      [
+       "com.amazonaws.",
+       {
+        "Ref": "AWS::Region"
+       },
+       ".s3"
+      ]
+     ]
+    },
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "VigilNetworkStack/VigilVpc"
+     }
+    ],
+    "VpcEndpointType": "Gateway",
+    "VpcId": {
+     "Ref": "VigilVpc441DE1E5"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilNetworkStack/VigilVpc/S3GatewayEndpoint/Resource"
+   }
+  },
+  "AlbSg1155C1BE": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "Vigil ALB - public HTTPS/HTTP",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "SecurityGroupIngress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "HTTP from internet",
+      "FromPort": 80,
+      "IpProtocol": "tcp",
+      "ToPort": 80
+     },
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "HTTPS from internet",
+      "FromPort": 443,
+      "IpProtocol": "tcp",
+      "ToPort": 443
+     }
+    ],
+    "VpcId": {
+     "Ref": "VigilVpc441DE1E5"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilNetworkStack/AlbSg/Resource"
+   }
+  },
+  "EcsSg17B4B0B3": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "Vigil ECS Fargate - from ALB only",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "SecurityGroupIngress": [
+     {
+      "CidrIp": {
+       "Fn::GetAtt": [
+        "VigilVpc441DE1E5",
+        "CidrBlock"
+       ]
+      },
+      "Description": "ALB to backend (VPC CIDR)",
+      "FromPort": 3000,
+      "IpProtocol": "tcp",
+      "ToPort": 3000
+     }
+    ],
+    "VpcId": {
+     "Ref": "VigilVpc441DE1E5"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilNetworkStack/EcsSg/Resource"
+   }
+  },
+  "RdsSg7F9F43B6": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "Vigil RDS PostgreSQL - from ECS only",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "255.255.255.255/32",
+      "Description": "Disallow all traffic",
+      "FromPort": 252,
+      "IpProtocol": "icmp",
+      "ToPort": 86
+     }
+    ],
+    "VpcId": {
+     "Ref": "VigilVpc441DE1E5"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilNetworkStack/RdsSg/Resource"
+   }
+  },
+  "RdsSgfromVigilNetworkStackEcsSgD5252DE154321FC991D8": {
+   "Type": "AWS::EC2::SecurityGroupIngress",
+   "Properties": {
+    "Description": "ECS to Postgres",
+    "FromPort": 5432,
+    "GroupId": {
+     "Fn::GetAtt": [
+      "RdsSg7F9F43B6",
+      "GroupId"
+     ]
+    },
+    "IpProtocol": "tcp",
+    "SourceSecurityGroupId": {
+     "Fn::GetAtt": [
+      "EcsSg17B4B0B3",
+      "GroupId"
+     ]
+    },
+    "ToPort": 5432
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilNetworkStack/RdsSg/from VigilNetworkStackEcsSgD5252DE1:5432"
+   }
+  },
+  "RedisSgFB48DCCD": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "Vigil Redis (stub) - from ECS only",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "255.255.255.255/32",
+      "Description": "Disallow all traffic",
+      "FromPort": 252,
+      "IpProtocol": "icmp",
+      "ToPort": 86
+     }
+    ],
+    "VpcId": {
+     "Ref": "VigilVpc441DE1E5"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilNetworkStack/RedisSg/Resource"
+   }
+  },
+  "RedisSgfromVigilNetworkStackEcsSgD5252DE163797F801817": {
+   "Type": "AWS::EC2::SecurityGroupIngress",
+   "Properties": {
+    "Description": "ECS to Redis",
+    "FromPort": 6379,
+    "GroupId": {
+     "Fn::GetAtt": [
+      "RedisSgFB48DCCD",
+      "GroupId"
+     ]
+    },
+    "IpProtocol": "tcp",
+    "SourceSecurityGroupId": {
+     "Fn::GetAtt": [
+      "EcsSg17B4B0B3",
+      "GroupId"
+     ]
+    },
+    "ToPort": 6379
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilNetworkStack/RedisSg/from VigilNetworkStackEcsSgD5252DE1:6379"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/32QQQvCMAyFf4v3rspQ0KOIiCfHJl6l66JmznS0iSLif7fqcDdPefl4JC9JdTqe6tHA3EJiq3PSYKkfBRt7VhHtwab6sWutWhxoly1UJmWDtpCSgN+sV7kThq0pG+h5z+YhOIuG0dHPrDKPV8PQz1gTg496FenN3LulXTfnmOp0AWLVkZhrSVXrkLiz/toCrHjk+8o7aT+B/oI1HT2E8FQ5BCfefm7YCLfCT0WuAl2H4TWd6Fl8VR0QEy/EeAGdf+sL1WqEYEcBAAA="
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilNetworkStack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "VpcId": {
+   "Value": {
+    "Ref": "VigilVpc441DE1E5"
+   }
+  },
+  "ExportsOutputRefVigilVpcisolatedSubnet1SubnetCBAA3C016996FF94": {
+   "Value": {
+    "Ref": "VigilVpcisolatedSubnet1SubnetCBAA3C01"
+   },
+   "Export": {
+    "Name": "VigilNetworkStack:ExportsOutputRefVigilVpcisolatedSubnet1SubnetCBAA3C016996FF94"
+   }
+  },
+  "ExportsOutputRefVigilVpcisolatedSubnet2Subnet24AD2F0A724F68D1": {
+   "Value": {
+    "Ref": "VigilVpcisolatedSubnet2Subnet24AD2F0A"
+   },
+   "Export": {
+    "Name": "VigilNetworkStack:ExportsOutputRefVigilVpcisolatedSubnet2Subnet24AD2F0A724F68D1"
+   }
+  },
+  "ExportsOutputFnGetAttRdsSg7F9F43B6GroupId133E31A8": {
+   "Value": {
+    "Fn::GetAtt": [
+     "RdsSg7F9F43B6",
+     "GroupId"
+    ]
+   },
+   "Export": {
+    "Name": "VigilNetworkStack:ExportsOutputFnGetAttRdsSg7F9F43B6GroupId133E31A8"
+   }
+  },
+  "ExportsOutputRefVigilVpcpublicSubnet1SubnetA5B6D2233C45AD52": {
+   "Value": {
+    "Ref": "VigilVpcpublicSubnet1SubnetA5B6D223"
+   },
+   "Export": {
+    "Name": "VigilNetworkStack:ExportsOutputRefVigilVpcpublicSubnet1SubnetA5B6D2233C45AD52"
+   }
+  },
+  "ExportsOutputRefVigilVpcpublicSubnet2SubnetBFCD1817E8E0564C": {
+   "Value": {
+    "Ref": "VigilVpcpublicSubnet2SubnetBFCD1817"
+   },
+   "Export": {
+    "Name": "VigilNetworkStack:ExportsOutputRefVigilVpcpublicSubnet2SubnetBFCD1817E8E0564C"
+   }
+  },
+  "ExportsOutputRefVigilVpc441DE1E5E59AE9D8": {
+   "Value": {
+    "Ref": "VigilVpc441DE1E5"
+   },
+   "Export": {
+    "Name": "VigilNetworkStack:ExportsOutputRefVigilVpc441DE1E5E59AE9D8"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

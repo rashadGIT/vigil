@@ -32,6 +32,7 @@ const compute = new ComputeStack(app, 'VigilComputeStack', {
   vpc: network.vpc,
   certificate: foundation.certificate,
   hostedZone: foundation.hostedZone,
+  dbSecret: data.dbSecret,
 });
 
 const _amplify = new AmplifyStack(app, 'VigilAmplifyStack', {

@@ -1,0 +1,56 @@
+{
+  "/VigilFoundationStack/HostedZoneId": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "HostedZoneId"
+    }
+  ],
+  "/VigilFoundationStack/CertificateArn": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CertificateArn"
+    }
+  ],
+  "/VigilFoundationStack/SesIdentityName": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "SesIdentityName"
+    }
+  ],
+  "/VigilFoundationStack/BootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BootstrapVersion"
+    }
+  ],
+  "/VigilFoundationStack/CheckBootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CheckBootstrapVersion"
+    }
+  ],
+  "/VigilFoundationStack/VigilWildcardCert/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilWildcardCert4BBA2E00"
+    }
+  ],
+  "/VigilFoundationStack/VigilSesIdentity/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilSesIdentity73CA21BA"
+    }
+  ],
+  "/VigilFoundationStack/CDKMetadata/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadata"
+    }
+  ],
+  "/VigilFoundationStack/Exports/Output{\"Ref\":\"VigilWildcardCert4BBA2E00\"}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputRefVigilWildcardCert4BBA2E00370A2AFE"
+    }
+  ]
+}

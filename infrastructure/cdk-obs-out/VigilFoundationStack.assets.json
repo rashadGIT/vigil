@@ -1,0 +1,21 @@
+{
+  "version": "53.0.0",
+  "files": {
+    "514d9d029a78dd7a4c655edf1452cacc943715496778ad78650f94012c735c03": {
+      "displayName": "VigilFoundationStack Template",
+      "source": {
+        "path": "VigilFoundationStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "887067305712-us-east-2-0ca377b8": {
+          "bucketName": "cdk-hnb659fds-assets-887067305712-us-east-2",
+          "objectKey": "514d9d029a78dd7a4c655edf1452cacc943715496778ad78650f94012c735c03.json",
+          "region": "us-east-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::887067305712:role/cdk-hnb659fds-file-publishing-role-887067305712-us-east-2"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

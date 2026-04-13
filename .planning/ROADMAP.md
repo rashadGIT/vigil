@@ -205,12 +205,12 @@ Plans:
 **Plans**: 6 plans
 
 Plans:
-- [ ] 09-01: Workflow 1 — Grief Follow-Up Scheduler (webhook on case completed → Wait 7d → SES 1-week → Wait 23d → 1-month → Wait 5mo → 6-month → Wait 6mo → 1-year; update FollowUp.status via internal callback)
-- [ ] 09-02: Workflow 2 — Staff Notification Hub (webhook → route by eventType → SES + SNS SMS for new case, overdue task daily 8am, vendor confirmation)
-- [ ] 09-03: Workflow 3 — Intake Notification (webhook on intake submitted → immediate SES notify to assigned staff with case link)
-- [ ] 09-04: Workflow 4 — Document Generation (webhook on case completed → POST /internal/documents/generate-service-program/:caseId via @InternalOnly() shared secret)
-- [ ] 09-05: Workflow 5 — Data Retention Cleanup (monthly CRON 1st 2am → GET /internal/cases/pending-hard-delete → hard-delete records where deletedAt < now() - 7 years)
-- [ ] 09-06: Workflow 6 — Review Request (scheduled 14 days after case.completedAt → SMS + email Google review using tenant.googleReviewUrl)
+- [x] 09-01-PLAN.md — Backend internal endpoints (4 endpoints: generate-service-program, pending-hard-delete, followup-complete, overdue-tasks) + cascade deletes + env var fix
+- [x] 09-02-PLAN.md — Workflow 1 (Grief Follow-Up Scheduler) + Workflow 3 (Intake Notification) in n8n UI + AWS credential setup
+- [x] 09-03-PLAN.md — Workflow 2 (Staff Notification Hub) in n8n UI — webhook + CRON dual triggers
+- [x] 09-04-PLAN.md — Workflow 4 (Document Generation) + Workflow 5 (Data Retention Cleanup) in n8n UI
+- [x] 09-05-PLAN.md — Workflow 6 (Review Request) in n8n UI — 14-day Wait + SNS SMS + SES email
+- [x] 09-06-PLAN.md — Verification: fix trigger payloads, confirm all 6 Active, no PLACEHOLDER warnings, Secrets Manager wired
 
 ---
 
@@ -228,13 +228,13 @@ Plans:
 **Plans**: 7 plans
 
 Plans:
-- [ ] 10-01: Jest config + mocks — jest.config.ts (separate backend/frontend projects), __mocks__/ for next/link, next/image, next/navigation
-- [ ] 10-02: Unit tests — ForTenantExtension (tenant isolation at ORM), TaskTemplatesService (correct tasks per service type), PdfService (generateGpl returns Buffer), EmailService (Resend↔SES switching), CognitoAuthGuard (bypass injects mock user)
-- [ ] 10-03: Contract tests (@jest-environment node) — POST /intake/:slug (atomic create), GET /cases (tenant scoped), POST /auth/login, GET /health (Redis disabled → 'disabled')
-- [ ] 10-04: Component tests (RTL) — case dashboard DataTable, intake form submission, signature capture on mobile viewport
-- [ ] 10-05: Acceptance test — full flow: intake form → case in dashboard → task checklist visible → mark task complete
-- [ ] 10-06: Tenant isolation test — seed 2 tenants, auth as Tenant A, assert GET /cases + /documents + /contacts return zero Tenant B records
-- [ ] 10-07: Playwright E2E — login → dashboard (DEV_AUTH_BYPASS), intake → case created, case workspace tab navigation, sign page renders
+- [ ] 10-01-PLAN.md — Backend Jest infrastructure: fix jest.config.ts coverage scope, install supertest, create shared prisma.mock.ts factory (createMockPrisma)
+- [ ] 10-02-PLAN.md — Backend unit tests (Wave 2): CasesService (transitions + n8n triggers), IntakeService ($transaction atomicity), FollowUpsService (4 records + offsets), N8nService (PLACEHOLDER skip + HTTP call)
+- [ ] 10-03-PLAN.md — Backend unit tests (Wave 2): CognitoAuthGuard (DEV_AUTH_BYPASS path), InternalOnlyGuard (key validation), PrismaService.forTenant() guard, TaskTemplatesService (18/15/12/10 tasks per type)
+- [ ] 10-04-PLAN.md — Backend contract tests (Wave 2): POST /intake/:slug (201/404/400), GET /cases (200 with auth, 401 without), internal endpoints (403 without key, 200 with key)
+- [ ] 10-05-PLAN.md — Tenant isolation integration test (Wave 3): real Prisma + TEST_DATABASE_URL, seeds 2 tenants + 1 case each, proves forTenant(A) cannot read Tenant B case
+- [ ] 10-06-PLAN.md — Frontend test infrastructure + IntakeForm component tests (Wave 3): install @testing-library, nextJest config, mocks for next/navigation + react-signature-canvas
+- [ ] 10-07-PLAN.md — Playwright E2E + CI update (Wave 4): navigation smoke test, intake form render test, ci.yml test job with Postgres:16 service + test-e2e job
 
 ---
 
@@ -272,6 +272,6 @@ Plans:
 | 6. Next.js Frontend Scaffold | 0/6 | Not started | - |
 | 7. CDK Project Init | 0/3 | Not started | - |
 | 8. AWS CDK Infrastructure Deployment | 0/5 | Not started | - |
-| 9. n8n Automation Workflows | 0/6 | Not started | - |
-| 10. Testing Suite | 0/7 | Not started | - |
+| 9. n8n Automation Workflows | 0/6 | Planned | - |
+| 10. Testing Suite | 0/7 | Planned | - |
 | 11. Seed Data & Demo Environment | 0/5 | Not started | - |

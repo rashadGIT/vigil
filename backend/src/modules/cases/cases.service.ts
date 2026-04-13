@@ -1,6 +1,8 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CaseStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '../../common/prisma/prisma.service';
+import { N8nService } from '../n8n/n8n.service';
+import { N8nEvent } from '../n8n/n8n-events.enum';
 import { CreateCaseDto } from './dto/create-case.dto';
 import { UpdateCaseDto } from './dto/update-case.dto';
 import { CaseFilterDto } from './dto/case-filter.dto';
@@ -15,7 +17,10 @@ const ALLOWED_TRANSITIONS: Record<CaseStatus, CaseStatus[]> = {
 
 @Injectable()
 export class CasesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly n8n: N8nService,
+  ) {}
 
   create(tenantId: string, dto: CreateCaseDto) {
     const data: Prisma.CaseUncheckedCreateInput = {
@@ -89,10 +94,36 @@ export class CasesService {
 
   async updateStatus(tenantId: string, id: string, status: CaseStatus) {
     await this.assertValidTransition(tenantId, id, status);
-    return this.prisma.forTenant(tenantId).case.update({
+    const updated = await this.prisma.forTenant(tenantId).case.update({
       where: { id },
       data: { status },
     });
+
+    if (status === CaseStatus.completed) {
+      const kase = await this.prisma.forTenant(tenantId).case.findFirst({
+        where: { id },
+        include: {
+          familyContacts: { where: { isPrimaryContact: true }, take: 1 },
+          tenant: true,
+        },
+      });
+      if (kase) {
+        const primary = kase.familyContacts[0];
+        await Promise.all([
+          this.n8n.trigger(N8nEvent.REVIEW_REQUEST, {
+            tenantId,
+            caseId: id,
+            familyEmail: primary?.email ?? '',
+            familyPhone: primary?.phone ?? '',
+            funeralHomeName: kase.tenant.name,
+            googleReviewUrl: kase.tenant.googleReviewUrl ?? '',
+          }),
+          this.n8n.trigger(N8nEvent.DOC_GENERATE, { caseId: id, tenantId }),
+        ]);
+      }
+    }
+
+    return updated;
   }
 
   /**

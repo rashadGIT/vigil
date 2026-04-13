@@ -1,0 +1,21 @@
+{
+  "version": "53.0.0",
+  "files": {
+    "b8fb25d1888dc5939e5e7c1b9698fdd2df5f519a489dc7aff439b4cf299fac3e": {
+      "displayName": "VigilDataStack Template",
+      "source": {
+        "path": "VigilDataStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "887067305712-us-east-2-ec535d04": {
+          "bucketName": "cdk-hnb659fds-assets-887067305712-us-east-2",
+          "objectKey": "b8fb25d1888dc5939e5e7c1b9698fdd2df5f519a489dc7aff439b4cf299fac3e.json",
+          "region": "us-east-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::887067305712:role/cdk-hnb659fds-file-publishing-role-887067305712-us-east-2"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

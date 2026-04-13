@@ -1,0 +1,44 @@
+{
+  "/VigilAuthStack/UserPoolId": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "UserPoolId"
+    }
+  ],
+  "/VigilAuthStack/UserPoolClientId": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "UserPoolClientId"
+    }
+  ],
+  "/VigilAuthStack/BootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BootstrapVersion"
+    }
+  ],
+  "/VigilAuthStack/CheckBootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CheckBootstrapVersion"
+    }
+  ],
+  "/VigilAuthStack/VigilUserPool/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilUserPool630D554B"
+    }
+  ],
+  "/VigilAuthStack/VigilUserPoolClient/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilUserPoolClient7D8FE6DB"
+    }
+  ],
+  "/VigilAuthStack/CDKMetadata/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadata"
+    }
+  ]
+}

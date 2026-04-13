@@ -1,0 +1,206 @@
+{
+  "/VigilNetworkStack/VpcId": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VpcId"
+    }
+  ],
+  "/VigilNetworkStack/BootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BootstrapVersion"
+    }
+  ],
+  "/VigilNetworkStack/CheckBootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CheckBootstrapVersion"
+    }
+  ],
+  "/VigilNetworkStack/VigilVpc/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilVpc441DE1E5"
+    }
+  ],
+  "/VigilNetworkStack/VigilVpc/IGW": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilVpcIGW3BF538BB"
+    }
+  ],
+  "/VigilNetworkStack/VigilVpc/VPCGW": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilVpcVPCGW0411B993"
+    }
+  ],
+  "/VigilNetworkStack/AlbSg/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AlbSg1155C1BE"
+    }
+  ],
+  "/VigilNetworkStack/EcsSg/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "EcsSg17B4B0B3"
+    }
+  ],
+  "/VigilNetworkStack/RdsSg/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "RdsSg7F9F43B6"
+    }
+  ],
+  "/VigilNetworkStack/RdsSg/from VigilNetworkStackEcsSgD5252DE1:5432": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "RdsSgfromVigilNetworkStackEcsSgD5252DE154321FC991D8"
+    }
+  ],
+  "/VigilNetworkStack/RedisSg/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "RedisSgFB48DCCD"
+    }
+  ],
+  "/VigilNetworkStack/RedisSg/from VigilNetworkStackEcsSgD5252DE1:6379": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "RedisSgfromVigilNetworkStackEcsSgD5252DE163797F801817"
+    }
+  ],
+  "/VigilNetworkStack/CDKMetadata/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadata"
+    }
+  ],
+  "/VigilNetworkStack/Exports/Output{\"Ref\":\"VigilVpcisolatedSubnet1SubnetCBAA3C01\"}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputRefVigilVpcisolatedSubnet1SubnetCBAA3C016996FF94"
+    }
+  ],
+  "/VigilNetworkStack/Exports/Output{\"Ref\":\"VigilVpcisolatedSubnet2Subnet24AD2F0A\"}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputRefVigilVpcisolatedSubnet2Subnet24AD2F0A724F68D1"
+    }
+  ],
+  "/VigilNetworkStack/Exports/Output{\"Fn::GetAtt\":[\"RdsSg7F9F43B6\",\"GroupId\"]}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputFnGetAttRdsSg7F9F43B6GroupId133E31A8"
+    }
+  ],
+  "/VigilNetworkStack/Exports/Output{\"Ref\":\"VigilVpcpublicSubnet1SubnetA5B6D223\"}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputRefVigilVpcpublicSubnet1SubnetA5B6D2233C45AD52"
+    }
+  ],
+  "/VigilNetworkStack/Exports/Output{\"Ref\":\"VigilVpcpublicSubnet2SubnetBFCD1817\"}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputRefVigilVpcpublicSubnet2SubnetBFCD1817E8E0564C"
+    }
+  ],
+  "/VigilNetworkStack/Exports/Output{\"Ref\":\"VigilVpc441DE1E5\"}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputRefVigilVpc441DE1E5E59AE9D8"
+    }
+  ],
+  "/VigilNetworkStack/VigilVpc/publicSubnet1/Subnet": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilVpcpublicSubnet1SubnetA5B6D223"
+    }
+  ],
+  "/VigilNetworkStack/VigilVpc/publicSubnet1/RouteTable": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilVpcpublicSubnet1RouteTable26965670"
+    }
+  ],
+  "/VigilNetworkStack/VigilVpc/publicSubnet1/RouteTableAssociation": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilVpcpublicSubnet1RouteTableAssociation1D33AE71"
+    }
+  ],
+  "/VigilNetworkStack/VigilVpc/publicSubnet1/DefaultRoute": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilVpcpublicSubnet1DefaultRouteFBB694CD"
+    }
+  ],
+  "/VigilNetworkStack/VigilVpc/publicSubnet2/Subnet": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilVpcpublicSubnet2SubnetBFCD1817"
+    }
+  ],
+  "/VigilNetworkStack/VigilVpc/publicSubnet2/RouteTable": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilVpcpublicSubnet2RouteTable41A3C74A"
+    }
+  ],
+  "/VigilNetworkStack/VigilVpc/publicSubnet2/RouteTableAssociation": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilVpcpublicSubnet2RouteTableAssociation852D90FD"
+    }
+  ],
+  "/VigilNetworkStack/VigilVpc/publicSubnet2/DefaultRoute": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilVpcpublicSubnet2DefaultRoute4AE3CD55"
+    }
+  ],
+  "/VigilNetworkStack/VigilVpc/isolatedSubnet1/Subnet": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilVpcisolatedSubnet1SubnetCBAA3C01"
+    }
+  ],
+  "/VigilNetworkStack/VigilVpc/isolatedSubnet1/RouteTable": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilVpcisolatedSubnet1RouteTable2206F6FE"
+    }
+  ],
+  "/VigilNetworkStack/VigilVpc/isolatedSubnet1/RouteTableAssociation": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilVpcisolatedSubnet1RouteTableAssociationDDE5FD49"
+    }
+  ],
+  "/VigilNetworkStack/VigilVpc/isolatedSubnet2/Subnet": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilVpcisolatedSubnet2Subnet24AD2F0A"
+    }
+  ],
+  "/VigilNetworkStack/VigilVpc/isolatedSubnet2/RouteTable": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilVpcisolatedSubnet2RouteTableECDFC19C"
+    }
+  ],
+  "/VigilNetworkStack/VigilVpc/isolatedSubnet2/RouteTableAssociation": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilVpcisolatedSubnet2RouteTableAssociationF02F313F"
+    }
+  ],
+  "/VigilNetworkStack/VigilVpc/S3GatewayEndpoint/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilVpcS3GatewayEndpoint05533A28"
+    }
+  ]
+}

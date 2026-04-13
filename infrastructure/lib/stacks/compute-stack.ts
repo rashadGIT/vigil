@@ -8,12 +8,14 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as acm from 'aws-cdk-lib/aws-certificatemanager';
+import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import { Construct } from 'constructs';
 
 export interface ComputeStackProps extends cdk.StackProps {
   vpc: ec2.IVpc;
   certificate: acm.ICertificate;
   hostedZone: route53.IHostedZone;
+  dbSecret: secretsmanager.ISecret;
 }
 
 export class ComputeStack extends cdk.Stack {
@@ -73,10 +75,14 @@ export class ComputeStack extends cdk.Stack {
             NODE_ENV: 'production',
             PORT: '3000',
           },
-          // DATABASE_URL will be injected when the real backend image is deployed (Phase 9+)
+          secrets: {
+            DATABASE_URL: ecs.Secret.fromSecretsManager(props.dbSecret),
+          },
         },
       },
     );
+
+    props.dbSecret.grantRead(this.fargateService.taskDefinition.taskRole);
 
     // Health check against nginx placeholder root path; update to /health when real image is deployed
     this.fargateService.targetGroup.configureHealthCheck({

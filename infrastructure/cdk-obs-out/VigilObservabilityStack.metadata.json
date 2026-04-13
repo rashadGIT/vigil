@@ -1,0 +1,80 @@
+{
+  "/VigilObservabilityStack/AlertsTopicArn": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AlertsTopicArn"
+    }
+  ],
+  "/VigilObservabilityStack/BootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BootstrapVersion"
+    }
+  ],
+  "/VigilObservabilityStack/CheckBootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CheckBootstrapVersion"
+    }
+  ],
+  "/VigilObservabilityStack/VigilEcsAgentLogs/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilEcsAgentLogs942065D0"
+    }
+  ],
+  "/VigilObservabilityStack/VigilAlertsTopic/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilAlertsTopic34DD5453"
+    }
+  ],
+  "/VigilObservabilityStack/EcsCpuHighAlarm/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "EcsCpuHighAlarm6A539C16"
+    }
+  ],
+  "/VigilObservabilityStack/EcsMemoryHighAlarm/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "EcsMemoryHighAlarmF24D1CCC"
+    }
+  ],
+  "/VigilObservabilityStack/Alb5xxAlarm/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "Alb5xxAlarm99BFF946"
+    }
+  ],
+  "/VigilObservabilityStack/AlbResponseTimeAlarm/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AlbResponseTimeAlarm5F2031E2"
+    }
+  ],
+  "/VigilObservabilityStack/RdsCpuHighAlarm/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "RdsCpuHighAlarmC6780032"
+    }
+  ],
+  "/VigilObservabilityStack/RdsFreeStorageLowAlarm/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "RdsFreeStorageLowAlarm2769C79D"
+    }
+  ],
+  "/VigilObservabilityStack/CDKMetadata/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadata"
+    }
+  ],
+  "/VigilObservabilityStack/VigilAlertsTopic/rashadbarnett.ai@gmail.com/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilAlertsTopicrashadbarnettaigmailcomDC93ED75"
+    }
+  ]
+}

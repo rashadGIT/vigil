@@ -1,0 +1,62 @@
+{
+  "/VigilAmplifyStack/AmplifyAppId": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AmplifyAppId"
+    }
+  ],
+  "/VigilAmplifyStack/AmplifyDefaultDomain": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AmplifyDefaultDomain"
+    }
+  ],
+  "/VigilAmplifyStack/FrontendUrl": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "FrontendUrl"
+    }
+  ],
+  "/VigilAmplifyStack/BootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BootstrapVersion"
+    }
+  ],
+  "/VigilAmplifyStack/CheckBootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CheckBootstrapVersion"
+    }
+  ],
+  "/VigilAmplifyStack/VigilFrontendApp/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilFrontendAppE9E38857"
+    }
+  ],
+  "/VigilAmplifyStack/CDKMetadata/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadata"
+    }
+  ],
+  "/VigilAmplifyStack/VigilFrontendApp/Role/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilFrontendAppRole0778215B"
+    }
+  ],
+  "/VigilAmplifyStack/VigilFrontendApp/main/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilFrontendAppmain58784FC4"
+    }
+  ],
+  "/VigilAmplifyStack/VigilFrontendApp/vigil.automagicly.ai/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilFrontendAppvigilautomagiclyai149612DC"
+    }
+  ]
+}

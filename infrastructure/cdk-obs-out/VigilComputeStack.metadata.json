@@ -1,0 +1,290 @@
+{
+  "/VigilComputeStack/Custom::AWSCDKOpenIdConnectProviderCustomResourceProvider": [
+    {
+      "type": "aws:cdk:is-custom-resource-handler-customResourceProvider",
+      "data": true
+    }
+  ],
+  "/VigilComputeStack/EcrRepoUri": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "EcrRepoUri"
+    }
+  ],
+  "/VigilComputeStack/EcsClusterName": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "EcsClusterName"
+    }
+  ],
+  "/VigilComputeStack/EcsServiceName": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "EcsServiceName"
+    }
+  ],
+  "/VigilComputeStack/GitHubActionsRoleArn": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "GitHubActionsRoleArn"
+    }
+  ],
+  "/VigilComputeStack/ApiUrl": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiUrl"
+    }
+  ],
+  "/VigilComputeStack/BootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BootstrapVersion"
+    }
+  ],
+  "/VigilComputeStack/CheckBootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CheckBootstrapVersion"
+    }
+  ],
+  "/VigilComputeStack/VigilBackendRepo/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilBackendRepoEB24735A"
+    }
+  ],
+  "/VigilComputeStack/VigilEcsCluster/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilEcsCluster6A02CA96"
+    }
+  ],
+  "/VigilComputeStack/VigilBackendLogs/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilBackendLogsB796FCD6"
+    }
+  ],
+  "/VigilComputeStack/VigilFargateService/LoadBalancerDNS": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilFargateServiceLoadBalancerDNSFEE6318B"
+    }
+  ],
+  "/VigilComputeStack/VigilFargateService/ServiceURL": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilFargateServiceServiceURL19070B8D"
+    }
+  ],
+  "/VigilComputeStack/VigilFargateService/Service": [
+    {
+      "type": "aws:cdk:warning",
+      "data": "minHealthyPercent has not been configured so the default value of 50% is used. The number of running tasks will decrease below the desired count during deployments etc. See https://github.com/aws/aws-cdk/issues/31705 [ack: @aws-cdk/aws-ecs:minHealthyPercent]",
+      "trace": [
+        "Annotations.addMessage (/Users/rashad/StudioProjects/Vigil/node_modules/aws-cdk-lib/core/lib/annotations.js:1:2399)",
+        "Annotations.addWarningV2 (/Users/rashad/StudioProjects/Vigil/node_modules/aws-cdk-lib/core/lib/annotations.js:1:1087)",
+        "new BaseService2 (/Users/rashad/StudioProjects/Vigil/node_modules/aws-cdk-lib/aws-ecs/lib/base/base-service.js:1:12795)",
+        "new FargateService2 (/Users/rashad/StudioProjects/Vigil/node_modules/aws-cdk-lib/aws-ecs/lib/fargate/fargate-service.js:1:6805)",
+        "new FargateService2 (/Users/rashad/StudioProjects/Vigil/node_modules/aws-cdk-lib/core/lib/prop-injectable.js:1:855)",
+        "new ApplicationLoadBalancedFargateService2 (/Users/rashad/StudioProjects/Vigil/node_modules/aws-cdk-lib/aws-ecs-patterns/lib/fargate/application-load-balanced-fargate-service.js:1:6392)",
+        "new ApplicationLoadBalancedFargateService2 (/Users/rashad/StudioProjects/Vigil/node_modules/aws-cdk-lib/core/lib/prop-injectable.js:1:855)",
+        "new ComputeStack (/Users/rashad/StudioProjects/Vigil/infrastructure/lib/stacks/compute-stack.ts:50:27)",
+        "Object.<anonymous> (/Users/rashad/StudioProjects/Vigil/infrastructure/bin/vigil.ts:30:17)",
+        "Module._compile (node:internal/modules/cjs/loader:1829:14)",
+        "Module.m._compile (/Users/rashad/StudioProjects/Vigil/node_modules/ts-node/src/index.ts:1618:23)",
+        "Module._extensions..js (node:internal/modules/cjs/loader:1969:10)",
+        "Object.require.extensions.<computed> [as .ts] (/Users/rashad/StudioProjects/Vigil/node_modules/ts-node/src/index.ts:1621:12)",
+        "Module.load (node:internal/modules/cjs/loader:1552:32)",
+        "Module._load (node:internal/modules/cjs/loader:1354:12)",
+        "wrapModuleLoad (node:internal/modules/cjs/loader:255:19)",
+        "Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)",
+        "phase4 (/Users/rashad/StudioProjects/Vigil/node_modules/ts-node/src/bin.ts:649:14)",
+        "bootstrap (/Users/rashad/StudioProjects/Vigil/node_modules/ts-node/src/bin.ts:95:10)",
+        "main (/Users/rashad/StudioProjects/Vigil/node_modules/ts-node/src/bin.ts:55:10)",
+        "Object.<anonymous> (/Users/rashad/StudioProjects/Vigil/node_modules/ts-node/src/bin.ts:800:3)",
+        "Module._compile (node:internal/modules/cjs/loader:1829:14)",
+        "Object.Module._extensions..js (node:internal/modules/cjs/loader:1969:10)",
+        "Module.load (node:internal/modules/cjs/loader:1552:32)",
+        "Module._load (node:internal/modules/cjs/loader:1354:12)",
+        "wrapModuleLoad (node:internal/modules/cjs/loader:255:19)",
+        "Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)",
+        "node:internal/main/run_main_module:33:47"
+      ]
+    }
+  ],
+  "/VigilComputeStack/VigilMigrationsTaskDef/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilMigrationsTaskDefEF6FF80C"
+    }
+  ],
+  "/VigilComputeStack/Custom::AWSCDKOpenIdConnectProviderCustomResourceProvider/Role": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CustomAWSCDKOpenIdConnectProviderCustomResourceProviderRole517FED65"
+    }
+  ],
+  "/VigilComputeStack/Custom::AWSCDKOpenIdConnectProviderCustomResourceProvider/Handler": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CustomAWSCDKOpenIdConnectProviderCustomResourceProviderHandlerF2C543E0"
+    }
+  ],
+  "/VigilComputeStack/GitHubActionsDeployRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "GitHubActionsDeployRoleA6F4AD3D"
+    }
+  ],
+  "/VigilComputeStack/CDKMetadata/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadata"
+    }
+  ],
+  "/VigilComputeStack/Exports/Output{\"Ref\":\"VigilEcsCluster6A02CA96\"}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputRefVigilEcsCluster6A02CA96A92FAA6C"
+    }
+  ],
+  "/VigilComputeStack/Exports/Output{\"Fn::GetAtt\":[\"VigilFargateService3B33BF76\",\"Name\"]}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputFnGetAttVigilFargateService3B33BF76NameAC9B96B9"
+    }
+  ],
+  "/VigilComputeStack/Exports/Output{\"Fn::GetAtt\":[\"VigilFargateServiceLBBF7A1435\",\"LoadBalancerFullName\"]}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputFnGetAttVigilFargateServiceLBBF7A1435LoadBalancerFullNameE5C7CBEE"
+    }
+  ],
+  "/VigilComputeStack/VigilFargateService/LB/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilFargateServiceLBBF7A1435"
+    }
+  ],
+  "/VigilComputeStack/VigilFargateService/DNS/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilFargateServiceDNS969E68FF"
+    }
+  ],
+  "/VigilComputeStack/VigilFargateService/TaskDef/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilFargateServiceTaskDef188E89C0"
+    }
+  ],
+  "/VigilComputeStack/VigilFargateService/Service/Service": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilFargateService3B33BF76"
+    }
+  ],
+  "/VigilComputeStack/VigilMigrationsTaskDef/TaskRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilMigrationsTaskDefTaskRole7B6B3FDE"
+    }
+  ],
+  "/VigilComputeStack/VigilMigrationsTaskDef/ExecutionRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilMigrationsTaskDefExecutionRole7B7316AC"
+    }
+  ],
+  "/VigilComputeStack/GitHubOidcProvider/Resource/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "GitHubOidcProvider7EBF861F"
+    }
+  ],
+  "/VigilComputeStack/GitHubActionsDeployRole/DefaultPolicy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "GitHubActionsDeployRoleDefaultPolicy3AC475A7"
+    }
+  ],
+  "/VigilComputeStack/VigilFargateService/LB/SecurityGroup/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilFargateServiceLBSecurityGroup2351E05D"
+    }
+  ],
+  "/VigilComputeStack/VigilFargateService/LB/SecurityGroup/to VigilComputeStackVigilFargateServiceSecurityGroup05DA8640:3000": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilFargateServiceLBSecurityGrouptoVigilComputeStackVigilFargateServiceSecurityGroup05DA86403000B4026AD0"
+    }
+  ],
+  "/VigilComputeStack/VigilFargateService/LB/PublicListener/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilFargateServiceLBPublicListener3A68D90B"
+    }
+  ],
+  "/VigilComputeStack/VigilFargateService/LB/PublicRedirectListener/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilFargateServiceLBPublicRedirectListener0931E3F3"
+    }
+  ],
+  "/VigilComputeStack/VigilFargateService/TaskDef/TaskRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilFargateServiceTaskDefTaskRole9EE2D92E"
+    }
+  ],
+  "/VigilComputeStack/VigilFargateService/TaskDef/ExecutionRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilFargateServiceTaskDefExecutionRole29B52A8C"
+    }
+  ],
+  "/VigilComputeStack/VigilFargateService/Service/SecurityGroup/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilFargateServiceSecurityGroupA4DE1B78"
+    }
+  ],
+  "/VigilComputeStack/VigilFargateService/Service/SecurityGroup/from VigilComputeStackVigilFargateServiceLBSecurityGroup38B07D6E:3000": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilFargateServiceSecurityGroupfromVigilComputeStackVigilFargateServiceLBSecurityGroup38B07D6E30006F5D41BC"
+    }
+  ],
+  "/VigilComputeStack/VigilMigrationsTaskDef/ExecutionRole/DefaultPolicy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilMigrationsTaskDefExecutionRoleDefaultPolicy5782000D"
+    }
+  ],
+  "/VigilComputeStack/VigilFargateService/LB/PublicListener/ECSGroup/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilFargateServiceLBPublicListenerECSGroup0788FCF3"
+    }
+  ],
+  "/VigilComputeStack/VigilFargateService/TaskDef/ExecutionRole/DefaultPolicy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilFargateServiceTaskDefExecutionRoleDefaultPolicy0B1A7C68"
+    }
+  ],
+  "/VigilComputeStack/VigilFargateService/Service/TaskCount/Target/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilFargateServiceTaskCountTarget40295B64"
+    }
+  ],
+  "/VigilComputeStack/VigilFargateService/Service/TaskCount/Target/CpuScaling/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilFargateServiceTaskCountTargetCpuScaling1FE1934B"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "version": "53.0.0",
+  "files": {
+    "fb6a00e6c891c41e4e1c799d061d75edc3346b5a53c0b0e7d6c5c3210b5efd4e": {
+      "displayName": "VigilAmplifyStack Template",
+      "source": {
+        "path": "VigilAmplifyStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "887067305712-us-east-2-daadc0bc": {
+          "bucketName": "cdk-hnb659fds-assets-887067305712-us-east-2",
+          "objectKey": "fb6a00e6c891c41e4e1c799d061d75edc3346b5a53c0b0e7d6c5c3210b5efd4e.json",
+          "region": "us-east-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::887067305712:role/cdk-hnb659fds-file-publishing-role-887067305712-us-east-2"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

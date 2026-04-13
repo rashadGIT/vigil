@@ -1,0 +1,1168 @@
+{
+ "Resources": {
+  "VigilBackendRepoEB24735A": {
+   "Type": "AWS::ECR::Repository",
+   "Properties": {
+    "ImageScanningConfiguration": {
+     "ScanOnPush": true
+    },
+    "ImageTagMutability": "MUTABLE",
+    "LifecyclePolicy": {
+     "LifecyclePolicyText": "{\"rules\":[{\"rulePriority\":1,\"description\":\"Keep last 10 images\",\"selection\":{\"tagStatus\":\"any\",\"countType\":\"imageCountMoreThan\",\"countNumber\":10},\"action\":{\"type\":\"expire\"}}]}"
+    },
+    "RepositoryName": "vigil-backend"
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "VigilComputeStack/VigilBackendRepo/Resource"
+   }
+  },
+  "VigilEcsCluster6A02CA96": {
+   "Type": "AWS::ECS::Cluster",
+   "Properties": {
+    "ClusterName": "vigil-cluster",
+    "ClusterSettings": [
+     {
+      "Name": "containerInsights",
+      "Value": "enabled"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilComputeStack/VigilEcsCluster/Resource"
+   }
+  },
+  "VigilBackendLogsB796FCD6": {
+   "Type": "AWS::Logs::LogGroup",
+   "Properties": {
+    "LogGroupName": "/vigil/backend",
+    "RetentionInDays": 30
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "VigilComputeStack/VigilBackendLogs/Resource"
+   }
+  },
+  "VigilFargateServiceLBBF7A1435": {
+   "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+   "Properties": {
+    "LoadBalancerAttributes": [
+     {
+      "Key": "deletion_protection.enabled",
+      "Value": "false"
+     }
+    ],
+    "Scheme": "internet-facing",
+    "SecurityGroups": [
+     {
+      "Fn::GetAtt": [
+       "VigilFargateServiceLBSecurityGroup2351E05D",
+       "GroupId"
+      ]
+     }
+    ],
+    "Subnets": [
+     {
+      "Fn::ImportValue": "VigilNetworkStack:ExportsOutputRefVigilVpcpublicSubnet1SubnetA5B6D2233C45AD52"
+     },
+     {
+      "Fn::ImportValue": "VigilNetworkStack:ExportsOutputRefVigilVpcpublicSubnet2SubnetBFCD1817E8E0564C"
+     }
+    ],
+    "Type": "application"
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilComputeStack/VigilFargateService/LB/Resource"
+   }
+  },
+  "VigilFargateServiceLBSecurityGroup2351E05D": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "Automatically created Security Group for ELB VigilComputeStackVigilFargateServiceLBA8C5203D",
+    "SecurityGroupIngress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow from anyone on port 443",
+      "FromPort": 443,
+      "IpProtocol": "tcp",
+      "ToPort": 443
+     },
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow from anyone on port 80",
+      "FromPort": 80,
+      "IpProtocol": "tcp",
+      "ToPort": 80
+     }
+    ],
+    "VpcId": {
+     "Fn::ImportValue": "VigilNetworkStack:ExportsOutputRefVigilVpc441DE1E5E59AE9D8"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilComputeStack/VigilFargateService/LB/SecurityGroup/Resource"
+   }
+  },
+  "VigilFargateServiceLBSecurityGrouptoVigilComputeStackVigilFargateServiceSecurityGroup05DA86403000B4026AD0": {
+   "Type": "AWS::EC2::SecurityGroupEgress",
+   "Properties": {
+    "Description": "Load balancer to target",
+    "DestinationSecurityGroupId": {
+     "Fn::GetAtt": [
+      "VigilFargateServiceSecurityGroupA4DE1B78",
+      "GroupId"
+     ]
+    },
+    "FromPort": 3000,
+    "GroupId": {
+     "Fn::GetAtt": [
+      "VigilFargateServiceLBSecurityGroup2351E05D",
+      "GroupId"
+     ]
+    },
+    "IpProtocol": "tcp",
+    "ToPort": 3000
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilComputeStack/VigilFargateService/LB/SecurityGroup/to VigilComputeStackVigilFargateServiceSecurityGroup05DA8640:3000"
+   }
+  },
+  "VigilFargateServiceLBPublicListener3A68D90B": {
+   "Type": "AWS::ElasticLoadBalancingV2::Listener",
+   "Properties": {
+    "Certificates": [
+     {
+      "CertificateArn": {
+       "Fn::ImportValue": "VigilFoundationStack:ExportsOutputRefVigilWildcardCert4BBA2E00370A2AFE"
+      }
+     }
+    ],
+    "DefaultActions": [
+     {
+      "TargetGroupArn": {
+       "Ref": "VigilFargateServiceLBPublicListenerECSGroup0788FCF3"
+      },
+      "Type": "forward"
+     }
+    ],
+    "LoadBalancerArn": {
+     "Ref": "VigilFargateServiceLBBF7A1435"
+    },
+    "Port": 443,
+    "Protocol": "HTTPS"
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilComputeStack/VigilFargateService/LB/PublicListener/Resource"
+   }
+  },
+  "VigilFargateServiceLBPublicListenerECSGroup0788FCF3": {
+   "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+   "Properties": {
+    "HealthCheckIntervalSeconds": 30,
+    "HealthCheckPath": "/",
+    "HealthyThresholdCount": 2,
+    "Port": 80,
+    "Protocol": "HTTP",
+    "TargetGroupAttributes": [
+     {
+      "Key": "stickiness.enabled",
+      "Value": "false"
+     }
+    ],
+    "TargetType": "ip",
+    "UnhealthyThresholdCount": 5,
+    "VpcId": {
+     "Fn::ImportValue": "VigilNetworkStack:ExportsOutputRefVigilVpc441DE1E5E59AE9D8"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilComputeStack/VigilFargateService/LB/PublicListener/ECSGroup/Resource"
+   }
+  },
+  "VigilFargateServiceLBPublicRedirectListener0931E3F3": {
+   "Type": "AWS::ElasticLoadBalancingV2::Listener",
+   "Properties": {
+    "DefaultActions": [
+     {
+      "RedirectConfig": {
+       "Port": "443",
+       "Protocol": "HTTPS",
+       "StatusCode": "HTTP_301"
+      },
+      "Type": "redirect"
+     }
+    ],
+    "LoadBalancerArn": {
+     "Ref": "VigilFargateServiceLBBF7A1435"
+    },
+    "Port": 80,
+    "Protocol": "HTTP"
+   },
+   "DependsOn": [
+    "VigilFargateServiceLBPublicListenerECSGroup0788FCF3",
+    "VigilFargateServiceLBPublicListener3A68D90B"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "VigilComputeStack/VigilFargateService/LB/PublicRedirectListener/Resource"
+   }
+  },
+  "VigilFargateServiceDNS969E68FF": {
+   "Type": "AWS::Route53::RecordSet",
+   "Properties": {
+    "AliasTarget": {
+     "DNSName": {
+      "Fn::Join": [
+       "",
+       [
+        "dualstack.",
+        {
+         "Fn::GetAtt": [
+          "VigilFargateServiceLBBF7A1435",
+          "DNSName"
+         ]
+        }
+       ]
+      ]
+     },
+     "HostedZoneId": {
+      "Fn::GetAtt": [
+       "VigilFargateServiceLBBF7A1435",
+       "CanonicalHostedZoneID"
+      ]
+     }
+    },
+    "HostedZoneId": "Z09382723RAE7AUP3G3OS",
+    "Name": "api.vigil.automagicly.ai.",
+    "Type": "A"
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilComputeStack/VigilFargateService/DNS/Resource"
+   }
+  },
+  "VigilFargateServiceTaskDefTaskRole9EE2D92E": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilComputeStack/VigilFargateService/TaskDef/TaskRole/Resource"
+   }
+  },
+  "VigilFargateServiceTaskDef188E89C0": {
+   "Type": "AWS::ECS::TaskDefinition",
+   "Properties": {
+    "ContainerDefinitions": [
+     {
+      "Environment": [
+       {
+        "Name": "NODE_ENV",
+        "Value": "production"
+       },
+       {
+        "Name": "PORT",
+        "Value": "3000"
+       }
+      ],
+      "Essential": true,
+      "Image": {
+       "Fn::Join": [
+        "",
+        [
+         {
+          "Fn::Select": [
+           4,
+           {
+            "Fn::Split": [
+             ":",
+             {
+              "Fn::GetAtt": [
+               "VigilBackendRepoEB24735A",
+               "Arn"
+              ]
+             }
+            ]
+           }
+          ]
+         },
+         ".dkr.ecr.",
+         {
+          "Fn::Select": [
+           3,
+           {
+            "Fn::Split": [
+             ":",
+             {
+              "Fn::GetAtt": [
+               "VigilBackendRepoEB24735A",
+               "Arn"
+              ]
+             }
+            ]
+           }
+          ]
+         },
+         ".",
+         {
+          "Ref": "AWS::URLSuffix"
+         },
+         "/",
+         {
+          "Ref": "VigilBackendRepoEB24735A"
+         },
+         ":latest"
+        ]
+       ]
+      },
+      "LogConfiguration": {
+       "LogDriver": "awslogs",
+       "Options": {
+        "awslogs-group": {
+         "Ref": "VigilBackendLogsB796FCD6"
+        },
+        "awslogs-stream-prefix": "backend",
+        "awslogs-region": "us-east-2"
+       }
+      },
+      "Name": "vigil-backend",
+      "PortMappings": [
+       {
+        "ContainerPort": 3000,
+        "Protocol": "tcp"
+       }
+      ]
+     }
+    ],
+    "Cpu": "512",
+    "ExecutionRoleArn": {
+     "Fn::GetAtt": [
+      "VigilFargateServiceTaskDefExecutionRole29B52A8C",
+      "Arn"
+     ]
+    },
+    "Family": "VigilComputeStackVigilFargateServiceTaskDef19EDCA9F",
+    "Memory": "1024",
+    "NetworkMode": "awsvpc",
+    "RequiresCompatibilities": [
+     "FARGATE"
+    ],
+    "TaskRoleArn": {
+     "Fn::GetAtt": [
+      "VigilFargateServiceTaskDefTaskRole9EE2D92E",
+      "Arn"
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilComputeStack/VigilFargateService/TaskDef/Resource"
+   }
+  },
+  "VigilFargateServiceTaskDefExecutionRole29B52A8C": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilComputeStack/VigilFargateService/TaskDef/ExecutionRole/Resource"
+   }
+  },
+  "VigilFargateServiceTaskDefExecutionRoleDefaultPolicy0B1A7C68": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:BatchGetImage"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "VigilBackendRepoEB24735A",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": "ecr:GetAuthorizationToken",
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "VigilBackendLogsB796FCD6",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "VigilFargateServiceTaskDefExecutionRoleDefaultPolicy0B1A7C68",
+    "Roles": [
+     {
+      "Ref": "VigilFargateServiceTaskDefExecutionRole29B52A8C"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilComputeStack/VigilFargateService/TaskDef/ExecutionRole/DefaultPolicy/Resource"
+   }
+  },
+  "VigilFargateService3B33BF76": {
+   "Type": "AWS::ECS::Service",
+   "Properties": {
+    "Cluster": {
+     "Ref": "VigilEcsCluster6A02CA96"
+    },
+    "DeploymentConfiguration": {
+     "Alarms": {
+      "AlarmNames": [],
+      "Enable": false,
+      "Rollback": false
+     },
+     "MaximumPercent": 200,
+     "MinimumHealthyPercent": 50
+    },
+    "DesiredCount": 1,
+    "EnableECSManagedTags": false,
+    "HealthCheckGracePeriodSeconds": 60,
+    "LaunchType": "FARGATE",
+    "LoadBalancers": [
+     {
+      "ContainerName": "vigil-backend",
+      "ContainerPort": 3000,
+      "TargetGroupArn": {
+       "Ref": "VigilFargateServiceLBPublicListenerECSGroup0788FCF3"
+      }
+     }
+    ],
+    "NetworkConfiguration": {
+     "AwsvpcConfiguration": {
+      "AssignPublicIp": "ENABLED",
+      "SecurityGroups": [
+       {
+        "Fn::GetAtt": [
+         "VigilFargateServiceSecurityGroupA4DE1B78",
+         "GroupId"
+        ]
+       }
+      ],
+      "Subnets": [
+       {
+        "Fn::ImportValue": "VigilNetworkStack:ExportsOutputRefVigilVpcpublicSubnet1SubnetA5B6D2233C45AD52"
+       },
+       {
+        "Fn::ImportValue": "VigilNetworkStack:ExportsOutputRefVigilVpcpublicSubnet2SubnetBFCD1817E8E0564C"
+       }
+      ]
+     }
+    },
+    "ServiceName": "vigil-backend",
+    "TaskDefinition": {
+     "Ref": "VigilFargateServiceTaskDef188E89C0"
+    }
+   },
+   "DependsOn": [
+    "VigilFargateServiceLBPublicListenerECSGroup0788FCF3",
+    "VigilFargateServiceLBPublicListener3A68D90B",
+    "VigilFargateServiceTaskDefTaskRole9EE2D92E"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "VigilComputeStack/VigilFargateService/Service/Service"
+   }
+  },
+  "VigilFargateServiceSecurityGroupA4DE1B78": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "VigilComputeStack/VigilFargateService/Service/SecurityGroup",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "VpcId": {
+     "Fn::ImportValue": "VigilNetworkStack:ExportsOutputRefVigilVpc441DE1E5E59AE9D8"
+    }
+   },
+   "DependsOn": [
+    "VigilFargateServiceTaskDefTaskRole9EE2D92E"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "VigilComputeStack/VigilFargateService/Service/SecurityGroup/Resource"
+   }
+  },
+  "VigilFargateServiceSecurityGroupfromVigilComputeStackVigilFargateServiceLBSecurityGroup38B07D6E30006F5D41BC": {
+   "Type": "AWS::EC2::SecurityGroupIngress",
+   "Properties": {
+    "Description": "Load balancer to target",
+    "FromPort": 3000,
+    "GroupId": {
+     "Fn::GetAtt": [
+      "VigilFargateServiceSecurityGroupA4DE1B78",
+      "GroupId"
+     ]
+    },
+    "IpProtocol": "tcp",
+    "SourceSecurityGroupId": {
+     "Fn::GetAtt": [
+      "VigilFargateServiceLBSecurityGroup2351E05D",
+      "GroupId"
+     ]
+    },
+    "ToPort": 3000
+   },
+   "DependsOn": [
+    "VigilFargateServiceTaskDefTaskRole9EE2D92E"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "VigilComputeStack/VigilFargateService/Service/SecurityGroup/from VigilComputeStackVigilFargateServiceLBSecurityGroup38B07D6E:3000"
+   }
+  },
+  "VigilFargateServiceTaskCountTarget40295B64": {
+   "Type": "AWS::ApplicationAutoScaling::ScalableTarget",
+   "Properties": {
+    "MaxCapacity": 10,
+    "MinCapacity": 1,
+    "ResourceId": {
+     "Fn::Join": [
+      "",
+      [
+       "service/",
+       {
+        "Ref": "VigilEcsCluster6A02CA96"
+       },
+       "/",
+       {
+        "Fn::GetAtt": [
+         "VigilFargateService3B33BF76",
+         "Name"
+        ]
+       }
+      ]
+     ]
+    },
+    "RoleARN": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":iam::887067305712:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService"
+      ]
+     ]
+    },
+    "ScalableDimension": "ecs:service:DesiredCount",
+    "ServiceNamespace": "ecs"
+   },
+   "DependsOn": [
+    "VigilFargateServiceTaskDefTaskRole9EE2D92E"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "VigilComputeStack/VigilFargateService/Service/TaskCount/Target/Resource"
+   }
+  },
+  "VigilFargateServiceTaskCountTargetCpuScaling1FE1934B": {
+   "Type": "AWS::ApplicationAutoScaling::ScalingPolicy",
+   "Properties": {
+    "PolicyName": "VigilComputeStackVigilFargateServiceTaskCountTargetCpuScaling285F86FC",
+    "PolicyType": "TargetTrackingScaling",
+    "ScalingTargetId": {
+     "Ref": "VigilFargateServiceTaskCountTarget40295B64"
+    },
+    "TargetTrackingScalingPolicyConfiguration": {
+     "PredefinedMetricSpecification": {
+      "PredefinedMetricType": "ECSServiceAverageCPUUtilization"
+     },
+     "ScaleInCooldown": 60,
+     "ScaleOutCooldown": 60,
+     "TargetValue": 70
+    }
+   },
+   "DependsOn": [
+    "VigilFargateServiceTaskDefTaskRole9EE2D92E"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "VigilComputeStack/VigilFargateService/Service/TaskCount/Target/CpuScaling/Resource"
+   }
+  },
+  "VigilMigrationsTaskDefTaskRole7B6B3FDE": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilComputeStack/VigilMigrationsTaskDef/TaskRole/Resource"
+   }
+  },
+  "VigilMigrationsTaskDefEF6FF80C": {
+   "Type": "AWS::ECS::TaskDefinition",
+   "Properties": {
+    "ContainerDefinitions": [
+     {
+      "Command": [
+       "npx",
+       "prisma",
+       "migrate",
+       "deploy"
+      ],
+      "Environment": [
+       {
+        "Name": "NODE_ENV",
+        "Value": "production"
+       }
+      ],
+      "Essential": true,
+      "Image": {
+       "Fn::Join": [
+        "",
+        [
+         {
+          "Fn::Select": [
+           4,
+           {
+            "Fn::Split": [
+             ":",
+             {
+              "Fn::GetAtt": [
+               "VigilBackendRepoEB24735A",
+               "Arn"
+              ]
+             }
+            ]
+           }
+          ]
+         },
+         ".dkr.ecr.",
+         {
+          "Fn::Select": [
+           3,
+           {
+            "Fn::Split": [
+             ":",
+             {
+              "Fn::GetAtt": [
+               "VigilBackendRepoEB24735A",
+               "Arn"
+              ]
+             }
+            ]
+           }
+          ]
+         },
+         ".",
+         {
+          "Ref": "AWS::URLSuffix"
+         },
+         "/",
+         {
+          "Ref": "VigilBackendRepoEB24735A"
+         },
+         ":latest"
+        ]
+       ]
+      },
+      "LogConfiguration": {
+       "LogDriver": "awslogs",
+       "Options": {
+        "awslogs-group": {
+         "Ref": "VigilBackendLogsB796FCD6"
+        },
+        "awslogs-stream-prefix": "migrations",
+        "awslogs-region": "us-east-2"
+       }
+      },
+      "Name": "migrations"
+     }
+    ],
+    "Cpu": "512",
+    "ExecutionRoleArn": {
+     "Fn::GetAtt": [
+      "VigilMigrationsTaskDefExecutionRole7B7316AC",
+      "Arn"
+     ]
+    },
+    "Family": "vigil-migrations",
+    "Memory": "1024",
+    "NetworkMode": "awsvpc",
+    "RequiresCompatibilities": [
+     "FARGATE"
+    ],
+    "TaskRoleArn": {
+     "Fn::GetAtt": [
+      "VigilMigrationsTaskDefTaskRole7B6B3FDE",
+      "Arn"
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilComputeStack/VigilMigrationsTaskDef/Resource"
+   }
+  },
+  "VigilMigrationsTaskDefExecutionRole7B7316AC": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilComputeStack/VigilMigrationsTaskDef/ExecutionRole/Resource"
+   }
+  },
+  "VigilMigrationsTaskDefExecutionRoleDefaultPolicy5782000D": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:BatchGetImage"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "VigilBackendRepoEB24735A",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": "ecr:GetAuthorizationToken",
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "VigilBackendLogsB796FCD6",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "VigilMigrationsTaskDefExecutionRoleDefaultPolicy5782000D",
+    "Roles": [
+     {
+      "Ref": "VigilMigrationsTaskDefExecutionRole7B7316AC"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilComputeStack/VigilMigrationsTaskDef/ExecutionRole/DefaultPolicy/Resource"
+   }
+  },
+  "GitHubOidcProvider7EBF861F": {
+   "Type": "Custom::AWSCDKOpenIdConnectProvider",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomAWSCDKOpenIdConnectProviderCustomResourceProviderHandlerF2C543E0",
+      "Arn"
+     ]
+    },
+    "ClientIDList": [
+     "sts.amazonaws.com"
+    ],
+    "Url": "https://token.actions.githubusercontent.com",
+    "RejectUnauthorized": false,
+    "CodeHash": "d75c48c9f82cde63e9bf414df335e84e8ac24f11eb34889be255b702aec71e50"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "VigilComputeStack/GitHubOidcProvider/Resource/Default"
+   }
+  },
+  "CustomAWSCDKOpenIdConnectProviderCustomResourceProviderRole517FED65": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ]
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+     }
+    ],
+    "Policies": [
+     {
+      "PolicyName": "Inline",
+      "PolicyDocument": {
+       "Version": "2012-10-17",
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Resource": "*",
+         "Action": [
+          "iam:CreateOpenIDConnectProvider",
+          "iam:DeleteOpenIDConnectProvider",
+          "iam:UpdateOpenIDConnectProviderThumbprint",
+          "iam:AddClientIDToOpenIDConnectProvider",
+          "iam:RemoveClientIDFromOpenIDConnectProvider"
+         ]
+        }
+       ]
+      }
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilComputeStack/Custom::AWSCDKOpenIdConnectProviderCustomResourceProvider/Role"
+   }
+  },
+  "CustomAWSCDKOpenIdConnectProviderCustomResourceProviderHandlerF2C543E0": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-887067305712-us-east-2",
+     "S3Key": "d75c48c9f82cde63e9bf414df335e84e8ac24f11eb34889be255b702aec71e50.zip"
+    },
+    "Timeout": 900,
+    "MemorySize": 128,
+    "Handler": "__entrypoint__.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "CustomAWSCDKOpenIdConnectProviderCustomResourceProviderRole517FED65",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs22.x"
+   },
+   "DependsOn": [
+    "CustomAWSCDKOpenIdConnectProviderCustomResourceProviderRole517FED65"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "VigilComputeStack/Custom::AWSCDKOpenIdConnectProviderCustomResourceProvider/Handler",
+    "aws:asset:path": "asset.d75c48c9f82cde63e9bf414df335e84e8ac24f11eb34889be255b702aec71e50",
+    "aws:asset:property": "Code"
+   }
+  },
+  "GitHubActionsDeployRoleA6F4AD3D": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRoleWithWebIdentity",
+       "Condition": {
+        "StringEquals": {
+         "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+        },
+        "StringLike": {
+         "token.actions.githubusercontent.com:sub": "repo:rashadGIT/Vigil:*"
+        }
+       },
+       "Effect": "Allow",
+       "Principal": {
+        "Federated": {
+         "Ref": "GitHubOidcProvider7EBF861F"
+        }
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Description": "Assumed by GitHub Actions to push ECR images and update ECS service",
+    "RoleName": "VigilGitHubActionsDeployRole"
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilComputeStack/GitHubActionsDeployRole/Resource"
+   }
+  },
+  "GitHubActionsDeployRoleDefaultPolicy3AC475A7": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "ecr:GetAuthorizationToken",
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:PutImage",
+        "ecr:InitiateLayerUpload",
+        "ecr:UploadLayerPart",
+        "ecr:CompleteLayerUpload",
+        "ecr:BatchGetImage"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "VigilBackendRepoEB24735A",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": [
+        "ecs:UpdateService",
+        "ecs:DescribeServices",
+        "ecs:RunTask",
+        "iam:PassRole"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "GitHubActionsDeployRoleDefaultPolicy3AC475A7",
+    "Roles": [
+     {
+      "Ref": "GitHubActionsDeployRoleA6F4AD3D"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilComputeStack/GitHubActionsDeployRole/DefaultPolicy/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/31T227CMAz9lr2HbGJD2h43dhESEojyPoXUqwwhrhKXCVX99zkthe6iPcU+OY6PLxnr8d29vrkyn3Fk893I4UbXGRu7UwK912CDrldQUkSmcFTTD3/xGgU26nrqqsgQ0l1vvppQGIa1ibtn+ECPjOQT4SdCng16CAPsFJtBOKCFFNSbmTXObFz77JQqz41yVIiCORVvgaoykXu7FfdeGhY9PurHsnRoTcowJ5M/yUveQv4jGTgTGa0TxqZloC8OY13/HR26fAN/yEPphD9xentwv5bMwGfZAzcpl5wZ2CogH8+U/4GXIkCMv+CZb/FGicMwuZVaVmAp5N0ok5WBNBLNXgZNrm14ey5JpLYTP1mLEvwsl5F5sLwMdMAcQqPMpSZTMUUZknRN9J+nlSprhX1HumMdZNkkIOviLlm/AU2ToEXFZcVqBZGqkHZDto32FzdV9OdVr/bJRFCPMQLLjhfyeqM85aC38fownugH+QnbiDgKsly4B73qzi+nWOB6JgMAAA=="
+   },
+   "Metadata": {
+    "aws:cdk:path": "VigilComputeStack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "VigilFargateServiceLoadBalancerDNSFEE6318B": {
+   "Value": {
+    "Fn::GetAtt": [
+     "VigilFargateServiceLBBF7A1435",
+     "DNSName"
+    ]
+   }
+  },
+  "VigilFargateServiceServiceURL19070B8D": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "VigilFargateServiceDNS969E68FF"
+      }
+     ]
+    ]
+   }
+  },
+  "EcrRepoUri": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      {
+       "Fn::Select": [
+        4,
+        {
+         "Fn::Split": [
+          ":",
+          {
+           "Fn::GetAtt": [
+            "VigilBackendRepoEB24735A",
+            "Arn"
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      ".dkr.ecr.",
+      {
+       "Fn::Select": [
+        3,
+        {
+         "Fn::Split": [
+          ":",
+          {
+           "Fn::GetAtt": [
+            "VigilBackendRepoEB24735A",
+            "Arn"
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      ".",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "VigilBackendRepoEB24735A"
+      }
+     ]
+    ]
+   }
+  },
+  "EcsClusterName": {
+   "Value": {
+    "Ref": "VigilEcsCluster6A02CA96"
+   }
+  },
+  "EcsServiceName": {
+   "Value": {
+    "Fn::GetAtt": [
+     "VigilFargateService3B33BF76",
+     "Name"
+    ]
+   }
+  },
+  "GitHubActionsRoleArn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "GitHubActionsDeployRoleA6F4AD3D",
+     "Arn"
+    ]
+   }
+  },
+  "ApiUrl": {
+   "Value": "https://api.vigil.automagicly.ai"
+  },
+  "ExportsOutputRefVigilEcsCluster6A02CA96A92FAA6C": {
+   "Value": {
+    "Ref": "VigilEcsCluster6A02CA96"
+   },
+   "Export": {
+    "Name": "VigilComputeStack:ExportsOutputRefVigilEcsCluster6A02CA96A92FAA6C"
+   }
+  },
+  "ExportsOutputFnGetAttVigilFargateService3B33BF76NameAC9B96B9": {
+   "Value": {
+    "Fn::GetAtt": [
+     "VigilFargateService3B33BF76",
+     "Name"
+    ]
+   },
+   "Export": {
+    "Name": "VigilComputeStack:ExportsOutputFnGetAttVigilFargateService3B33BF76NameAC9B96B9"
+   }
+  },
+  "ExportsOutputFnGetAttVigilFargateServiceLBBF7A1435LoadBalancerFullNameE5C7CBEE": {
+   "Value": {
+    "Fn::GetAtt": [
+     "VigilFargateServiceLBBF7A1435",
+     "LoadBalancerFullName"
+    ]
+   },
+   "Export": {
+    "Name": "VigilComputeStack:ExportsOutputFnGetAttVigilFargateServiceLBBF7A1435LoadBalancerFullNameE5C7CBEE"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

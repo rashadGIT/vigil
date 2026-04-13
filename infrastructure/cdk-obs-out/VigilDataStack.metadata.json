@@ -1,0 +1,116 @@
+{
+  "/VigilDataStack/RdsEndpoint": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "RdsEndpoint"
+    }
+  ],
+  "/VigilDataStack/DocumentsBucketName": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DocumentsBucketName"
+    }
+  ],
+  "/VigilDataStack/PublicAssetsBucketName": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "PublicAssetsBucketName"
+    }
+  ],
+  "/VigilDataStack/BootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BootstrapVersion"
+    }
+  ],
+  "/VigilDataStack/CheckBootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CheckBootstrapVersion"
+    }
+  ],
+  "/VigilDataStack/VigilRds/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilRds58E5085D"
+    }
+  ],
+  "/VigilDataStack/VigilDocumentsBucket/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilDocumentsBucket11C9B446"
+    }
+  ],
+  "/VigilDataStack/VigilPublicAssetsBucket/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilPublicAssetsBucketE2E9B417"
+    }
+  ],
+  "/VigilDataStack/CognitoConfigSecret/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CognitoConfigSecretEFC6F6E0"
+    }
+  ],
+  "/VigilDataStack/N8nWebhookSecret/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "N8nWebhookSecret9120B852"
+    }
+  ],
+  "/VigilDataStack/SentryDsnSecret/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "SentryDsnSecretD5567F69"
+    }
+  ],
+  "/VigilDataStack/AmplifyGitHubTokenSecret/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AmplifyGitHubTokenSecret1F8633D5"
+    }
+  ],
+  "/VigilDataStack/CDKMetadata/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadata"
+    }
+  ],
+  "/VigilDataStack/Exports/Output{\"Ref\":\"VigilRds58E5085D\"}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputRefVigilRds58E5085DE1E88ABC"
+    }
+  ],
+  "/VigilDataStack/VigilRds/SubnetGroup/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilRdsSubnetGroup75391589"
+    }
+  ],
+  "/VigilDataStack/VigilRds/Secret/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilDataStackVigilRdsSecret8092CCAB3fdaad7efa858a3daf9490cf0a702aeb"
+    }
+  ],
+  "/VigilDataStack/VigilDocumentsBucket/Policy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilDocumentsBucketPolicy8D8E7767"
+    }
+  ],
+  "/VigilDataStack/VigilPublicAssetsBucket/Policy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilPublicAssetsBucketPolicy4A83C3F6"
+    }
+  ],
+  "/VigilDataStack/VigilRds/Secret/Attachment/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VigilRdsSecretAttachmentE4D446B3"
+    }
+  ]
+}

@@ -1,6 +1,8 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { EventType } from '@prisma/client';
 import { PrismaService } from '../../common/prisma/prisma.service';
+import { N8nService } from '../n8n/n8n.service';
+import { N8nEvent } from '../n8n/n8n-events.enum';
 import { TaskTemplatesService } from '../tasks/task-templates.service';
 import { IntakeFormDto } from './dto/intake-form.dto';
 
@@ -10,6 +12,7 @@ export class IntakeService {
 
   constructor(
     private readonly prisma: PrismaService,
+    private readonly n8n: N8nService,
     private readonly taskTemplates: TaskTemplatesService,
   ) {}
 
@@ -75,9 +78,16 @@ export class IntakeService {
       return { caseId: createdCase.id };
     });
 
-    // 5. Trigger n8n INTAKE_NOTIFY webhook (fire-and-forget — N8nService wired in Plan 05-05)
-    // For now, log; Plan 05-05 adds the real N8nService call via an injected dependency.
+    // 5. Trigger n8n INTAKE_NOTIFY webhook (fire-and-forget)
     this.logger.log(`[INTAKE] Submitted for tenant=${tenantId} case=${result.caseId}`);
+    void this.n8n.trigger(N8nEvent.INTAKE_NOTIFY, {
+      tenantId,
+      caseId: result.caseId,
+      deceasedName: dto.deceasedName,
+      staffEmail: 'staff@vigilhq.com', // TODO: resolve assigned staff email from tenant config
+      caseUrl: `https://app.vigilhq.com/cases/${result.caseId}`,
+      sesFromAddress: 'noreply@vigilhq.com',
+    });
 
     return result;
   }
