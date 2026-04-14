@@ -1,4 +1,9 @@
-import { PrismaClient, UserRole, PriceCategory } from '@prisma/client';
+import { PrismaClient, UserRole, PriceCategory, ServiceType, CaseStatus } from '@prisma/client';
+import {
+  BURIAL,
+  CREMATION,
+  GRAVESIDE,
+} from '../src/modules/tasks/task-templates.service';
 import {
   CognitoIdentityProviderClient,
   AdminCreateUserCommand,
@@ -192,12 +197,153 @@ async function seedUsers(
   console.log(`[seed] users: ${users.length}`);
 }
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+type DemoCase = {
+  deceasedName: string;
+  deceasedDob: Date;
+  deceasedDod: Date;
+  serviceType: ServiceType;
+  status: CaseStatus;
+  daysAgo: number;
+  template: typeof BURIAL;
+  contact: { name: string; relationship: string; email: string; phone: string };
+  completedTaskIndices: number[];
+  overdueTaskIndex: number | null;
+};
+
+function demoCases(): DemoCase[] {
+  return [
+    {
+      deceasedName: 'James Holloway',
+      deceasedDob: new Date('1948-03-12'),
+      deceasedDod: new Date(Date.now() - 2 * DAY_MS),
+      serviceType: 'burial' as ServiceType,
+      status: 'new' as CaseStatus,
+      daysAgo: 0,
+      template: BURIAL,
+      contact: { name: 'Linda Holloway', relationship: 'Spouse', email: 'linda.holloway@example.com', phone: '614-555-0142' },
+      completedTaskIndices: [],
+      overdueTaskIndex: null,
+    },
+    {
+      deceasedName: 'Margaret Chen',
+      deceasedDob: new Date('1955-07-24'),
+      deceasedDod: new Date(Date.now() - 6 * DAY_MS),
+      serviceType: 'cremation' as ServiceType,
+      status: 'in_progress' as CaseStatus,
+      daysAgo: 5,
+      template: CREMATION,
+      contact: { name: 'David Chen', relationship: 'Son', email: 'david.chen@example.com', phone: '614-555-0187' },
+      completedTaskIndices: [0, 1, 2],
+      overdueTaskIndex: 4,
+    },
+    {
+      deceasedName: 'Robert Abrams',
+      deceasedDob: new Date('1941-11-02'),
+      deceasedDod: new Date(Date.now() - 16 * DAY_MS),
+      serviceType: 'graveside' as ServiceType,
+      status: 'completed' as CaseStatus,
+      daysAgo: 14,
+      template: GRAVESIDE,
+      contact: { name: 'Ruth Abrams', relationship: 'Spouse', email: 'ruth.abrams@example.com', phone: '614-555-0119' },
+      completedTaskIndices: Array.from({ length: GRAVESIDE.length }, (_, i) => i),
+      overdueTaskIndex: null,
+    },
+  ];
+}
+
+async function seedCases(sunriseId: string, assignedToId: string) {
+  for (const dc of demoCases()) {
+    const baseDate = new Date(Date.now() - dc.daysAgo * DAY_MS);
+
+    // 1. Upsert Case by (tenantId, deceasedName)
+    let caseRow = await prisma.case.findFirst({
+      where: { tenantId: sunriseId, deceasedName: dc.deceasedName },
+    });
+    if (!caseRow) {
+      caseRow = await prisma.case.create({
+        data: {
+          tenantId: sunriseId,
+          deceasedName: dc.deceasedName,
+          deceasedDob: dc.deceasedDob,
+          deceasedDod: dc.deceasedDod,
+          serviceType: dc.serviceType,
+          status: dc.status,
+          assignedToId,
+          createdAt: baseDate,
+        },
+      });
+    } else {
+      caseRow = await prisma.case.update({
+        where: { id: caseRow.id },
+        data: { status: dc.status, assignedToId },
+      });
+    }
+
+    // 2. Upsert primary FamilyContact
+    const existingContact = await prisma.familyContact.findFirst({
+      where: { tenantId: sunriseId, caseId: caseRow.id, isPrimaryContact: true },
+    });
+    if (!existingContact) {
+      await prisma.familyContact.create({
+        data: {
+          tenantId: sunriseId,
+          caseId: caseRow.id,
+          name: dc.contact.name,
+          relationship: dc.contact.relationship,
+          email: dc.contact.email,
+          phone: dc.contact.phone,
+          isPrimaryContact: true,
+        },
+      });
+    }
+
+    // 3. Upsert tasks from template
+    for (let i = 0; i < dc.template.length; i++) {
+      const tmpl = dc.template[i];
+      const dueDate =
+        dc.overdueTaskIndex === i
+          ? new Date(Date.now() - 1 * DAY_MS)
+          : tmpl.defaultDueDays === null
+            ? null
+            : new Date(baseDate.getTime() + tmpl.defaultDueDays * DAY_MS);
+      const completed = dc.completedTaskIndices.includes(i);
+
+      const existing = await prisma.task.findFirst({
+        where: { tenantId: sunriseId, caseId: caseRow.id, title: tmpl.title },
+      });
+      if (existing) {
+        await prisma.task.update({
+          where: { id: existing.id },
+          data: { dueDate, completed, completedBy: completed ? assignedToId : null },
+        });
+      } else {
+        await prisma.task.create({
+          data: {
+            tenantId: sunriseId,
+            caseId: caseRow.id,
+            title: tmpl.title,
+            dueDate,
+            completed,
+            completedBy: completed ? assignedToId : null,
+          },
+        });
+      }
+    }
+
+    console.log(`[seed] case: ${dc.deceasedName} (${dc.status}) + ${dc.template.length} tasks`);
+  }
+}
+
 async function main() {
   console.log(`[seed] Cognito enabled: ${COGNITO_ENABLED}`);
   const tenants = await seedTenants();
   await seedUsers(tenants);
   await seedPriceList(tenants.sunrise.id);
-  console.log('[seed] Plan 11-02 complete');
+  const director = await prisma.user.findUniqueOrThrow({ where: { email: 'director@sunrise.demo' } });
+  await seedCases(tenants.sunrise.id, director.id);
+  console.log('[seed] Plan 11-03 complete');
 }
 
 main()
