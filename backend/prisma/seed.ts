@@ -1,4 +1,4 @@
-import { PrismaClient, UserRole } from '@prisma/client';
+import { PrismaClient, UserRole, PriceCategory } from '@prisma/client';
 import {
   CognitoIdentityProviderClient,
   AdminCreateUserCommand,
@@ -59,6 +59,69 @@ async function ensureCognitoUser(
     console.warn(`[seed] Cognito create failed for ${email}:`, (err as Error).message);
     return stubSub;
   }
+}
+
+type SeedPriceItem = {
+  category: PriceCategory;
+  name: string;
+  price: number;
+  taxable: boolean;
+  sortOrder: number;
+};
+
+const SUNRISE_PRICE_LIST: SeedPriceItem[] = [
+  // Professional Services (5)
+  { category: PriceCategory.professional_services, name: 'Basic Services of Funeral Director and Staff', price: 1995, taxable: false, sortOrder: 10 },
+  { category: PriceCategory.professional_services, name: 'Embalming', price: 795, taxable: false, sortOrder: 20 },
+  { category: PriceCategory.professional_services, name: 'Other Preparation of the Body', price: 295, taxable: false, sortOrder: 30 },
+  { category: PriceCategory.professional_services, name: 'Transfer of Remains to Funeral Home', price: 395, taxable: false, sortOrder: 40 },
+  { category: PriceCategory.professional_services, name: 'Direct Cremation (Alternative Container)', price: 895, taxable: false, sortOrder: 50 },
+
+  // Facilities (4)
+  { category: PriceCategory.facilities, name: 'Use of Facilities for Visitation', price: 495, taxable: false, sortOrder: 10 },
+  { category: PriceCategory.facilities, name: 'Use of Facilities for Funeral Ceremony', price: 695, taxable: false, sortOrder: 20 },
+  { category: PriceCategory.facilities, name: 'Use of Facilities for Memorial Service', price: 595, taxable: false, sortOrder: 30 },
+  { category: PriceCategory.facilities, name: 'Graveside Service (On-Site Staffing)', price: 495, taxable: false, sortOrder: 40 },
+
+  // Vehicles (4)
+  { category: PriceCategory.vehicles, name: 'Funeral Coach (Hearse)', price: 395, taxable: false, sortOrder: 10 },
+  { category: PriceCategory.vehicles, name: 'Family Limousine', price: 295, taxable: false, sortOrder: 20 },
+  { category: PriceCategory.vehicles, name: 'Utility Vehicle / Flower Car', price: 195, taxable: false, sortOrder: 30 },
+  { category: PriceCategory.vehicles, name: 'Service Vehicle (Out-of-Area Mileage)', price: 3.50, taxable: false, sortOrder: 40 },
+
+  // Merchandise (5)
+  { category: PriceCategory.merchandise, name: 'Standard Cloth-Covered Casket', price: 1495, taxable: true, sortOrder: 10 },
+  { category: PriceCategory.merchandise, name: 'Solid Oak Hardwood Casket', price: 3295, taxable: true, sortOrder: 20 },
+  { category: PriceCategory.merchandise, name: 'Cremation Urn — Brushed Brass', price: 295, taxable: true, sortOrder: 30 },
+  { category: PriceCategory.merchandise, name: 'Cremation Urn — Cherry Wood', price: 495, taxable: true, sortOrder: 40 },
+  { category: PriceCategory.merchandise, name: 'Memorial Register Book + Acknowledgement Cards', price: 145, taxable: true, sortOrder: 50 },
+];
+
+async function seedPriceList(sunriseId: string) {
+  for (const item of SUNRISE_PRICE_LIST) {
+    const existing = await prisma.priceListItem.findFirst({
+      where: { tenantId: sunriseId, category: item.category, name: item.name },
+    });
+    if (existing) {
+      await prisma.priceListItem.update({
+        where: { id: existing.id },
+        data: { price: item.price, taxable: item.taxable, sortOrder: item.sortOrder, active: true },
+      });
+    } else {
+      await prisma.priceListItem.create({
+        data: {
+          tenantId: sunriseId,
+          category: item.category,
+          name: item.name,
+          price: item.price,
+          taxable: item.taxable,
+          active: true,
+          sortOrder: item.sortOrder,
+        },
+      });
+    }
+  }
+  console.log(`[seed] price list: ${SUNRISE_PRICE_LIST.length} items for Sunrise`);
 }
 
 async function seedTenants() {
@@ -133,8 +196,8 @@ async function main() {
   console.log(`[seed] Cognito enabled: ${COGNITO_ENABLED}`);
   const tenants = await seedTenants();
   await seedUsers(tenants);
-  // Plans 11-02 → 11-04 will extend main() with subsequent seed sections.
-  console.log('[seed] Plan 11-01 complete');
+  await seedPriceList(tenants.sunrise.id);
+  console.log('[seed] Plan 11-02 complete');
 }
 
 main()
