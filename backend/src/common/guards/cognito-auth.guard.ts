@@ -67,6 +67,7 @@ export class CognitoAuthGuard implements CanActivate {
       process.env.NODE_ENV !== 'production' &&
       process.env.DEV_AUTH_BYPASS === 'true'
     ) {
+      this.logger.warn('DEV_AUTH_BYPASS active — Cognito verification skipped');
       const devUser =
         (request.headers['x-dev-user'] as string | undefined) ??
         'dev-user-1|seed-tenant-id|admin|director@sunrise.demo';
