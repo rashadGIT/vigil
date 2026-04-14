@@ -114,9 +114,9 @@
 
 - [ ] **TEST-01**: Unit tests (Jest) — pure functions, utilities, business logic — 80%+ coverage target
 - [ ] **TEST-02**: Component tests (Jest + RTL) — UI rendering, user interactions
-- [ ] **TEST-03**: Contract tests (Jest, `@jest-environment node`) — API route handlers
+- [x] **TEST-03**: Contract tests (Jest, `@jest-environment node`) — API route handlers
 - [ ] **TEST-04**: Integration test — tenant isolation verified (Tenant A cannot read Tenant B data)
-- [ ] **TEST-05**: E2E tests (Playwright) — intake → case created, login → dashboard, case workspace navigation
+- [x] **TEST-05**: E2E tests (Playwright) — intake → case created, login → dashboard, case workspace navigation
 - [ ] **TEST-06**: `npm run test` and `npm run test:e2e` runnable in CI without manual setup
 
 ### Seed Data
