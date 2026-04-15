@@ -13,10 +13,10 @@ export async function login(credentials: LoginCredentials) {
 
   if (DEV_BYPASS) {
     // Backend CognitoAuthGuard will parse x-dev-user header injected by apiClient interceptor
-    const res = await apiClient.post<{ user: { id: string; email: string; name: string; role: string; tenantId: string } }>(
-      '/auth/profile',
+    const res = await apiClient.get<{ id: string; email: string; name: string; role: string; tenantId: string }>(
+      '/auth/me',
     );
-    return res.data.user;
+    return res.data;
   }
 
   // Production: Amplify handles Cognito sign-in + sets tokens in memory

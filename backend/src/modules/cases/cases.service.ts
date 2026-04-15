@@ -35,6 +35,21 @@ export class CasesService {
     return this.prisma.forTenant(tenantId).case.create({ data });
   }
 
+  async getStats(tenantId: string) {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const db = this.prisma.forTenant(tenantId);
+
+    const [activeCases, casesThisMonth, overdueTasks, pendingSignatures] = await Promise.all([
+      db.case.count({ where: { deletedAt: null, status: { in: ['new', 'in_progress'] } } }),
+      db.case.count({ where: { deletedAt: null, createdAt: { gte: startOfMonth } } }),
+      db.task.count({ where: { completed: false, dueDate: { lt: now } } }),
+      db.signature.count({ where: { signedAt: null } }),
+    ]);
+
+    return { activeCases, casesThisMonth, overdueTasks, pendingSignatures };
+  }
+
   async findAll(tenantId: string, filter: CaseFilterDto) {
     const now = new Date();
     const cases = await this.prisma.forTenant(tenantId).case.findMany({

@@ -45,6 +45,16 @@ Never miss a step in a service again — every case has a complete, automated ch
 - [ ] First client onboarding — tenant provisioning runbook, staging environment
 - [ ] Review request workflow end-to-end test (Google review SMS + email 14 days post-service)
 
+## Current Milestone: v1.1 Stability & First Client
+
+**Goal:** Harden the platform for real-world use and onboard the first paying client.
+
+**Target features:**
+- Fix CronStubsService local dev guard (fires @Cron in dev — should not)
+- Verify all 6 n8n workflows are Active in production
+- First client onboarding — tenant provisioning runbook + staging environment
+- Review request workflow end-to-end test (Google review SMS + email 14 days post-service)
+
 **Phase 2 — Expansion Modules (after 2-3 clients)**
 
 - [ ] Family collaboration portal — secure link: families view details, upload photos, approve obituary, see payments
@@ -123,4 +133,4 @@ Never miss a step in a service again — every case has a complete, automated ch
 **After each milestone:** full review of all sections, Core Value check, Out of Scope audit, Context update.
 
 ---
-*Last updated: 2026-04-14 after v1.0 milestone*
+*Last updated: 2026-04-14 after v1.1 milestone start*

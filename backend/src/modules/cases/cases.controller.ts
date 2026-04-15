@@ -24,6 +24,11 @@ export class CasesController {
     return this.casesService.create(user.tenantId, dto);
   }
 
+  @Get('stats')
+  getStats(@CurrentUser() user: AuthUser) {
+    return this.casesService.getStats(user.tenantId);
+  }
+
   @Get()
   findAll(@CurrentUser() user: AuthUser, @Query() filter: CaseFilterDto) {
     return this.casesService.findAll(user.tenantId, filter);

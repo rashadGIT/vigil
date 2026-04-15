@@ -6,7 +6,7 @@ export interface TaskTemplateItem {
   defaultDueDays: number | null;
 }
 
-const BURIAL: TaskTemplateItem[] = [
+export const BURIAL: TaskTemplateItem[] = [
   { title: 'Initial family call — document service preferences', defaultDueDays: 0 },
   { title: 'Transfer remains to funeral home', defaultDueDays: 0 },
   { title: 'Obtain death certificate (original + certified copies)', defaultDueDays: 1 },
@@ -27,7 +27,7 @@ const BURIAL: TaskTemplateItem[] = [
   { title: 'Obtain signed authorization and service contract', defaultDueDays: 1 },
 ];
 
-const CREMATION: TaskTemplateItem[] = [
+export const CREMATION: TaskTemplateItem[] = [
   { title: 'Initial family call — document service preferences', defaultDueDays: 0 },
   { title: 'Transfer remains to funeral home', defaultDueDays: 0 },
   { title: 'Obtain death certificate (original + certified copies)', defaultDueDays: 1 },
@@ -45,7 +45,7 @@ const CREMATION: TaskTemplateItem[] = [
   { title: 'Obtain signed service contract and payment agreement', defaultDueDays: 1 },
 ];
 
-const GRAVESIDE: TaskTemplateItem[] = [
+export const GRAVESIDE: TaskTemplateItem[] = [
   { title: 'Initial family call — document service preferences', defaultDueDays: 0 },
   { title: 'Transfer remains to funeral home', defaultDueDays: 0 },
   { title: 'Obtain death certificate (original + certified copies)', defaultDueDays: 1 },

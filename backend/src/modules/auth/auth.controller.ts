@@ -1,4 +1,4 @@
-import { Body, Controller, Headers, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, Headers, Post, Req, Res } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
@@ -27,6 +27,18 @@ export class AuthController {
       throw new Error('Missing refresh_token cookie');
     }
     return this.authService.refresh(token);
+  }
+
+  @Get('me')
+  me(@Req() request: Request): { id: string; email: string; name: string; role: string; tenantId: string } {
+    const user = (request as Request & { user: { sub: string; email: string; tenantId: string; role: string } }).user;
+    return {
+      id: user.sub,
+      email: user.email,
+      name: user.email,
+      role: user.role,
+      tenantId: user.tenantId,
+    };
   }
 
   @Post('logout')

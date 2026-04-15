@@ -17,13 +17,11 @@ export interface RecentCase {
 }
 
 export async function getDashboardStats(): Promise<DashboardStats> {
-  const res = await apiClient.get<DashboardStats>('/dashboard/stats');
+  const res = await apiClient.get<DashboardStats>('/cases/stats');
   return res.data;
 }
 
 export async function getRecentCases(): Promise<RecentCase[]> {
-  const res = await apiClient.get<RecentCase[]>('/cases', {
-    params: { limit: 5, sort: 'updatedAt', order: 'desc' },
-  });
+  const res = await apiClient.get<RecentCase[]>('/cases');
   return res.data;
 }
