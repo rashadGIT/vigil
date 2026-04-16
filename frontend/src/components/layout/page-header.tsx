@@ -1,8 +1,10 @@
 import { Separator } from '@/components/ui/separator';
 
+import React from 'react';
+
 interface PageHeaderProps {
   title: string;
-  description?: string;
+  description?: React.ReactNode;
   action?: React.ReactNode;
 }
 
@@ -13,7 +15,7 @@ export function PageHeader({ title, description, action }: PageHeaderProps) {
         <div>
           <h1 className="text-2xl font-semibold">{title}</h1>
           {description && (
-            <p className="text-sm text-muted-foreground mt-1">{description}</p>
+            <div className="text-sm text-muted-foreground mt-1">{description}</div>
           )}
         </div>
         {action && <div>{action}</div>}

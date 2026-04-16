@@ -68,7 +68,7 @@ export function RecentCasesTable() {
               className="cursor-pointer hover:bg-muted/50"
               onClick={() => router.push(`/cases/${c.id}`)}
             >
-              <TableCell className="font-medium">{c.deceasedFirstName} {c.deceasedLastName}</TableCell>
+              <TableCell className="font-medium">{c.deceasedName}</TableCell>
               <TableCell><CaseStatusBadge status={c.status as CaseStatus} /></TableCell>
               <TableCell className="text-muted-foreground text-sm hidden sm:table-cell">{c.assignedTo ?? '—'}</TableCell>
               <TableCell className="text-muted-foreground text-sm hidden sm:table-cell">{formatRelative(c.updatedAt)}</TableCell>

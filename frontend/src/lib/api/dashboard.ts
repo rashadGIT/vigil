@@ -9,6 +9,7 @@ export interface DashboardStats {
 
 export interface RecentCase {
   id: string;
+  deceasedName: string;
   deceasedFirstName: string;
   deceasedLastName: string;
   status: string;

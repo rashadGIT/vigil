@@ -2,8 +2,8 @@ import { apiClient } from './client';
 import type { ICalendarEvent } from '@vigil/shared-types';
 import { EventType } from '@vigil/shared-types';
 
-export async function getCalendarEvents(start?: string, end?: string): Promise<ICalendarEvent[]> {
-  const res = await apiClient.get<ICalendarEvent[]>('/calendar', { params: { start, end } });
+export async function getCalendarEvents(from?: string, to?: string): Promise<ICalendarEvent[]> {
+  const res = await apiClient.get<ICalendarEvent[]>('/calendar/events', { params: { from, to } });
   return res.data;
 }
 
@@ -15,6 +15,6 @@ export async function createCalendarEvent(dto: {
   caseId?: string;
   notes?: string;
 }): Promise<ICalendarEvent> {
-  const res = await apiClient.post<ICalendarEvent>('/calendar', dto);
+  const res = await apiClient.post<ICalendarEvent>('/calendar/events', dto);
   return res.data;
 }

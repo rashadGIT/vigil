@@ -17,7 +17,7 @@ function VendorList({ caseId }: { caseId: string }) {
   const queryClient = useQueryClient();
   const { data: assignments = [], isLoading } = useQuery({
     queryKey: ['vendorAssignments', caseId],
-    queryFn: () => apiClient.get(`/cases/${caseId}/vendor-assignments`).then((r) => r.data),
+    queryFn: () => apiClient.get(`/cases/${caseId}/vendors`).then((r) => r.data),
   });
 
   const { data: vendors = [] } = useQuery({
@@ -29,7 +29,7 @@ function VendorList({ caseId }: { caseId: string }) {
   const [selectedVendor, setSelectedVendor] = useState('');
 
   const mutation = useMutation({
-    mutationFn: (vendorId: string) => apiClient.post(`/cases/${caseId}/vendor-assignments`, { vendorId }),
+    mutationFn: (vendorId: string) => apiClient.post(`/cases/${caseId}/vendors`, { vendorId }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vendorAssignments', caseId] });
       toast.success('Vendor assigned.');

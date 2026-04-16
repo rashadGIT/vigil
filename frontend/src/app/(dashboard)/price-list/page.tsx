@@ -110,7 +110,7 @@ export default function PriceListPage() {
                       <p className="text-sm font-medium">{item.name}</p>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-sm font-medium">${item.price}</span>
+                      <span className="text-sm font-medium">${Number(item.price).toFixed(2)}</span>
                       <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive" onClick={() => deleteMutation.mutate(item.id)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
