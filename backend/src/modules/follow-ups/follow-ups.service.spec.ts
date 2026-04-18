@@ -16,7 +16,7 @@ describe('FollowUpsService', () => {
   let service: FollowUpsService;
   let mockPrisma: ReturnType<typeof createMockPrisma>;
   const mockN8n = { trigger: jest.fn().mockResolvedValue(undefined) };
-  const mockConfig = { get: jest.fn().mockReturnValue('noreply@vigilhq.com') };
+  const mockConfig = { get: jest.fn().mockReturnValue('noreply@velaapp.com') };
 
   beforeEach(async () => {
     jest.clearAllMocks();

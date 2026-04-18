@@ -71,7 +71,7 @@ export class AuthService {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      domain: process.env.NODE_ENV === 'production' ? '.vigilhq.com' : 'localhost',
+      domain: process.env.NODE_ENV === 'production' ? '.velaapp.com' : 'localhost',
       path: '/auth',
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });

@@ -17,17 +17,17 @@ const env = {
   region: 'us-east-2',
 };
 
-const foundation = new FoundationStack(app, 'VigilFoundationStack', { env });
-const network = new NetworkStack(app, 'VigilNetworkStack', { env });
-const _auth = new AuthStack(app, 'VigilAuthStack', { env });
+const foundation = new FoundationStack(app, 'VelaFoundationStack', { env });
+const network = new NetworkStack(app, 'VelaNetworkStack', { env });
+const _auth = new AuthStack(app, 'VelaAuthStack', { env });
 
-const data = new DataStack(app, 'VigilDataStack', {
+const data = new DataStack(app, 'VelaDataStack', {
   env,
   vpc: network.vpc,
   rdsSg: network.rdsSg,
 });
 
-const compute = new ComputeStack(app, 'VigilComputeStack', {
+const compute = new ComputeStack(app, 'VelaComputeStack', {
   env,
   vpc: network.vpc,
   certificate: foundation.certificate,
@@ -35,13 +35,13 @@ const compute = new ComputeStack(app, 'VigilComputeStack', {
   dbSecret: data.dbSecret,
 });
 
-const _amplify = new AmplifyStack(app, 'VigilAmplifyStack', {
+const _amplify = new AmplifyStack(app, 'VelaAmplifyStack', {
   env,
   hostedZone: foundation.hostedZone,
   certificate: foundation.certificate,
 });
 
-new ObservabilityStack(app, 'VigilObservabilityStack', {
+new ObservabilityStack(app, 'VelaObservabilityStack', {
   env,
   ecsCluster: compute.ecsCluster,
   fargateService: compute.fargateService,

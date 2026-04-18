@@ -84,9 +84,9 @@ export class IntakeService {
       tenantId,
       caseId: result.caseId,
       deceasedName: dto.deceasedName,
-      staffEmail: 'staff@vigilhq.com', // TODO: resolve assigned staff email from tenant config
-      caseUrl: `https://app.vigilhq.com/cases/${result.caseId}`,
-      sesFromAddress: 'noreply@vigilhq.com',
+      staffEmail: 'staff@velaapp.com', // TODO: resolve assigned staff email from tenant config
+      caseUrl: `https://app.velaapp.com/cases/${result.caseId}`,
+      sesFromAddress: 'noreply@velaapp.com',
     });
 
     return result;

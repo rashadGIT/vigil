@@ -31,6 +31,6 @@ export class PriceListController {
 
   @Post('cases/:caseId/gpl/generate')
   generate(@CurrentUser() user: AuthUser, @Param('caseId') caseId: string) {
-    return this.service.generateGplPdf(user.tenantId, caseId);
+    return this.service.generateGplPdf(user.tenantId, caseId, user.sub);
   }
 }

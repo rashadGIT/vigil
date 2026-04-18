@@ -50,7 +50,7 @@ export class FollowUpsService {
       familyEmail: contact?.email ?? '',
       familyLastName: contact?.name?.split(' ').pop() ?? '',
       funeralHomeName: tenant?.name ?? '',
-      sesFromAddress: this.configService.get<string>('SES_FROM_ADDRESS') ?? 'noreply@vigilhq.com',
+      sesFromAddress: this.configService.get<string>('SES_FROM_ADDRESS') ?? 'noreply@velaapp.com',
     });
 
     return created;

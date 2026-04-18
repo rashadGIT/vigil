@@ -94,6 +94,8 @@ enum AuditAction {
   update
   delete
   view_sensitive
+  gpl_view
+  gpl_sent
 }
 
 // ============================================================
@@ -167,12 +169,16 @@ model User {
 model Case {
   id             String      @id @default(cuid())
   tenantId       String      @map("tenant_id")
+  /// @sensitive decedentInfo — exclude from logs and non-essential exports
   deceasedName   String      @map("deceased_name")
+  /// @sensitive decedentInfo
   deceasedDob    DateTime?   @map("deceased_dob")
+  /// @sensitive decedentInfo
   deceasedDod    DateTime?   @map("deceased_dod")
   serviceType    ServiceType @map("service_type")
   status         CaseStatus  @default(new)
   assignedToId   String?     @map("assigned_to_id")
+  /// @sensitive decedentInfo
   faithTradition String?     @map("faith_tradition")
   deletedAt      DateTime?  @map("deleted_at")
   archivedAt     DateTime?  @map("archived_at")
@@ -277,9 +283,13 @@ model Payment {
   id          String   @id @default(cuid())
   tenantId    String   @map("tenant_id")
   caseId      String   @unique @map("case_id")
+  /// @sensitive familyFinancials — exclude from logs and non-essential exports
   totalAmount Decimal  @map("total_amount") @db.Decimal(10, 2)
+  /// @sensitive familyFinancials
   amountPaid  Decimal  @default(0) @map("amount_paid") @db.Decimal(10, 2)
+  /// @sensitive familyFinancials
   method      String
+  /// @sensitive familyFinancials
   notes       String?
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")

@@ -11,8 +11,8 @@ export class AuthStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    this.userPool = new cognito.UserPool(this, 'VigilUserPool', {
-      userPoolName: 'vigil-user-pool',
+    this.userPool = new cognito.UserPool(this, 'VelaUserPool', {
+      userPoolName: 'vela-user-pool',
       selfSignUpEnabled: false,
       signInAliases: { email: true },
       standardAttributes: {
@@ -37,9 +37,9 @@ export class AuthStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.RETAIN,
     });
 
-    this.userPoolClient = new cognito.UserPoolClient(this, 'VigilUserPoolClient', {
+    this.userPoolClient = new cognito.UserPoolClient(this, 'VelaUserPoolClient', {
       userPool: this.userPool,
-      userPoolClientName: 'vigil-web-client',
+      userPoolClientName: 'vela-web-client',
       generateSecret: false,
       authFlows: {
         userPassword: true,

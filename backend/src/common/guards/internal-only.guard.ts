@@ -18,7 +18,7 @@ export class InternalOnlyGuard implements CanActivate {
     if (!isInternal) return true; // Not an @InternalOnly() route — let other guards handle
 
     const request = context.switchToHttp().getRequest();
-    const key = request.headers['x-vigil-internal-key'] as string | undefined;
+    const key = request.headers['x-vela-internal-key'] as string | undefined;
     const expected = this.configService.get<string>('INTERNAL_API_KEY');
     if (!expected || key !== expected) {
       throw new UnauthorizedException('Invalid internal key');

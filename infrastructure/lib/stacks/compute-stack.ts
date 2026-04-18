@@ -27,22 +27,22 @@ export class ComputeStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: ComputeStackProps) {
     super(scope, id, props);
 
-    this.ecrRepo = new ecr.Repository(this, 'VigilBackendRepo', {
-      repositoryName: 'vigil-backend',
+    this.ecrRepo = new ecr.Repository(this, 'VelaBackendRepo', {
+      repositoryName: 'vela-backend',
       imageTagMutability: ecr.TagMutability.MUTABLE,
       imageScanOnPush: true,
       lifecycleRules: [{ maxImageCount: 10, description: 'Keep last 10 images' }],
       removalPolicy: cdk.RemovalPolicy.RETAIN,
     });
 
-    this.ecsCluster = new ecs.Cluster(this, 'VigilEcsCluster', {
+    this.ecsCluster = new ecs.Cluster(this, 'VelaEcsCluster', {
       vpc: props.vpc,
-      clusterName: 'vigil-cluster',
+      clusterName: 'vela-cluster',
       containerInsights: true,
     });
 
-    const logGroup = new logs.LogGroup(this, 'VigilBackendLogs', {
-      logGroupName: '/vigil/backend',
+    const logGroup = new logs.LogGroup(this, 'VelaBackendLogs', {
+      logGroupName: '/vela/backend',
       retention: logs.RetentionDays.ONE_MONTH,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
@@ -51,10 +51,10 @@ export class ComputeStack extends cdk.Stack {
 
     this.fargateService = new ecsPatterns.ApplicationLoadBalancedFargateService(
       this,
-      'VigilFargateService',
+      'VelaFargateService',
       {
         cluster: this.ecsCluster,
-        serviceName: 'vigil-backend',
+        serviceName: 'vela-backend',
         cpu: 512,
         memoryLimitMiB: 1024,
         desiredCount: 1,
@@ -63,12 +63,12 @@ export class ComputeStack extends cdk.Stack {
         taskSubnets: { subnetType: ec2.SubnetType.PUBLIC },
         protocol: elbv2.ApplicationProtocol.HTTPS,
         certificate: props.certificate,
-        domainName: 'api.vigil.automagicly.ai',
+        domainName: 'api.vela.automagicly.ai',
         domainZone: props.hostedZone,
         redirectHTTP: true,
         taskImageOptions: {
           image: containerImage,
-          containerName: 'vigil-backend',
+          containerName: 'vela-backend',
           containerPort: 3000,
           logDriver: ecs.LogDrivers.awsLogs({ streamPrefix: 'backend', logGroup }),
           environment: {
@@ -103,10 +103,10 @@ export class ComputeStack extends cdk.Stack {
     });
 
     // Migrations task definition — DATABASE_URL injected at run time via --overrides in CI
-    const migrationsTaskDef = new ecs.FargateTaskDefinition(this, 'VigilMigrationsTaskDef', {
+    const migrationsTaskDef = new ecs.FargateTaskDefinition(this, 'VelaMigrationsTaskDef', {
       cpu: 512,
       memoryLimitMiB: 1024,
-      family: 'vigil-migrations',
+      family: 'vela-migrations',
     });
     migrationsTaskDef.addContainer('migrations', {
       image: containerImage,
@@ -122,7 +122,7 @@ export class ComputeStack extends cdk.Stack {
     });
 
     const ghDeployRole = new iam.Role(this, 'GitHubActionsDeployRole', {
-      roleName: 'VigilGitHubActionsDeployRole',
+      roleName: 'VelaGitHubActionsDeployRole',
       assumedBy: new iam.FederatedPrincipal(
         ghOidcProvider.openIdConnectProviderArn,
         {
@@ -130,7 +130,7 @@ export class ComputeStack extends cdk.Stack {
             'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
           },
           StringLike: {
-            'token.actions.githubusercontent.com:sub': 'repo:rashadGIT/Vigil:*',
+            'token.actions.githubusercontent.com:sub': 'repo:rashadGIT/Vela:*',
           },
         },
         'sts:AssumeRoleWithWebIdentity',
@@ -170,6 +170,6 @@ export class ComputeStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'EcsClusterName', { value: this.ecsCluster.clusterName });
     new cdk.CfnOutput(this, 'EcsServiceName', { value: this.fargateService.service.serviceName });
     new cdk.CfnOutput(this, 'GitHubActionsRoleArn', { value: this.githubActionsRoleArn });
-    new cdk.CfnOutput(this, 'ApiUrl', { value: 'https://api.vigil.automagicly.ai' });
+    new cdk.CfnOutput(this, 'ApiUrl', { value: 'https://api.vela.automagicly.ai' });
   }
 }

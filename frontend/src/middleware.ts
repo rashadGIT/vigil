@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const DASHBOARD_PATHS = ['/', '/cases', '/calendar', '/vendors', '/price-list', '/settings'];
-const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_DOMAIN ?? 'vigilhq.com';
+const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_DOMAIN ?? 'velaapp.com';
 const DEV_BYPASS = process.env.NEXT_PUBLIC_DEV_AUTH_BYPASS === 'true';
 
 export function middleware(request: NextRequest) {
@@ -9,7 +9,7 @@ export function middleware(request: NextRequest) {
   const host = request.headers.get('host') ?? '';
 
   // Subdomain tenant resolution
-  // Production: sunrise.vigilhq.com → slug = 'sunrise'
+  // Production: sunrise.velaapp.com → slug = 'sunrise'
   // Local dev:  localhost:3000?tenant=sunrise → slug = 'sunrise'
   const subdomain = host.replace(`.${APP_DOMAIN}`, '').replace(/:\d+$/, '');
   const isSubdomain =

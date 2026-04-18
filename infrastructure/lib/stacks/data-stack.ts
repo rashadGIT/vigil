@@ -19,7 +19,7 @@ export class DataStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: DataStackProps) {
     super(scope, id, props);
 
-    this.rdsInstance = new rds.DatabaseInstance(this, 'VigilRds', {
+    this.rdsInstance = new rds.DatabaseInstance(this, 'VelaRds', {
       engine: rds.DatabaseInstanceEngine.postgres({
         version: rds.PostgresEngineVersion.VER_16,
       }),
@@ -30,9 +30,9 @@ export class DataStack extends cdk.Stack {
       multiAz: false,
       allocatedStorage: 20,
       storageType: rds.StorageType.GP3,
-      databaseName: 'vigil',
-      credentials: rds.Credentials.fromGeneratedSecret('vigil_admin', {
-        secretName: 'vigil/rds/credentials',
+      databaseName: 'vela',
+      credentials: rds.Credentials.fromGeneratedSecret('vela_admin', {
+        secretName: 'vela/rds/credentials',
       }),
       enablePerformanceInsights: true,
       performanceInsightRetention: rds.PerformanceInsightRetention.DEFAULT,
@@ -42,8 +42,8 @@ export class DataStack extends cdk.Stack {
     });
     this.dbSecret = this.rdsInstance.secret!;
 
-    this.documentsBucket = new s3.Bucket(this, 'VigilDocumentsBucket', {
-      bucketName: `vigil-documents-${this.account}-${this.region}`,
+    this.documentsBucket = new s3.Bucket(this, 'VelaDocumentsBucket', {
+      bucketName: `vela-documents-${this.account}-${this.region}`,
       versioned: true,
       encryption: s3.BucketEncryption.S3_MANAGED,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
@@ -63,8 +63,8 @@ export class DataStack extends cdk.Stack {
       ],
     });
 
-    this.publicAssetsBucket = new s3.Bucket(this, 'VigilPublicAssetsBucket', {
-      bucketName: `vigil-public-assets-${this.account}-${this.region}`,
+    this.publicAssetsBucket = new s3.Bucket(this, 'VelaPublicAssetsBucket', {
+      bucketName: `vela-public-assets-${this.account}-${this.region}`,
       versioned: false,
       encryption: s3.BucketEncryption.S3_MANAGED,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
@@ -73,7 +73,7 @@ export class DataStack extends cdk.Stack {
     });
 
     new secretsmanager.Secret(this, 'CognitoConfigSecret', {
-      secretName: 'vigil/cognito/config',
+      secretName: 'vela/cognito/config',
       description: 'Cognito User Pool ID + Client ID',
       secretStringValue: cdk.SecretValue.unsafePlainText(
         JSON.stringify({ userPoolId: 'us-east-2_kd30RmPp5', clientId: '2t3crm3c2s4rtoldp0lq17p11e' }),
@@ -81,7 +81,7 @@ export class DataStack extends cdk.Stack {
     });
 
     new secretsmanager.Secret(this, 'N8nWebhookSecret', {
-      secretName: 'vigil/n8n/webhook-secret',
+      secretName: 'vela/n8n/webhook-secret',
       description: 'Shared secret for @InternalOnly() guard',
       secretStringValue: cdk.SecretValue.unsafePlainText(
         JSON.stringify({ secret: 'PLACEHOLDER_CHANGE_ME' }),
@@ -89,7 +89,7 @@ export class DataStack extends cdk.Stack {
     });
 
     new secretsmanager.Secret(this, 'SentryDsnSecret', {
-      secretName: 'vigil/sentry/dsn',
+      secretName: 'vela/sentry/dsn',
       description: 'Sentry DSN',
       secretStringValue: cdk.SecretValue.unsafePlainText(
         JSON.stringify({ dsn: 'PLACEHOLDER' }),
@@ -97,7 +97,7 @@ export class DataStack extends cdk.Stack {
     });
 
     new secretsmanager.Secret(this, 'AmplifyGitHubTokenSecret', {
-      secretName: 'vigil/amplify/github-token',
+      secretName: 'vela/amplify/github-token',
       description: 'GitHub PAT for Amplify source code provider',
       secretStringValue: cdk.SecretValue.unsafePlainText(
         JSON.stringify({ token: 'PLACEHOLDER_CHANGE_ME' }),
