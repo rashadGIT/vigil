@@ -53,7 +53,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
     <div className="flex flex-col h-full">
       {/* Logo / brand */}
       <div className="flex items-center gap-2 px-4 py-5 border-b">
-        <span className="text-lg font-semibold tracking-tight">Vela</span>
+        <span className="text-lg font-semibold tracking-tight">Kelova</span>
       </div>
 
       {/* Nav items */}

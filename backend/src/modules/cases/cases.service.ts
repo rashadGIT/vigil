@@ -43,7 +43,7 @@ export class CasesService {
     const [activeCases, casesThisMonth, overdueTasks, pendingSignatures] = await Promise.all([
       db.case.count({ where: { deletedAt: null, status: { in: ['new', 'in_progress'] } } }),
       db.case.count({ where: { deletedAt: null, createdAt: { gte: startOfMonth } } }),
-      db.task.count({ where: { completed: false, dueDate: { lt: now } } }),
+      db.case.count({ where: { deletedAt: null, tasks: { some: { completed: false, dueDate: { lt: now } } } } }),
       db.signature.count({ where: { signedAt: null } }),
     ]);
 
@@ -52,11 +52,37 @@ export class CasesService {
 
   async findAll(tenantId: string, filter: CaseFilterDto) {
     const now = new Date();
-    const cases = await this.prisma.forTenant(tenantId).case.findMany({
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const db = this.prisma.forTenant(tenantId);
+
+    // Resolve dashboard filter into prisma where clause
+    let dashboardWhere = {};
+    if (filter.dashboardFilter === 'active') {
+      dashboardWhere = { status: { in: ['new', 'in_progress'] } };
+    } else if (filter.dashboardFilter === 'this-month') {
+      dashboardWhere = { createdAt: { gte: startOfMonth } };
+    } else if (filter.dashboardFilter === 'overdue') {
+      const caseIds = await db.task.findMany({
+        where: { completed: false, dueDate: { lt: now } },
+        select: { caseId: true },
+        distinct: ['caseId'],
+      });
+      dashboardWhere = { id: { in: caseIds.map((t) => t.caseId) } };
+    } else if (filter.dashboardFilter === 'pending-signatures') {
+      const caseIds = await db.signature.findMany({
+        where: { signedAt: null },
+        select: { caseId: true },
+        distinct: ['caseId'],
+      });
+      dashboardWhere = { id: { in: caseIds.map((s) => s.caseId) } };
+    }
+
+    const cases = await db.case.findMany({
       where: {
         deletedAt: null,
         ...(filter.status ? { status: filter.status } : {}),
         ...(filter.assignedToId ? { assignedToId: filter.assignedToId } : {}),
+        ...dashboardWhere,
       },
       include: {
         tasks: {

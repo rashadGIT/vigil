@@ -11,14 +11,15 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { CaseStatusBadge } from './case-status-badge';
-import { getCases } from '@/lib/api/cases';
+import { getCases, type CaseFilters } from '@/lib/api/cases';
 import { formatRelative } from '@/lib/utils/format-date';
 import type { ICase } from '@vigil/shared-types';
 
 const columnHelper = createColumnHelper<ICase>();
 
-const columns = [
+const baseColumns = [
   columnHelper.accessor('deceasedName', {
     id: 'deceasedName',
     header: () => <span className="font-medium">Deceased</span>,
@@ -42,12 +43,34 @@ const columns = [
   }),
 ];
 
-export function CaseTable() {
+const overdueColumn = columnHelper.accessor('overdueTaskCount', {
+  id: 'overdueTaskCount',
+  header: () => <span className="font-medium">Overdue Tasks</span>,
+  cell: (info) => {
+    const count = info.getValue() ?? 0;
+    return count > 0 ? (
+      <Badge variant="destructive" className="text-xs">{count} overdue</Badge>
+    ) : null;
+  },
+});
+
+function buildFilters(filter?: string): CaseFilters {
+  if (filter === 'active' || filter === 'overdue' || filter === 'this-month' || filter === 'pending-signatures') {
+    return { dashboardFilter: filter };
+  }
+  return {};
+}
+
+export function CaseTable({ filter }: { filter?: string }) {
   const router = useRouter();
   const { data: cases = [], isLoading, error, refetch } = useQuery({
-    queryKey: ['cases'],
-    queryFn: () => getCases(),
+    queryKey: ['cases', filter],
+    queryFn: () => getCases(buildFilters(filter)),
   });
+
+  const columns = filter === 'overdue'
+    ? [...baseColumns, overdueColumn]
+    : baseColumns;
 
   const table = useReactTable({
     data: cases,

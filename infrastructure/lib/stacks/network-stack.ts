@@ -12,7 +12,7 @@ export class NetworkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    this.vpc = new ec2.Vpc(this, 'VelaVpc', {
+    this.vpc = new ec2.Vpc(this, 'KelovaVpc', {
       ipAddresses: ec2.IpAddresses.cidr('10.0.0.0/16'),
       maxAzs: 2,
       natGateways: 0,
@@ -28,7 +28,7 @@ export class NetworkStack extends cdk.Stack {
 
     this.albSg = new ec2.SecurityGroup(this, 'AlbSg', {
       vpc: this.vpc,
-      description: 'Vela ALB - public HTTPS/HTTP',
+      description: 'Kelova ALB - public HTTPS/HTTP',
       allowAllOutbound: true,
     });
     this.albSg.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(80), 'HTTP from internet');
@@ -36,21 +36,21 @@ export class NetworkStack extends cdk.Stack {
 
     this.ecsSg = new ec2.SecurityGroup(this, 'EcsSg', {
       vpc: this.vpc,
-      description: 'Vela ECS Fargate - from ALB only',
+      description: 'Kelova ECS Fargate - from ALB only',
       allowAllOutbound: true,
     });
     this.ecsSg.addIngressRule(ec2.Peer.ipv4(this.vpc.vpcCidrBlock), ec2.Port.tcp(3000), 'ALB to backend (VPC CIDR)');
 
     this.rdsSg = new ec2.SecurityGroup(this, 'RdsSg', {
       vpc: this.vpc,
-      description: 'Vela RDS PostgreSQL - from ECS only',
+      description: 'Kelova RDS PostgreSQL - from ECS only',
       allowAllOutbound: false,
     });
     this.rdsSg.addIngressRule(this.ecsSg, ec2.Port.tcp(5432), 'ECS to Postgres');
 
     this.redisSg = new ec2.SecurityGroup(this, 'RedisSg', {
       vpc: this.vpc,
-      description: 'Vela Redis (stub) - from ECS only',
+      description: 'Kelova Redis (stub) - from ECS only',
       allowAllOutbound: false,
     });
     this.redisSg.addIngressRule(this.ecsSg, ec2.Port.tcp(6379), 'ECS to Redis');

@@ -22,7 +22,7 @@ export class EmailService {
     this.provider =
       (this.configService.get<'resend' | 'ses'>('EMAIL_PROVIDER') as 'resend' | 'ses') ?? 'resend';
     this.defaultFrom =
-      this.configService.get<string>('EMAIL_FROM') ?? 'noreply@velaapp.com';
+      this.configService.get<string>('EMAIL_FROM') ?? 'noreply@kelovaapp.com';
     if (this.provider === 'resend') {
       const apiKey = this.configService.get<string>('RESEND_API_KEY') ?? '';
       this.resend = apiKey ? new Resend(apiKey) : null;

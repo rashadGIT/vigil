@@ -25,6 +25,7 @@ export default function DashboardPage() {
           icon={FolderOpen}
           description="New + in progress"
           loading={isLoading}
+          href="/cases?filter=active"
         />
         <StatCard
           title="Overdue Tasks"
@@ -32,6 +33,7 @@ export default function DashboardPage() {
           icon={AlertCircle}
           description="Past due date"
           loading={isLoading}
+          href="/cases?filter=overdue"
         />
         <StatCard
           title="Cases This Month"
@@ -39,6 +41,7 @@ export default function DashboardPage() {
           icon={CalendarDays}
           description="Created in current month"
           loading={isLoading}
+          href="/cases?filter=this-month"
         />
         <StatCard
           title="Pending Signatures"
@@ -46,6 +49,7 @@ export default function DashboardPage() {
           icon={FileSignature}
           description="Awaiting family signature"
           loading={isLoading}
+          href="/cases?filter=pending-signatures"
         />
       </div>
 

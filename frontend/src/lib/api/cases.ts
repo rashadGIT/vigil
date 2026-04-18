@@ -17,6 +17,7 @@ export interface CaseFilters {
   serviceType?: ServiceType;
   page?: number;
   limit?: number;
+  dashboardFilter?: 'active' | 'overdue' | 'this-month' | 'pending-signatures';
 }
 
 export async function getCases(filters?: CaseFilters): Promise<ICase[]> {

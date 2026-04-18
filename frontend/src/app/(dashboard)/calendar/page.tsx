@@ -129,14 +129,36 @@ export default function CalendarPage() {
       <PageHeader
         title="Calendar"
         description={
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
+          <div className="flex items-center gap-1">
+            {/* <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
               <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <span>{format(currentMonth, 'MMMM yyyy')}</span>
-            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+            </Button> */}
+            <Select
+              value={format(currentMonth, 'M')}
+              onValueChange={(v) => {
+                const d = new Date(currentMonth);
+                d.setMonth(parseInt(v) - 1);
+                setCurrentMonth(d);
+              }}
+            >
+              <SelectTrigger className="h-7 w-[110px] text-sm border-0 shadow-none focus:ring-0 px-1">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {['January','February','March','April','May','June','July','August','September','October','November','December'].map((m, i) => (
+                  <SelectItem key={i} value={String(i + 1)}>{m}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className="flex items-center gap-0.5">
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear() - 1, currentMonth.getMonth(), 1))}>
+                <ChevronLeft className="h-3 w-3" />
+              </Button>
+              <span className="text-sm w-10 text-center tabular-nums">{format(currentMonth, 'yyyy')}</span>
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear() + 1, currentMonth.getMonth(), 1))}>
+                <ChevronRight className="h-3 w-3" />
+              </Button>
+            </div>
           </div>
         }
         action={<NewEventDialog onCreated={handleCreated} />}

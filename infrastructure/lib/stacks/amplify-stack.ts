@@ -16,12 +16,12 @@ export class AmplifyStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: AmplifyStackProps) {
     super(scope, id, props);
 
-    this.amplifyApp = new amplify.App(this, 'VelaFrontendApp', {
-      appName: 'vela-frontend',
+    this.amplifyApp = new amplify.App(this, 'KelovaFrontendApp', {
+      appName: 'kelova-frontend',
       sourceCodeProvider: new amplify.GitHubSourceCodeProvider({
         owner: 'rashadGIT',
-        repository: 'Vela',
-        oauthToken: cdk.SecretValue.secretsManager('vela/amplify/github-token', {
+        repository: 'Kelova',
+        oauthToken: cdk.SecretValue.secretsManager('kelova/amplify/github-token', {
           jsonField: 'token',
         }),
       }),
@@ -47,7 +47,7 @@ export class AmplifyStack extends cdk.Stack {
         ],
       }),
       environmentVariables: {
-        NEXT_PUBLIC_API_URL: 'https://api.vela.automagicly.ai',
+        NEXT_PUBLIC_API_URL: 'https://api.kelova.automagicly.ai',
       },
     });
 
@@ -57,7 +57,7 @@ export class AmplifyStack extends cdk.Stack {
     });
 
     // Custom domain — map app subdomain to main branch
-    const domain = this.amplifyApp.addDomain('vela.automagicly.ai', {
+    const domain = this.amplifyApp.addDomain('kelova.automagicly.ai', {
       enableAutoSubdomain: true,
       autoSubdomainCreationPatterns: ['*'],
     });
@@ -66,6 +66,6 @@ export class AmplifyStack extends cdk.Stack {
 
     new cdk.CfnOutput(this, 'AmplifyAppId', { value: this.amplifyApp.appId });
     new cdk.CfnOutput(this, 'AmplifyDefaultDomain', { value: this.amplifyApp.defaultDomain });
-    new cdk.CfnOutput(this, 'FrontendUrl', { value: 'https://app.vela.automagicly.ai' });
+    new cdk.CfnOutput(this, 'FrontendUrl', { value: 'https://app.kelova.automagicly.ai' });
   }
 }

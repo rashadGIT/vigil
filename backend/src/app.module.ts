@@ -33,6 +33,7 @@ import { SignaturesModule } from './modules/signatures/signatures.module';
 import { VendorsModule } from './modules/vendors/vendors.module';
 import { CalendarModule } from './modules/calendar/calendar.module';
 import { FollowUpsModule } from './modules/follow-ups/follow-ups.module';
+import { SettingsModule } from './modules/settings/settings.module';
 
 // Phase 2 stubs
 import { TrackingModule } from './modules/tracking/tracking.module';
@@ -76,6 +77,7 @@ import { MultiFaithModule } from './modules/multi-faith/multi-faith.module';
     VendorsModule,
     CalendarModule,
     FollowUpsModule,
+    SettingsModule,
 
     // Phase 2 stubs
     TrackingModule,

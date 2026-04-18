@@ -26,20 +26,20 @@ async function bootstrap(): Promise<void> {
   // Dashboard CORS — credentialed, specific origins (D-14)
   app.enableCors({
     origin: [
-      'https://app.velaapp.com',
-      /\.velaapp\.com$/,
+      'https://app.kelovaapp.com',
+      /\.kelovaapp\.com$/,
       'http://localhost:3000',
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'x-dev-user', 'x-vela-internal-key'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-dev-user', 'x-kelova-internal-key'],
   });
   // Intake endpoint CORS is applied per-route via @Header() in intake.controller.ts
 
   // Swagger — dev only (D-13)
   if (process.env.NODE_ENV !== 'production') {
     const config = new DocumentBuilder()
-      .setTitle('Vela API')
+      .setTitle('Kelova API')
       .setDescription('Funeral Home Operations Platform')
       .setVersion('1.0')
       .addBearerAuth()
@@ -50,7 +50,7 @@ async function bootstrap(): Promise<void> {
 
   const port = parseInt(process.env.PORT ?? '3001', 10);
   await app.listen(port);
-  Logger.log(`Vela API listening on http://localhost:${port}`, 'Bootstrap');
+  Logger.log(`Kelova API listening on http://localhost:${port}`, 'Bootstrap');
 }
 
 void bootstrap();

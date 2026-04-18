@@ -15,4 +15,5 @@ export interface ICase {
   archivedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  overdueTaskCount?: number;
 }

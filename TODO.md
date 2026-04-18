@@ -1,30 +1,54 @@
-# Vela — Todo List
-
-## Rebrand: Vigil → Vela
-
-### Prerequisites (Before Any Code Changes)
-- [ ] Commission USPTO trademark clearance search on "Vela" in Classes 35 and 42
-- [ ] Secure domain — check `vela.com`, `getvela.com`, `velaapp.com` availability
-- [ ] File "Vela" as a trademark once clearance confirms no conflicts
-
-### Code Changes (After Clearance)
-- [x] Replace all "Vigil" references with "Vela" across the UI — page titles, nav, emails, intake forms, footer
-- [x] Update domain references from `vigilhq.com` to `velaapp.com` in seed data, config, and env files
-- [x] Rename app title in `package.json`, meta tags, and `<title>` tags to "Vela"
-- [x] Update CDK stack names and resource tags from "vigil" to "vela"
-- [ ] Update n8n workflow names and webhook URLs to reflect new brand *(manual — update in n8n cloud dashboard)*
+# Kelova — Todo List
+*(Codebase rebranded to Kelova — domain acquisition and trademark filing pending)*
 
 ---
 
-## Legal & Market Risk Fixes
+## Brand: Kelova ✅ Confirmed Direction
 
-### E-Signature Risk (Medium — future)
-- [x] Add a feature flag or abstraction layer around the e-signature integration so swapping from third-party to proprietary requires changing one file, not dozens
-- [ ] Commission Freedom-to-Operate (FTO) analysis against DocuSign patent portfolio before building proprietary e-sign — budget $3,000–$8,000
+**Research summary:** Kelova is the cleanest name found across all checks.
+- No exact USPTO filing exists for KELOVA
+- All phonetic variants checked (KALOVA, KILOVA, KELIVA, KELOBA, etc.) — all clear
+- KALEVA (Serial 98103211, Class 35) — **dead as of July 1, 2024** (abandoned, failed to respond to Office Action) — no longer a conflict
+- KELLANOVA (Kellogg/Mars snack food) — different goods/classes, negligible risk
+- No competing company, SaaS, or product named Kelova found anywhere in the world
 
-### Competitive Gap — Compliance Positioning
-- [x] Add FTC GPL compliance audit logging — log every time a GPL is viewed or sent to a family, creating an auditable compliance trail
+### Domain — Action Required
+- [ ] Register **kelova.co, kelova.app, kelova.net** immediately — before announcing the name publicly
+- [ ] Investigate **kelova.io** — registered March 2026 (6 weeks ago), unknown owner; determine if squatter or real project
+- [ ] Negotiate **kelova.com** via Sedo — parked since 2018, owner is likely a domain investor; budget $500–$5,000 for acquisition
 
-### Data Privacy / ToS Risk
-- [x] Add data sensitivity classification to the Prisma schema — flag fields like `causeOfDeath`, `familyFinancials`, and `decedentInfo` to exclude them from logs, exports, and non-essential queries
-- [ ] Draft Terms of Service and Data Processing Agreements with an attorney before launch
+### Trademark Filing
+- [ ] Engage IP attorney to file USPTO trademark for KELOVA in **Classes 35 and 42** — field is clean, filing should be straightforward
+- [ ] Budget: $1,500–$3,000 legal fees; 12–18 months to registration
+- [ ] Do not publicly market or advertise "Kelova" until application is filed
+
+### Code Rebrand (After Domain Secured)
+- [x] Replace "Vela" / "Vigil" references with "Kelova" across UI, meta tags, manifest, CDK resource names, email addresses, and env files
+- [x] Update domain references from `velaapp.com` → `kelovaapp.com` (placeholder until kelova.com acquired)
+- [ ] Update n8n workflow names and webhook URLs *(manual — update in n8n cloud dashboard)*
+
+---
+
+## Legal — Pre-Launch Requirements
+
+### IP Attorney
+- [ ] Engage IP attorney for USPTO KELOVA filing in Classes 35 and 42
+- [ ] Commission FTO (Freedom-to-Operate) analysis against DocuSign patent portfolio before building proprietary e-sign — budget $3,000–$8,000
+- [ ] Draft Terms of Service and Data Processing Agreements with attorney before launch
+
+---
+
+## Go-to-Market — Competitive Positioning
+
+- [ ] Add transparent self-serve pricing page at launch — every competitor (Tribute, Passare, Gather) forces a sales call; this is a credible differentiator
+- [ ] Lead marketing with FTC GPL compliance — built-in audit trail addresses real legal anxiety for independent operators; no competitor does this natively
+- [ ] Target Tribute Technology churn — monitor G2/Capterra for customer frustration signals following their Oct 2024 C-suite exodus (CEO + CFO + Head of Transformation all resigned simultaneously)
+- [ ] Reach out to NFDA and state funeral director associations for early access partnerships
+
+### Market Notes (For Reference)
+- ~11,550 independent US funeral homes (75% of ~15,401 total) — primary TAM
+- $2.8M ARR at 10% penetration at $200/month
+- Tribute Technology holds ~70% market share but is PE-owned (Carlyle + Vista) and operationally weakened post-2024 leadership departure
+- Closest underfunded challenger: Gather ($5.04M total raised, Idaho-based)
+- Meadow raised $9M Series A (2025) but is B2C cremation booking — not a direct competitor
+- No well-funded B2B indie funeral ops SaaS launched 2023–2025 — window is open but not permanent

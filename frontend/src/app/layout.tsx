@@ -12,7 +12,7 @@ configureAmplify();
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Vela — Funeral Home Operations',
+  title: 'Kelova — Funeral Home Operations',
   description: 'Multi-tenant funeral operations platform',
 };
 

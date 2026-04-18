@@ -11,17 +11,17 @@ export class FoundationStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    this.hostedZone = route53.HostedZone.fromLookup(this, 'VelaHostedZone', {
+    this.hostedZone = route53.HostedZone.fromLookup(this, 'KelovaHostedZone', {
       domainName: 'automagicly.ai',
     });
 
-    this.certificate = new acm.Certificate(this, 'VelaWildcardCert', {
+    this.certificate = new acm.Certificate(this, 'KelovaWildcardCert', {
       domainName: 'vigil.automagicly.ai',
       subjectAlternativeNames: ['*.vigil.automagicly.ai'],
       validation: acm.CertificateValidation.fromDns(this.hostedZone),
     });
 
-    const sesIdentity = new ses.EmailIdentity(this, 'VelaSesIdentity', {
+    const sesIdentity = new ses.EmailIdentity(this, 'KelovaSesIdentity', {
       identity: ses.Identity.domain('vigil.automagicly.ai'),
     });
 

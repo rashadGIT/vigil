@@ -27,22 +27,22 @@ export class ComputeStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: ComputeStackProps) {
     super(scope, id, props);
 
-    this.ecrRepo = new ecr.Repository(this, 'VelaBackendRepo', {
-      repositoryName: 'vela-backend',
+    this.ecrRepo = new ecr.Repository(this, 'KelovaBackendRepo', {
+      repositoryName: 'kelova-backend',
       imageTagMutability: ecr.TagMutability.MUTABLE,
       imageScanOnPush: true,
       lifecycleRules: [{ maxImageCount: 10, description: 'Keep last 10 images' }],
       removalPolicy: cdk.RemovalPolicy.RETAIN,
     });
 
-    this.ecsCluster = new ecs.Cluster(this, 'VelaEcsCluster', {
+    this.ecsCluster = new ecs.Cluster(this, 'KelovaEcsCluster', {
       vpc: props.vpc,
-      clusterName: 'vela-cluster',
+      clusterName: 'kelova-cluster',
       containerInsights: true,
     });
 
-    const logGroup = new logs.LogGroup(this, 'VelaBackendLogs', {
-      logGroupName: '/vela/backend',
+    const logGroup = new logs.LogGroup(this, 'KelovaBackendLogs', {
+      logGroupName: '/kelova/backend',
       retention: logs.RetentionDays.ONE_MONTH,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
@@ -51,10 +51,10 @@ export class ComputeStack extends cdk.Stack {
 
     this.fargateService = new ecsPatterns.ApplicationLoadBalancedFargateService(
       this,
-      'VelaFargateService',
+      'KelovaFargateService',
       {
         cluster: this.ecsCluster,
-        serviceName: 'vela-backend',
+        serviceName: 'kelova-backend',
         cpu: 512,
         memoryLimitMiB: 1024,
         desiredCount: 1,
@@ -63,12 +63,12 @@ export class ComputeStack extends cdk.Stack {
         taskSubnets: { subnetType: ec2.SubnetType.PUBLIC },
         protocol: elbv2.ApplicationProtocol.HTTPS,
         certificate: props.certificate,
-        domainName: 'api.vela.automagicly.ai',
+        domainName: 'api.kelova.automagicly.ai',
         domainZone: props.hostedZone,
         redirectHTTP: true,
         taskImageOptions: {
           image: containerImage,
-          containerName: 'vela-backend',
+          containerName: 'kelova-backend',
           containerPort: 3000,
           logDriver: ecs.LogDrivers.awsLogs({ streamPrefix: 'backend', logGroup }),
           environment: {
@@ -103,10 +103,10 @@ export class ComputeStack extends cdk.Stack {
     });
 
     // Migrations task definition — DATABASE_URL injected at run time via --overrides in CI
-    const migrationsTaskDef = new ecs.FargateTaskDefinition(this, 'VelaMigrationsTaskDef', {
+    const migrationsTaskDef = new ecs.FargateTaskDefinition(this, 'KelovaMigrationsTaskDef', {
       cpu: 512,
       memoryLimitMiB: 1024,
-      family: 'vela-migrations',
+      family: 'kelova-migrations',
     });
     migrationsTaskDef.addContainer('migrations', {
       image: containerImage,
@@ -122,7 +122,7 @@ export class ComputeStack extends cdk.Stack {
     });
 
     const ghDeployRole = new iam.Role(this, 'GitHubActionsDeployRole', {
-      roleName: 'VelaGitHubActionsDeployRole',
+      roleName: 'KelovaGitHubActionsDeployRole',
       assumedBy: new iam.FederatedPrincipal(
         ghOidcProvider.openIdConnectProviderArn,
         {
@@ -130,7 +130,7 @@ export class ComputeStack extends cdk.Stack {
             'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
           },
           StringLike: {
-            'token.actions.githubusercontent.com:sub': 'repo:rashadGIT/Vela:*',
+            'token.actions.githubusercontent.com:sub': 'repo:rashadGIT/Kelova:*',
           },
         },
         'sts:AssumeRoleWithWebIdentity',
@@ -170,6 +170,6 @@ export class ComputeStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'EcsClusterName', { value: this.ecsCluster.clusterName });
     new cdk.CfnOutput(this, 'EcsServiceName', { value: this.fargateService.service.serviceName });
     new cdk.CfnOutput(this, 'GitHubActionsRoleArn', { value: this.githubActionsRoleArn });
-    new cdk.CfnOutput(this, 'ApiUrl', { value: 'https://api.vela.automagicly.ai' });
+    new cdk.CfnOutput(this, 'ApiUrl', { value: 'https://api.kelova.automagicly.ai' });
   }
 }
