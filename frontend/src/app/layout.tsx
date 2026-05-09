@@ -1,13 +1,11 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { Toaster } from 'sonner';
-import { configureAmplify } from '@/lib/auth/amplify-config';
 import { QueryProvider } from '@/providers/query-provider';
+import { AuthHydration } from '@/providers/auth-hydration';
 import { PwaRegister } from '@/components/pwa-register';
+import { AmplifyClientConfig } from '@/components/amplify-client-config';
 import './globals.css';
-
-// Configure Amplify once at module level (safe in Server Component context)
-configureAmplify();
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -26,6 +24,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
       <body className={inter.className}>
+        <AmplifyClientConfig />
+        <AuthHydration />
         <QueryProvider>
           {children}
           <Toaster position="bottom-right" richColors closeButton />

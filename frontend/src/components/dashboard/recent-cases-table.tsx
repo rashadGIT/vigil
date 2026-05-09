@@ -62,7 +62,7 @@ export function RecentCasesTable() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {cases.map((c) => (
+          {cases.slice(0, 5).map((c) => (
             <TableRow
               key={c.id}
               className="cursor-pointer hover:bg-muted/50"
@@ -76,6 +76,11 @@ export function RecentCasesTable() {
           ))}
         </TableBody>
       </Table>
+      <div className="px-4 py-2 border-t">
+        <a href="/cases" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+          View all cases →
+        </a>
+      </div>
     </div>
   );
 }

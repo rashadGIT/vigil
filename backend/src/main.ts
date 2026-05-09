@@ -36,17 +36,15 @@ async function bootstrap(): Promise<void> {
   });
   // Intake endpoint CORS is applied per-route via @Header() in intake.controller.ts
 
-  // Swagger — dev only (D-13)
-  if (process.env.NODE_ENV !== 'production') {
-    const config = new DocumentBuilder()
-      .setTitle('Kelova API')
-      .setDescription('Funeral Home Operations Platform')
-      .setVersion('1.0')
-      .addBearerAuth()
-      .build();
-    const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('api/docs', app, document);
-  }
+  // Swagger — always available
+  const config = new DocumentBuilder()
+    .setTitle('Kelova API')
+    .setDescription('Funeral Home Operations Platform')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/docs', app, document);
 
   const port = parseInt(process.env.PORT ?? '3001', 10);
   await app.listen(port);

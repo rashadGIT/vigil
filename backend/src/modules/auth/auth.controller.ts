@@ -1,10 +1,17 @@
 import { Body, Controller, Get, Headers, Post, Req, Res } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import type { Request, Response } from 'express';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { Public } from '../../common/decorators/public.decorator';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -12,6 +19,9 @@ export class AuthController {
   @Public()
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
   @Post('login')
+  @ApiOperation({ summary: 'Authenticate with email and password' })
+  @ApiResponse({ status: 200, description: 'Returns access token' })
+  @ApiResponse({ status: 401, description: 'Invalid credentials' })
   login(
     @Body() dto: LoginDto,
     @Res({ passthrough: true }) response: Response,
@@ -21,6 +31,9 @@ export class AuthController {
 
   @Public()
   @Post('refresh')
+  @ApiOperation({ summary: 'Refresh access token using refresh_token cookie' })
+  @ApiResponse({ status: 200, description: 'Returns new access token' })
+  @ApiResponse({ status: 401, description: 'Missing or invalid refresh token' })
   refresh(@Req() request: Request): Promise<{ accessToken: string }> {
     const token = request.cookies?.['refresh_token'] as string | undefined;
     if (!token) {
@@ -29,7 +42,11 @@ export class AuthController {
     return this.authService.refresh(token);
   }
 
+  @ApiBearerAuth()
   @Get('me')
+  @ApiOperation({ summary: 'Get the currently authenticated user' })
+  @ApiResponse({ status: 200, description: 'Returns user profile' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   me(@Req() request: Request): { id: string; email: string; name: string; role: string; tenantId: string } {
     const user = (request as Request & { user: { sub: string; email: string; tenantId: string; role: string } }).user;
     return {
@@ -41,7 +58,10 @@ export class AuthController {
     };
   }
 
+  @ApiBearerAuth()
   @Post('logout')
+  @ApiOperation({ summary: 'Logout and invalidate the current session' })
+  @ApiResponse({ status: 200, description: 'Successfully logged out' })
   logout(
     @Headers('authorization') auth: string | undefined,
     @Res({ passthrough: true }) response: Response,

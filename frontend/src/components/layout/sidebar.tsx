@@ -35,6 +35,7 @@ function NavLink({ item, onClick }: { item: (typeof navItems)[number]; onClick?:
     <Link
       href={item.href}
       onClick={onClick}
+      aria-current={isActive ? 'page' : undefined}
       className={cn(
         'flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors',
         isActive
@@ -57,7 +58,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
       </div>
 
       {/* Nav items */}
-      <nav className="flex-1 px-3 py-4 space-y-1">
+      <nav aria-label="Main navigation" className="flex-1 px-3 py-4 space-y-1">
         {navItems.map((item) => (
           <NavLink key={item.href} item={item} onClick={onClose} />
         ))}
@@ -73,7 +74,7 @@ export function MobileSidebarTrigger() {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="md:hidden">
+        <Button variant="ghost" size="icon" className="md:hidden touch-target">
           <Menu className="h-5 w-5" />
           <span className="sr-only">Open navigation menu</span>
         </Button>

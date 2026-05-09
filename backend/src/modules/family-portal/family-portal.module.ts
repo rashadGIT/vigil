@@ -1,13 +1,10 @@
 import { Module } from '@nestjs/common';
+import { FamilyPortalController } from './family-portal.controller';
+import { FamilyPortalService } from './family-portal.service';
 
-/**
- * Phase 2 stub — Family collaboration portal.
- * Schema model `FamilyPortalAccess` already exists (Phase 4).
- * Implementation deferred to Phase 2 feature work.
- */
 @Module({
-  imports: [],
-  controllers: [],
-  providers: [],
+  controllers: [FamilyPortalController],
+  providers: [FamilyPortalService],
+  exports: [FamilyPortalService],
 })
 export class FamilyPortalModule {}

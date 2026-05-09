@@ -1,13 +1,10 @@
 import { Module } from '@nestjs/common';
+import { ReferralsController } from './referrals.controller';
+import { ReferralsService } from './referrals.service';
 
-/**
- * Phase 2 stub — Referral source tracking.
- * Schema model `ReferralSource` already exists (Phase 4).
- * Implementation deferred to Phase 2 feature work.
- */
 @Module({
-  imports: [],
-  controllers: [],
-  providers: [],
+  controllers: [ReferralsController],
+  providers: [ReferralsService],
+  exports: [ReferralsService],
 })
 export class ReferralsModule {}

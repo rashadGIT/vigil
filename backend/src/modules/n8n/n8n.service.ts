@@ -58,4 +58,9 @@ export class N8nService implements OnModuleInit {
       this.logger.error(`Failed to trigger n8n event ${event}: ${(err as Error).message}`);
     }
   }
+
+  handleCallback(event: string, payload: unknown): void {
+    this.logger.log(`Received n8n callback: event=${event}, payload=${JSON.stringify(payload)}`);
+    // TODO: Route to domain service for audit logging
+  }
 }

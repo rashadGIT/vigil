@@ -16,6 +16,7 @@ export interface ComputeStackProps extends cdk.StackProps {
   certificate: acm.ICertificate;
   hostedZone: route53.IHostedZone;
   dbSecret: secretsmanager.ISecret;
+  stage?: 'production' | 'staging';
 }
 
 export class ComputeStack extends cdk.Stack {
@@ -27,8 +28,11 @@ export class ComputeStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: ComputeStackProps) {
     super(scope, id, props);
 
+    const stage = props.stage ?? 'production';
+    const serviceSuffix = stage === 'staging' ? '-staging' : '';
+
     this.ecrRepo = new ecr.Repository(this, 'KelovaBackendRepo', {
-      repositoryName: 'kelova-backend',
+      repositoryName: 'vigil-backend',
       imageTagMutability: ecr.TagMutability.MUTABLE,
       imageScanOnPush: true,
       lifecycleRules: [{ maxImageCount: 10, description: 'Keep last 10 images' }],
@@ -37,12 +41,12 @@ export class ComputeStack extends cdk.Stack {
 
     this.ecsCluster = new ecs.Cluster(this, 'KelovaEcsCluster', {
       vpc: props.vpc,
-      clusterName: 'kelova-cluster',
+      clusterName: 'vigil-cluster',
       containerInsights: true,
     });
 
     const logGroup = new logs.LogGroup(this, 'KelovaBackendLogs', {
-      logGroupName: '/kelova/backend',
+      logGroupName: `/vigil/backend${serviceSuffix}`,
       retention: logs.RetentionDays.ONE_MONTH,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
@@ -54,7 +58,7 @@ export class ComputeStack extends cdk.Stack {
       'KelovaFargateService',
       {
         cluster: this.ecsCluster,
-        serviceName: 'kelova-backend',
+        serviceName: `vigil-backend${serviceSuffix}`,
         cpu: 512,
         memoryLimitMiB: 1024,
         desiredCount: 1,
@@ -63,12 +67,12 @@ export class ComputeStack extends cdk.Stack {
         taskSubnets: { subnetType: ec2.SubnetType.PUBLIC },
         protocol: elbv2.ApplicationProtocol.HTTPS,
         certificate: props.certificate,
-        domainName: 'api.kelova.automagicly.ai',
+        domainName: stage === 'staging' ? 'api-staging.vigilhq.com' : 'api.vigilhq.com',
         domainZone: props.hostedZone,
         redirectHTTP: true,
         taskImageOptions: {
           image: containerImage,
-          containerName: 'kelova-backend',
+          containerName: `vigil-backend${serviceSuffix}`,
           containerPort: 3000,
           logDriver: ecs.LogDrivers.awsLogs({ streamPrefix: 'backend', logGroup }),
           environment: {
@@ -106,7 +110,7 @@ export class ComputeStack extends cdk.Stack {
     const migrationsTaskDef = new ecs.FargateTaskDefinition(this, 'KelovaMigrationsTaskDef', {
       cpu: 512,
       memoryLimitMiB: 1024,
-      family: 'kelova-migrations',
+      family: `vigil-migrations${serviceSuffix}`,
     });
     migrationsTaskDef.addContainer('migrations', {
       image: containerImage,
@@ -122,7 +126,7 @@ export class ComputeStack extends cdk.Stack {
     });
 
     const ghDeployRole = new iam.Role(this, 'GitHubActionsDeployRole', {
-      roleName: 'KelovaGitHubActionsDeployRole',
+      roleName: 'VigilGitHubActionsDeployRole',
       assumedBy: new iam.FederatedPrincipal(
         ghOidcProvider.openIdConnectProviderArn,
         {
@@ -130,7 +134,7 @@ export class ComputeStack extends cdk.Stack {
             'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
           },
           StringLike: {
-            'token.actions.githubusercontent.com:sub': 'repo:rashadGIT/Kelova:*',
+            'token.actions.githubusercontent.com:sub': 'repo:rashadGIT/Vigil:*',
           },
         },
         'sts:AssumeRoleWithWebIdentity',
@@ -170,6 +174,8 @@ export class ComputeStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'EcsClusterName', { value: this.ecsCluster.clusterName });
     new cdk.CfnOutput(this, 'EcsServiceName', { value: this.fargateService.service.serviceName });
     new cdk.CfnOutput(this, 'GitHubActionsRoleArn', { value: this.githubActionsRoleArn });
-    new cdk.CfnOutput(this, 'ApiUrl', { value: 'https://api.kelova.automagicly.ai' });
+    new cdk.CfnOutput(this, 'ApiUrl', {
+      value: stage === 'staging' ? 'https://api-staging.vigilhq.com' : 'https://api.vigilhq.com',
+    });
   }
 }

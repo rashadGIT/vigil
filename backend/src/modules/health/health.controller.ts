@@ -1,4 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { Public } from '../../common/decorators/public.decorator';
 
@@ -11,12 +12,15 @@ function getRedisState(): RedisState {
   return 'disabled';
 }
 
+@ApiTags('health')
 @Controller('health')
 export class HealthController {
   constructor(private readonly prisma: PrismaService) {}
 
   @Public()
   @Get()
+  @ApiOperation({ summary: 'Health check — reports DB and Redis connectivity' })
+  @ApiResponse({ status: 200, description: 'Returns status, db, and redis states' })
   async health(): Promise<{ status: 'ok' | 'degraded'; db: string; redis: RedisState }> {
     let db: 'ok' | 'error' = 'ok';
     try {

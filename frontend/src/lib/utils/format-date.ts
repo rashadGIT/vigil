@@ -1,17 +1,27 @@
 import { format, formatDistanceToNow, isAfter } from 'date-fns';
 
-export function formatDate(date: string | Date): string {
-  return format(new Date(date), 'MMM d, yyyy');
+function toDate(date: string | Date | null | undefined): Date | null {
+  if (!date) return null;
+  const d = new Date(date);
+  return isNaN(d.getTime()) ? null : d;
 }
 
-export function formatDateTime(date: string | Date): string {
-  return format(new Date(date), 'MMM d, yyyy h:mm a');
+export function formatDate(date: string | Date | null | undefined): string {
+  const d = toDate(date);
+  return d ? format(d, 'MMM d, yyyy') : '—';
 }
 
-export function formatRelative(date: string | Date): string {
-  return formatDistanceToNow(new Date(date), { addSuffix: true });
+export function formatDateTime(date: string | Date | null | undefined): string {
+  const d = toDate(date);
+  return d ? format(d, 'MMM d, yyyy h:mm a') : '—';
 }
 
-export function isOverdue(dueDate: string | Date): boolean {
-  return isAfter(new Date(), new Date(dueDate));
+export function formatRelative(date: string | Date | null | undefined): string {
+  const d = toDate(date);
+  return d ? formatDistanceToNow(d, { addSuffix: true }) : '—';
+}
+
+export function isOverdue(dueDate: string | Date | null | undefined): boolean {
+  const d = toDate(dueDate);
+  return d ? isAfter(new Date(), d) : false;
 }

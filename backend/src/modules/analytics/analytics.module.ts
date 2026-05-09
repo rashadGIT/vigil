@@ -1,13 +1,10 @@
 import { Module } from '@nestjs/common';
+import { AnalyticsController } from './analytics.controller';
+import { AnalyticsService } from './analytics.service';
 
-/**
- * Phase 2 stub — Revenue trends and case analytics.
- * Schema model `AnalyticsSnapshot` already exists (Phase 4).
- * Implementation deferred to Phase 2 feature work.
- */
 @Module({
-  imports: [],
-  controllers: [],
-  providers: [],
+  controllers: [AnalyticsController],
+  providers: [AnalyticsService],
+  exports: [AnalyticsService],
 })
 export class AnalyticsModule {}
