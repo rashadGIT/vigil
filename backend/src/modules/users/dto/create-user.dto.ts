@@ -12,7 +12,7 @@ export class CreateUserDto {
   @MinLength(2)
   name!: string;
 
-  @ApiProperty({ description: 'Role determining permissions within the tenant', enum: UserRole, example: UserRole.STAFF })
+  @ApiProperty({ description: 'Role determining permissions within the tenant', enum: UserRole, example: 'staff' })
   @IsEnum(UserRole)
   role!: UserRole;
 

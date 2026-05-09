@@ -34,6 +34,9 @@ import { VendorsModule } from './modules/vendors/vendors.module';
 import { CalendarModule } from './modules/calendar/calendar.module';
 import { FollowUpsModule } from './modules/follow-ups/follow-ups.module';
 import { SettingsModule } from './modules/settings/settings.module';
+import { MerchandiseModule } from './modules/merchandise/merchandise.module';
+import { PreneedModule } from './modules/preneed/preneed.module';
+import { CemeteryModule } from './modules/cemetery/cemetery.module';
 
 // Phase 2 stubs
 import { TrackingModule } from './modules/tracking/tracking.module';
@@ -78,6 +81,9 @@ import { MultiFaithModule } from './modules/multi-faith/multi-faith.module';
     CalendarModule,
     FollowUpsModule,
     SettingsModule,
+    MerchandiseModule,
+    PreneedModule,
+    CemeteryModule,
 
     // Phase 2 stubs
     TrackingModule,

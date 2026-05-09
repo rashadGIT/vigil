@@ -3,7 +3,7 @@ import { PriceCategory } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpsertPriceListItemDto {
-  @ApiProperty({ description: 'FTC GPL category for this item', enum: PriceCategory, example: PriceCategory.BASIC_SERVICES })
+  @ApiProperty({ description: 'FTC GPL category for this item', enum: PriceCategory, example: 'professional_services' })
   @IsEnum(PriceCategory)
   category!: PriceCategory;
 

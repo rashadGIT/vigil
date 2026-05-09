@@ -7,7 +7,7 @@ export class RequestSignatureDto {
   @IsString()
   contactId!: string;
 
-  @ApiProperty({ description: 'Type of document requiring signature', enum: SignatureDocument, example: SignatureDocument.AUTHORIZATION_FOR_CREMATION })
+  @ApiProperty({ description: 'Type of document requiring signature', enum: SignatureDocument, example: 'authorization' })
   @IsEnum(SignatureDocument)
   documentType!: SignatureDocument;
 

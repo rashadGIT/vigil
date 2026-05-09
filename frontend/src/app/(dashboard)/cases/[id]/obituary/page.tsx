@@ -8,7 +8,7 @@ import { CaseWorkspaceTabs } from '@/components/cases/case-workspace-tabs';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Badge } from '@/components/ui/badge';
+import { StatusPill } from '@/components/ui/status-pill';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { apiClient } from '@/lib/api/client';
 import { Copy, Wand2 } from 'lucide-react';
@@ -94,9 +94,7 @@ function ObituaryEditor({ caseId }: { caseId: string }) {
       <Card className="max-w-3xl">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <div className="space-y-1">
-            <Badge className="bg-green-100 text-green-800 border-green-200 hover:bg-green-100">
-              ✓ Approved
-            </Badge>
+            <StatusPill kind="completed" />
             {deceasedName && (
               <h2 className="text-xl font-semibold tracking-tight">{deceasedName}</h2>
             )}

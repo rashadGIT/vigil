@@ -16,6 +16,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CaseStatusBadge } from './case-status-badge';
 import { getCases, type CaseFilters } from '@/lib/api/cases';
 import { formatRelative } from '@/lib/utils/format-date';
@@ -24,7 +25,7 @@ import type { ICase } from '@vigil/shared-types';
 
 const columnHelper = createColumnHelper<ICase>();
 
-const PAGE_SIZE = 10;
+// PAGE_SIZE is now stateful — see useState below
 
 function SortIcon({ isSorted }: { isSorted: false | 'asc' | 'desc' }) {
   if (isSorted === 'asc') return <ChevronUp className="inline h-3.5 w-3.5 ml-1" />;
@@ -51,11 +52,14 @@ const baseColumns = [
     header: () => <span className="font-medium">Status</span>,
     cell: (info) => <CaseStatusBadge status={info.getValue()} />,
   }),
-  columnHelper.accessor('assignedToId', {
+  columnHelper.accessor((row) => (row as any).assignedTo, {
+    id: 'assignedTo',
     header: () => <span className="font-medium">Assigned</span>,
-    cell: (info) => (
-      <span className="text-muted-foreground text-sm">{info.getValue() ?? '—'}</span>
-    ),
+    cell: (info) => {
+      const val = info.getValue();
+      const display = val?.name ?? val ?? '—';
+      return <span className="text-muted-foreground text-sm">{display}</span>;
+    },
   }),
   columnHelper.accessor('updatedAt', {
     id: 'updatedAt',
@@ -97,6 +101,7 @@ export function CaseTable({ filter }: { filter?: string }) {
   const router = useRouter();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [pageIndex, setPageIndex] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
 
   const { data: cases = [], isLoading, error, refetch } = useQuery({
     queryKey: ['cases', filter],
@@ -110,13 +115,13 @@ export function CaseTable({ filter }: { filter?: string }) {
   const table = useReactTable({
     data: cases,
     columns,
-    state: { sorting, pagination: { pageIndex, pageSize: PAGE_SIZE } },
+    state: { sorting, pagination: { pageIndex, pageSize } },
     onSortingChange: (updater) => {
       setSorting(updater);
       setPageIndex(0);
     },
     onPaginationChange: (updater) => {
-      const next = typeof updater === 'function' ? updater({ pageIndex, pageSize: PAGE_SIZE }) : updater;
+      const next = typeof updater === 'function' ? updater({ pageIndex, pageSize }) : updater;
       setPageIndex(next.pageIndex);
     },
     getCoreRowModel: getCoreRowModel(),
@@ -158,8 +163,8 @@ export function CaseTable({ filter }: { filter?: string }) {
   }
 
   const totalRows = cases.length;
-  const firstRow = pageIndex * PAGE_SIZE + 1;
-  const lastRow = Math.min((pageIndex + 1) * PAGE_SIZE, totalRows);
+  const firstRow = pageIndex * pageSize + 1;
+  const lastRow = Math.min((pageIndex + 1) * pageSize, totalRows);
 
   return (
     <div className="space-y-3">
@@ -180,7 +185,7 @@ export function CaseTable({ filter }: { filter?: string }) {
             {table.getRowModel().rows.map((row) => (
               <TableRow
                 key={row.id}
-                className="cursor-pointer hover:bg-muted/50"
+                className="cursor-pointer hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset focus-visible:bg-muted"
                 tabIndex={0}
                 onClick={() => router.push(`/cases/${row.original.id}`)}
                 onKeyDown={(e) => {
@@ -201,31 +206,44 @@ export function CaseTable({ filter }: { filter?: string }) {
         </Table>
       </div>
 
-      {totalRows > PAGE_SIZE && (
-        <div className="flex items-center justify-between px-1">
-          <p className="text-sm text-muted-foreground">
-            Showing {firstRow}–{lastRow} of {totalRows} cases
-          </p>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPageIndex((p) => Math.max(0, p - 1))}
-              disabled={pageIndex === 0}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPageIndex((p) => p + 1)}
-              disabled={lastRow >= totalRows}
-            >
-              Next
-            </Button>
-          </div>
+      <div className="flex items-center justify-between px-1">
+        <p className="text-sm text-muted-foreground">
+          {totalRows > 0 ? `Showing ${firstRow}–${lastRow} of ${totalRows} cases` : ''}
+        </p>
+        <div className="flex items-center gap-2">
+          <Select
+            value={String(pageSize)}
+            onValueChange={(v) => { setPageSize(Number(v)); setPageIndex(0); }}
+          >
+            <SelectTrigger className="w-[100px]"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {[10, 25, 50].map((n) => (
+                <SelectItem key={n} value={String(n)}>{n} / page</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {totalRows > pageSize && (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPageIndex((p) => Math.max(0, p - 1))}
+                disabled={pageIndex === 0}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPageIndex((p) => p + 1)}
+                disabled={lastRow >= totalRows}
+              >
+                Next
+              </Button>
+            </>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }

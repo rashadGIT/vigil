@@ -6,22 +6,12 @@ import { CaseWorkspaceTabs } from '@/components/cases/case-workspace-tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { apiClient } from '@/lib/api/client';
 import { formatDate } from '@/lib/utils/format-date';
+import { StatusPill } from '@/components/ui/status-pill';
 
-function getStatusClasses(status: string, scheduledAt: string | null): string {
-  if (status === 'sent') return 'bg-green-100 text-green-800';
-  if (status === 'pending') {
-    if (scheduledAt && new Date(scheduledAt) < new Date()) {
-      return 'bg-red-100 text-red-800';
-    }
-    return 'bg-yellow-100 text-yellow-800';
-  }
-  return 'bg-gray-100 text-gray-700';
-}
-
-function getStatusLabel(status: string, scheduledAt: string | null): string {
+function getStatusKind(status: string, scheduledAt: string | null): 'sent' | 'pending' | 'overdue' {
   if (status === 'sent') return 'sent';
   if (status === 'pending' && scheduledAt && new Date(scheduledAt) < new Date()) return 'overdue';
-  return status;
+  return 'pending';
 }
 
 function FollowUpList({ caseId }: { caseId: string }) {
@@ -41,8 +31,6 @@ function FollowUpList({ caseId }: { caseId: string }) {
     <div className="rounded-md border divide-y">
       {followUps.map((f: any) => {
         const scheduledDate = f.scheduledAt ?? f.scheduledFor ?? null;
-        const statusClasses = getStatusClasses(f.status, scheduledDate);
-        const statusLabel = getStatusLabel(f.status, scheduledDate);
         return (
           <div key={f.id} className="flex items-center justify-between px-4 py-3">
             <div>
@@ -51,12 +39,7 @@ function FollowUpList({ caseId }: { caseId: string }) {
                 {scheduledDate ? `Scheduled for ${formatDate(scheduledDate)}` : 'Date TBD'}
               </p>
             </div>
-            <span
-              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusClasses}`}
-              aria-label={`Status: ${statusLabel}`}
-            >
-              {statusLabel}
-            </span>
+            <StatusPill kind={getStatusKind(f.status, scheduledDate)} />
           </div>
         );
       })}

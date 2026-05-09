@@ -11,6 +11,7 @@ import {
   Settings,
   Menu,
   X,
+  BookOpen,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -22,6 +23,7 @@ const navItems = [
   { label: 'Cases', href: '/cases', icon: FolderOpen },
   { label: 'Calendar', href: '/calendar', icon: Calendar },
   { label: 'Vendors', href: '/vendors', icon: Building2 },
+  { label: 'Pre-Need', href: '/preneed', icon: BookOpen },
   { label: 'Price List', href: '/price-list', icon: DollarSign },
   { label: 'Settings', href: '/settings', icon: Settings },
 ];

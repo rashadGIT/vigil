@@ -2,8 +2,10 @@ import { apiClient } from './client';
 
 export interface DashboardStats {
   activeCases: number;
+  activeCasesDelta: number;
   overdueTasks: number;
   casesThisMonth: number;
+  casesLastMonthDelta: number;
   pendingSignatures: number;
 }
 

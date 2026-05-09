@@ -19,7 +19,7 @@ export class CreateCaseDto {
   @IsDateString()
   deceasedDod?: string;
 
-  @ApiProperty({ description: 'Type of funeral service', enum: ServiceType, example: ServiceType.BURIAL })
+  @ApiProperty({ description: 'Type of funeral service', enum: ServiceType, example: 'burial' })
   @IsEnum(ServiceType)
   serviceType!: ServiceType;
 

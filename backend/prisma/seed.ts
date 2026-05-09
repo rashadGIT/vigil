@@ -502,6 +502,119 @@ async function seedCases(sunriseId: string, assignedToId: string) {
   }
 }
 
+async function seedPreneedArrangements(sunriseId: string) {
+  const arrangements = [
+    {
+      clientFirstName: 'Dorothy',
+      clientLastName:  'Watkins',
+      clientDob:       new Date('1942-06-18'),
+      clientPhone:     '614-555-0312',
+      clientEmail:     'dorothy.watkins@example.com',
+      clientAddress:   '214 Elm Street, Westerville, OH 43081',
+      fundingType:     'insurance',
+      insuranceCompany:'Forethought Life Insurance',
+      policyNumber:    'FTH-8821045',
+      faceValue:       8500,
+      serviceType:     ServiceType.burial,
+      servicePreferences: { music: 'hymns', flowers: 'lilies', viewing: true },
+      status:          'active',
+      notes:           'Dorothy visited in person. Prefers morning services.',
+    },
+    {
+      clientFirstName: 'Franklin',
+      clientLastName:  'Morrison',
+      clientDob:       new Date('1938-11-04'),
+      clientPhone:     '614-555-0398',
+      clientEmail:     'fmorrison@example.com',
+      clientAddress:   '88 Maple Ridge Ct, Dublin, OH 43016',
+      fundingType:     'trust',
+      insuranceCompany: null,
+      policyNumber:    'TRU-2024-FM',
+      faceValue:       12000,
+      serviceType:     ServiceType.cremation,
+      servicePreferences: { urn: 'cherry wood', scattering: 'Alum Creek', reception: true },
+      status:          'active',
+      notes:           'Franklin and his wife Carol came together. Carol will pre-arrange separately.',
+    },
+    {
+      clientFirstName: 'Eugene',
+      clientLastName:  'Petrov',
+      clientDob:       new Date('1950-02-27'),
+      clientPhone:     '614-555-0441',
+      clientEmail:     'epetrov@example.com',
+      clientAddress:   '5501 Karl Road, Columbus, OH 43229',
+      fundingType:     'cash',
+      insuranceCompany: null,
+      policyNumber:    null,
+      faceValue:       6200,
+      serviceType:     ServiceType.memorial,
+      servicePreferences: { military: true, honors: 'Army', reception: false },
+      status:          'active',
+      notes:           'Vietnam veteran. Requests military honors. Paid $2,000 deposit.',
+    },
+    {
+      clientFirstName: 'Carol',
+      clientLastName:  'Morrison',
+      clientDob:       new Date('1941-08-15'),
+      clientPhone:     '614-555-0398',
+      clientEmail:     'carol.morrison@example.com',
+      clientAddress:   '88 Maple Ridge Ct, Dublin, OH 43016',
+      fundingType:     'insurance',
+      insuranceCompany:'Lincoln Heritage Life',
+      policyNumber:    'LHL-9934821',
+      faceValue:       9750,
+      serviceType:     ServiceType.cremation,
+      servicePreferences: { urn: 'brushed brass', reception: true },
+      status:          'active',
+      notes:           'Arranged same day as Franklin Morrison. Cross-reference.',
+    },
+    {
+      clientFirstName: 'Harriet',
+      clientLastName:  'Okafor',
+      clientDob:       new Date('1955-03-09'),
+      clientPhone:     '614-555-0277',
+      clientEmail:     'harriet.okafor@example.com',
+      clientAddress:   '3302 Cleveland Ave, Columbus, OH 43224',
+      fundingType:     'insurance',
+      insuranceCompany:'Security Plan Life',
+      policyNumber:    'SPL-44190-HO',
+      faceValue:       7500,
+      serviceType:     ServiceType.burial,
+      servicePreferences: { viewing: true, flowers: 'roses', repast: true },
+      status:          'cancelled',
+      notes:           'Family relocated to Atlanta. Arrangement cancelled and refunded.',
+    },
+  ];
+
+  for (const a of arrangements) {
+    const existing = await prisma.preneedArrangement.findFirst({
+      where: { tenantId: sunriseId, clientFirstName: a.clientFirstName, clientLastName: a.clientLastName },
+    });
+    if (!existing) {
+      await prisma.preneedArrangement.create({
+        data: {
+          tenantId:        sunriseId,
+          clientFirstName: a.clientFirstName,
+          clientLastName:  a.clientLastName,
+          clientDob:       a.clientDob,
+          clientPhone:     a.clientPhone,
+          clientEmail:     a.clientEmail,
+          clientAddress:   a.clientAddress,
+          fundingType:     a.fundingType,
+          insuranceCompany: a.insuranceCompany ?? undefined,
+          policyNumber:    a.policyNumber ?? undefined,
+          faceValue:       a.faceValue,
+          serviceType:     a.serviceType,
+          servicePreferences: a.servicePreferences,
+          status:          a.status,
+          notes:           a.notes,
+        },
+      });
+    }
+  }
+  console.log(`[seed] preneed arrangements: ${arrangements.length}`);
+}
+
 async function main() {
   console.log(`[seed] Cognito enabled: ${COGNITO_ENABLED}`);
   const tenants = await seedTenants();
@@ -524,6 +637,7 @@ async function main() {
   await seedPaymentsAndSignatures(tenants.sunrise.id, abrams.id, abramsContact.id);
   await seedObituaries(tenants.sunrise.id, chen.id, abrams.id);
   await seedFollowUps(tenants.sunrise.id, abrams.id, abramsContact.id);
+  await seedPreneedArrangements(tenants.sunrise.id);
 
   // Isolation guard — every new row must carry sunriseId, never heritage
   const heritageLeaks = await prisma.case.count({ where: { tenantId: tenants.heritage.id } });

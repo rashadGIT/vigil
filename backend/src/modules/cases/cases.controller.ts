@@ -13,6 +13,7 @@ import {
   ApiTags,
   ApiBearerAuth,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
 } from '@nestjs/swagger';
 import { CasesService } from './cases.service';
@@ -33,6 +34,19 @@ export class CasesController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   create(@CurrentUser() user: AuthUser, @Body() dto: CreateCaseDto) {
     return this.casesService.create(user.tenantId, dto);
+  }
+
+  @Get('reports/revenue')
+  @ApiOperation({ summary: 'Revenue report' })
+  @ApiQuery({ name: 'from', required: true, description: 'ISO date string (inclusive)' })
+  @ApiQuery({ name: 'to', required: true, description: 'ISO date string (inclusive)' })
+  @ApiResponse({ status: 200 })
+  getRevenueReport(
+    @CurrentUser() user: AuthUser,
+    @Query('from') from: string,
+    @Query('to') to: string,
+  ) {
+    return this.casesService.getRevenueReport(user.tenantId, from, to);
   }
 
   @Get('stats')

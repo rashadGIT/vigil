@@ -45,6 +45,9 @@ const config: Config = {
           foreground: 'hsl(var(--card-foreground))',
         },
       },
+      fontFamily: {
+        serif: ['var(--font-serif)', ...require('tailwindcss/defaultTheme').fontFamily.serif],
+      },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',

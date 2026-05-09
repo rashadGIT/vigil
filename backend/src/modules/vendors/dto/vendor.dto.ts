@@ -7,7 +7,7 @@ export class UpsertVendorDto {
   @IsString()
   name!: string;
 
-  @ApiProperty({ description: 'Type of vendor', enum: VendorType, example: VendorType.CREMATORY })
+  @ApiProperty({ description: 'Type of vendor', enum: VendorType, example: 'crematory' })
   @IsEnum(VendorType)
   type!: VendorType;
 

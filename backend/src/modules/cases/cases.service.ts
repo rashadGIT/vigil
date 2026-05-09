@@ -37,17 +37,35 @@ export class CasesService {
 
   async getStats(tenantId: string) {
     const now = new Date();
+    const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     const db = this.prisma.forTenant(tenantId);
 
-    const [activeCases, casesThisMonth, overdueTasks, pendingSignatures] = await Promise.all([
+    const [
+      activeCases,
+      activeCasesYesterday,
+      casesThisMonth,
+      casesLastMonth,
+      overdueTasks,
+      pendingSignatures,
+    ] = await Promise.all([
       db.case.count({ where: { deletedAt: null, status: { in: ['new', 'in_progress'] } } }),
+      db.case.count({ where: { deletedAt: null, status: { in: ['new', 'in_progress'] }, createdAt: { lte: yesterday } } }),
       db.case.count({ where: { deletedAt: null, createdAt: { gte: startOfMonth } } }),
+      db.case.count({ where: { deletedAt: null, createdAt: { gte: startOfLastMonth, lt: startOfMonth } } }),
       db.case.count({ where: { deletedAt: null, tasks: { some: { completed: false, dueDate: { lt: now } } } } }),
       db.signature.count({ where: { signedAt: null } }),
     ]);
 
-    return { activeCases, casesThisMonth, overdueTasks, pendingSignatures };
+    return {
+      activeCases,
+      activeCasesDelta: activeCases - activeCasesYesterday,
+      casesThisMonth,
+      casesLastMonthDelta: casesThisMonth - casesLastMonth,
+      overdueTasks,
+      pendingSignatures,
+    };
   }
 
   async findAll(tenantId: string, filter: CaseFilterDto) {
@@ -227,6 +245,77 @@ export class CasesService {
       overdueCount: caseIdSet.size,
       caseIds: Array.from(caseIdSet),
     }));
+  }
+
+  async getRevenueReport(tenantId: string, from: string, to: string) {
+    const scoped = this.prisma.forTenant(tenantId);
+    const fromDate = new Date(from);
+    const toDate = new Date(to);
+    const dateWhere = { createdAt: { gte: fromDate, lte: toDate }, deletedAt: null };
+
+    const [cases, paymentAgg, byServiceType, pendingAgg] = await Promise.all([
+      scoped.case.findMany({
+        where: dateWhere,
+        select: {
+          id: true,
+          serviceType: true,
+          createdAt: true,
+          payment: { select: { amountPaid: true, totalAmount: true } },
+        },
+      }),
+      scoped.payment.aggregate({
+        where: { case: { createdAt: { gte: fromDate, lte: toDate }, deletedAt: null } },
+        _sum: { amountPaid: true },
+      }),
+      scoped.case.groupBy({
+        by: ['serviceType'],
+        where: dateWhere,
+        _count: { id: true },
+      }),
+      scoped.payment.aggregate({
+        where: { case: { createdAt: { gte: fromDate, lte: toDate }, deletedAt: null } },
+        _sum: { totalAmount: true, amountPaid: true },
+      }),
+    ]);
+
+    const totalRevenue = Number(paymentAgg._sum.amountPaid ?? 0);
+    const totalCases = cases.length;
+    const averageCaseValue = totalCases > 0 ? totalRevenue / totalCases : 0;
+    const pendingBalance =
+      Number(pendingAgg._sum.totalAmount ?? 0) - Number(pendingAgg._sum.amountPaid ?? 0);
+
+    // Revenue per serviceType
+    const revenueMap = new Map<string, number>();
+    for (const c of cases) {
+      const paid = Number(c.payment?.amountPaid ?? 0);
+      revenueMap.set(c.serviceType, (revenueMap.get(c.serviceType) ?? 0) + paid);
+    }
+    const revenueByServiceType = byServiceType.map((row) => ({
+      serviceType: row.serviceType,
+      count: row._count.id,
+      revenue: revenueMap.get(row.serviceType) ?? 0,
+    }));
+
+    // Cases + revenue by calendar month
+    const monthMap = new Map<string, { count: number; revenue: number }>();
+    for (const c of cases) {
+      const month = c.createdAt.toISOString().slice(0, 7); // "YYYY-MM"
+      const paid = Number(c.payment?.amountPaid ?? 0);
+      const existing = monthMap.get(month) ?? { count: 0, revenue: 0 };
+      monthMap.set(month, { count: existing.count + 1, revenue: existing.revenue + paid });
+    }
+    const casesByMonth = Array.from(monthMap.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([month, data]) => ({ month, ...data }));
+
+    return {
+      totalCases,
+      totalRevenue,
+      revenueByServiceType,
+      casesByMonth,
+      averageCaseValue,
+      pendingBalance,
+    };
   }
 
   private async assertValidTransition(

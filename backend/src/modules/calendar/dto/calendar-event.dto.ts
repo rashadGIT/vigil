@@ -7,7 +7,7 @@ export class UpsertEventDto {
   @IsString()
   title!: string;
 
-  @ApiProperty({ description: 'Type of event', enum: EventType, example: EventType.SERVICE })
+  @ApiProperty({ description: 'Type of event', enum: EventType, example: 'service' })
   @IsEnum(EventType)
   eventType!: EventType;
 

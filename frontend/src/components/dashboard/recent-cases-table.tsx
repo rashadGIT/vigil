@@ -65,8 +65,10 @@ export function RecentCasesTable() {
           {cases.slice(0, 5).map((c) => (
             <TableRow
               key={c.id}
-              className="cursor-pointer hover:bg-muted/50"
+              className="cursor-pointer hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset focus-visible:bg-muted"
+              tabIndex={0}
               onClick={() => router.push(`/cases/${c.id}`)}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); router.push(`/cases/${c.id}`); } }}
             >
               <TableCell className="font-medium">{c.deceasedName}</TableCell>
               <TableCell><CaseStatusBadge status={c.status as CaseStatus} /></TableCell>

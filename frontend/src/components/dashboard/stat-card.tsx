@@ -10,9 +10,10 @@ interface StatCardProps {
   description?: string;
   loading?: boolean;
   href?: string;
+  delta?: number;
 }
 
-export function StatCard({ title, value, icon: Icon, description, loading, href }: StatCardProps) {
+export function StatCard({ title, value, icon: Icon, description, loading, href, delta }: StatCardProps) {
   const card = (
     <Card className={href ? 'cursor-pointer transition-colors hover:bg-muted/50' : undefined}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -24,6 +25,9 @@ export function StatCard({ title, value, icon: Icon, description, loading, href 
           <Skeleton className="h-8 w-16" />
         ) : (
           <div className="text-3xl font-semibold">{value ?? 0}</div>
+        )}
+        {delta !== undefined && (
+          <p className="text-xs text-muted-foreground mt-1">{delta >= 0 ? '↑' : '↓'} {Math.abs(delta)} since yesterday</p>
         )}
         {description && (
           <p className="text-xs text-muted-foreground mt-1">{description}</p>

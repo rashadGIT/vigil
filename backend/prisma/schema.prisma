@@ -89,6 +89,16 @@ enum EventType {
   other
 }
 
+enum MerchandiseCategory {
+  casket
+  urn
+  vault
+  clothing
+  flowers
+  stationery
+  other
+}
+
 enum AuditAction {
   create
   update
@@ -141,7 +151,14 @@ model Tenant {
   memorialPages          MemorialPage[]
   locations              Location[]
   faithTraditionTemplates FaithTraditionTemplate[]
-  analyticsSnapshots     AnalyticsSnapshot[]
+  analyticsSnapshots      AnalyticsSnapshot[]
+  merchandiseItems        MerchandiseItem[]
+  caseMerchandise         CaseMerchandise[]
+  preneedArrangements     PreneedArrangement[]
+  cemeteryRecords         CemeteryRecord[]
+  deathCertificates       DeathCertificate[]
+  firstCalls              FirstCall[]
+  cremationAuthorizations CremationAuthorization[]
 
   @@map("tenants")
 }
@@ -197,6 +214,12 @@ model Case {
   caseLineItems     CaseLineItem[]
   calendarEvents    CalendarEvent[]
   memorialPage      MemorialPage?
+  merchandise            CaseMerchandise[]
+  cemeteryRecord         CemeteryRecord?
+  preneedSource          PreneedArrangement?
+  deathCertificate       DeathCertificate?
+  firstCall              FirstCall?
+  cremationAuthorization CremationAuthorization?
 
   @@index([tenantId, status])
   @@index([tenantId, assignedToId])
@@ -603,4 +626,184 @@ model AnalyticsSnapshot {
 
   @@index([tenantId, periodStart])
   @@map("analytics_snapshots")
+}
+
+// ============================================================
+// Phase 2 operational models — Merchandise, Pre-Need, Cemetery
+// ============================================================
+
+model MerchandiseItem {
+  id          String              @id @default(cuid())
+  tenantId    String              @map("tenant_id")
+  name        String
+  description String?
+  category    MerchandiseCategory
+  priceRetail Decimal             @map("price_retail") @db.Decimal(10, 2)
+  priceCost   Decimal?            @map("price_cost") @db.Decimal(10, 2)
+  photoUrls   String[]            @map("photo_urls")
+  sku         String?
+  inStock     Boolean             @default(true) @map("in_stock")
+  sortOrder   Int                 @default(0) @map("sort_order")
+  createdAt   DateTime            @default(now()) @map("created_at")
+  updatedAt   DateTime            @updatedAt @map("updated_at")
+
+  tenant     Tenant            @relation(fields: [tenantId], references: [id])
+  selections CaseMerchandise[]
+
+  @@index([tenantId, category])
+  @@map("merchandise_items")
+}
+
+model CaseMerchandise {
+  id          String   @id @default(cuid())
+  tenantId    String   @map("tenant_id")
+  caseId      String   @map("case_id")
+  itemId      String   @map("item_id")
+  quantity    Int      @default(1)
+  priceAtTime Decimal  @map("price_at_time") @db.Decimal(10, 2)
+  notes       String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  tenant Tenant          @relation(fields: [tenantId], references: [id])
+  case   Case            @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  item   MerchandiseItem @relation(fields: [itemId], references: [id])
+
+  @@index([tenantId, caseId])
+  @@map("case_merchandise")
+}
+
+model PreneedArrangement {
+  id                 String      @id @default(cuid())
+  tenantId           String      @map("tenant_id")
+  clientFirstName    String      @map("client_first_name")
+  clientLastName     String      @map("client_last_name")
+  clientDob          DateTime?   @map("client_dob")
+  clientPhone        String?     @map("client_phone")
+  clientEmail        String?     @map("client_email")
+  clientAddress      String?     @map("client_address")
+  fundingType        String?     @map("funding_type")
+  policyNumber       String?     @map("policy_number")
+  insuranceCompany   String?     @map("insurance_company")
+  faceValue          Decimal?    @map("face_value") @db.Decimal(10, 2)
+  serviceType        ServiceType @map("service_type")
+  servicePreferences Json        @default("{}") @map("service_preferences")
+  convertedCaseId    String?     @unique @map("converted_case_id")
+  convertedAt        DateTime?   @map("converted_at")
+  status             String      @default("active")
+  notes              String?
+  createdAt          DateTime    @default(now()) @map("created_at")
+  updatedAt          DateTime    @updatedAt @map("updated_at")
+
+  tenant        Tenant @relation(fields: [tenantId], references: [id])
+  convertedCase Case?  @relation(fields: [convertedCaseId], references: [id])
+
+  @@index([tenantId, status])
+  @@map("preneed_arrangements")
+}
+
+model CemeteryRecord {
+  id                       String    @id @default(cuid())
+  tenantId                 String    @map("tenant_id")
+  caseId                   String    @unique @map("case_id")
+  cemeteryName             String?   @map("cemetery_name")
+  cemeteryAddress          String?   @map("cemetery_address")
+  cemeteryPhone            String?   @map("cemetery_phone")
+  sectionLotGrave          String?   @map("section_lot_grave")
+  intermentType            String?   @map("interment_type")
+  openingClosingOrdered    Boolean   @default(false) @map("opening_closing_ordered")
+  openingClosingOrderedAt  DateTime? @map("opening_closing_ordered_at")
+  intermentScheduledAt     DateTime? @map("interment_scheduled_at")
+  intermentCompletedAt     DateTime? @map("interment_completed_at")
+  permitNumber             String?   @map("permit_number")
+  notes                    String?
+  createdAt                DateTime  @default(now()) @map("created_at")
+  updatedAt                DateTime  @updatedAt @map("updated_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  case   Case   @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@map("cemetery_records")
+}
+
+// ============================================================
+// Phase 1 operational models — Death Certificate, First Call, Cremation Auth
+// ============================================================
+
+model DeathCertificate {
+  id                      String    @id @default(cuid())
+  tenantId                String    @map("tenant_id")
+  caseId                  String    @unique @map("case_id")
+  deceasedFullName        String    @map("deceased_full_name")
+  dateOfDeath             DateTime  @map("date_of_death")
+  placeOfDeath            String?   @map("place_of_death")
+  causeOfDeath            String?   @map("cause_of_death")
+  certifiedCopiesOrdered  Int       @default(0) @map("certified_copies_ordered")
+  certifiedCopiesReceived Int       @default(0) @map("certified_copies_received")
+  edrsFiledAt             DateTime? @map("edrs_filed_at")
+  stateFiledAt            DateTime? @map("state_filed_at")
+  physicianName           String?   @map("physician_name")
+  physicianSignedAt       DateTime? @map("physician_signed_at")
+  status                  String    @default("pending")
+  notes                   String?
+  createdAt               DateTime  @default(now()) @map("created_at")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  case   Case   @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("death_certificates")
+}
+
+model FirstCall {
+  id                  String    @id @default(cuid())
+  tenantId            String    @map("tenant_id")
+  caseId              String    @unique @map("case_id")
+  calledAt            DateTime  @map("called_at")
+  calledBy            String?   @map("called_by")
+  callerRelationship  String?   @map("caller_relationship")
+  removalAddress      String?   @map("removal_address")
+  removalLocation     String?   @map("removal_location")
+  removalAt           DateTime? @map("removal_at")
+  removedBy           String?   @map("removed_by")
+  authorizedBy        String?   @map("authorized_by")
+  authorizationMethod String?   @map("authorization_method")
+  specialInstructions String?   @map("special_instructions")
+  weightEstimate      Int?      @map("weight_estimate")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  case   Case   @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("first_calls")
+}
+
+model CremationAuthorization {
+  id                      String    @id @default(cuid())
+  tenantId                String    @map("tenant_id")
+  caseId                  String    @unique @map("case_id")
+  authorizerName          String    @map("authorizer_name")
+  authorizerRelationship  String    @map("authorizer_relationship")
+  authorizerPhone         String?   @map("authorizer_phone")
+  authorizerEmail         String?   @map("authorizer_email")
+  authorizedAt            DateTime? @map("authorized_at")
+  waitingPeriodHours      Int       @default(24) @map("waiting_period_hours")
+  cremationClearedAt      DateTime? @map("cremation_cleared_at")
+  cremationPerformedAt    DateTime? @map("cremation_performed_at")
+  cremationLocation       String?   @map("cremation_location")
+  dispositionInstructions String?   @map("disposition_instructions")
+  status                  String    @default("pending")
+  signatureToken          String?   @unique @map("signature_token")
+  signedAt                DateTime? @map("signed_at")
+  notes                   String?
+  createdAt               DateTime  @default(now()) @map("created_at")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  case   Case   @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("cremation_authorizations")
 }

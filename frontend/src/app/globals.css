@@ -4,26 +4,33 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
+    --background:         38 30% 98%;
+    --foreground:         220 18% 14%;
+    --card:               38 25% 99%;
+    --card-foreground:    220 18% 14%;
+    --popover:            38 25% 99%;
+    --popover-foreground: 220 18% 14%;
+    --primary:            220 25% 18%;
+    --primary-foreground: 38 30% 98%;
+    --secondary:          35 20% 93%;
+    --secondary-foreground: 220 18% 14%;
+    --muted:              35 15% 92%;
+    --muted-foreground:   220 10% 45%;
+    --accent:             35 22% 88%;
+    --accent-foreground:  220 25% 18%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 5.9% 10%;
+    --border:             35 20% 86%;
+    --input:              35 20% 86%;
+    --ring:               35 40% 45%;
     --radius: 0.5rem;
+
+    --success:    142 60% 28%;
+    --success-bg: 142 50% 95%;
+    --warning:    32  75% 32%;
+    --warning-bg: 35  90% 95%;
+    --info:       215 65% 35%;
+    --info-bg:    215 60% 95%;
   }
 }
 
@@ -33,6 +40,8 @@
     color: hsl(var(--foreground));
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+
+  h1, h2 { font-family: var(--font-serif); font-weight: 300; letter-spacing: -0.02em; }
 }
 
 @layer utilities {

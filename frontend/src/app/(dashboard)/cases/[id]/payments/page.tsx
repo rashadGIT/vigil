@@ -3,23 +3,25 @@
 import { use } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
+import { Download } from 'lucide-react';
 import { CaseWorkspaceTabs } from '@/components/cases/case-workspace-tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getCasePayments, recordPayment } from '@/lib/api/payments';
 import { formatDate } from '@/lib/utils/format-date';
 
 const paymentSchema = z.object({
   amount: z.coerce.number({ invalid_type_error: 'Amount is required' }).positive('Amount must be greater than zero'),
-  method: z.string().min(1, 'Payment method is required'),
+  method: z.enum(['Cash', 'Check', 'Card', 'Wire', 'Other'], { errorMap: () => ({ message: 'Payment method is required' }) }),
 });
 
 type PaymentFormValues = z.infer<typeof paymentSchema>;
@@ -37,6 +39,7 @@ function PaymentList({ caseId }: { caseId: string }) {
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<PaymentFormValues>({
     resolver: zodResolver(paymentSchema),
@@ -80,11 +83,11 @@ function PaymentList({ caseId }: { caseId: string }) {
           </div>
           <div>
             <p className="text-xs text-muted-foreground">Paid</p>
-            <p className="text-lg font-semibold text-green-600">${amountPaid.toFixed(2)}</p>
+            <p className="text-lg font-semibold text-[hsl(var(--success))]">${amountPaid.toFixed(2)}</p>
           </div>
           <div>
             <p className="text-xs text-muted-foreground">Outstanding</p>
-            <p className={`text-lg font-semibold ${isPaidInFull ? 'text-green-600' : 'text-amber-600'}`}>
+            <p className={`text-lg font-semibold ${isPaidInFull ? 'text-[hsl(var(--success))]' : 'text-[hsl(var(--warning))]'}`}>
               {isPaidInFull ? 'Paid in Full' : `$${outstanding.toFixed(2)}`}
             </p>
           </div>
@@ -93,7 +96,35 @@ function PaymentList({ caseId }: { caseId: string }) {
 
       <div className="flex justify-between items-center">
         <h3 className="text-sm font-medium">Payment History</h3>
-        <Dialog open={open} onOpenChange={(val) => { setOpen(val); if (!val) reset(); }}>
+        <div className="flex items-center gap-2">
+          {payment && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                const rows = [
+                  ['Case ID', 'Total', 'Paid', 'Outstanding', 'Method', 'Date'],
+                  [
+                    caseId,
+                    totalAmount.toFixed(2),
+                    amountPaid.toFixed(2),
+                    Math.max(0, outstanding).toFixed(2),
+                    payment.method ?? '',
+                    payment.createdAt ? new Date(payment.createdAt).toLocaleDateString() : '',
+                  ],
+                ];
+                const csv = rows.map((r) => r.join(',')).join('\n');
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+                a.download = `payment-${caseId}.csv`;
+                a.click();
+              }}
+            >
+              <Download className="h-3.5 w-3.5 mr-1.5" />
+              Export CSV
+            </Button>
+          )}
+          <Dialog open={open} onOpenChange={(val) => { setOpen(val); if (!val) reset(); }}>
           <DialogTrigger asChild>
             <Button size="sm">Record Payment</Button>
           </DialogTrigger>
@@ -121,12 +152,21 @@ function PaymentList({ caseId }: { caseId: string }) {
               </div>
               <div>
                 <Label htmlFor="payment-method">Method</Label>
-                <Input
-                  id="payment-method"
-                  placeholder="Cash, Check, Card..."
-                  {...register('method')}
-                  aria-invalid={!!errors.method}
-                  aria-describedby={errors.method ? 'payment-method-error' : undefined}
+                <Controller
+                  control={control}
+                  name="method"
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger id="payment-method" aria-invalid={!!errors.method}>
+                        <SelectValue placeholder="Select method" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {['Cash', 'Check', 'Card', 'Wire', 'Other'].map((m) => (
+                          <SelectItem key={m} value={m}>{m}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                 />
                 {errors.method && (
                   <p id="payment-method-error" className="text-destructive text-sm mt-1">
@@ -139,7 +179,8 @@ function PaymentList({ caseId }: { caseId: string }) {
               </Button>
             </form>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
 
       {!payment ? (
@@ -153,8 +194,8 @@ function PaymentList({ caseId }: { caseId: string }) {
               {payment.notes && <p className="text-xs text-muted-foreground mt-0.5">{payment.notes}</p>}
             </div>
             <div className="text-right">
-              <p className="text-sm font-medium text-green-600">${amountPaid.toFixed(2)} paid</p>
-              {outstanding > 0 && <p className="text-xs text-amber-600">${outstanding.toFixed(2)} remaining</p>}
+              <p className="text-sm font-medium text-[hsl(var(--success))]">${amountPaid.toFixed(2)} paid</p>
+              {outstanding > 0 && <p className="text-xs text-[hsl(var(--warning))]">${outstanding.toFixed(2)} remaining</p>}
             </div>
           </div>
         </div>

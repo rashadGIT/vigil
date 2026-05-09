@@ -13,7 +13,7 @@ export class PresignDto {
   @IsString()
   contentType!: string;
 
-  @ApiProperty({ description: 'Category of document being uploaded', enum: DocumentType, example: DocumentType.DEATH_CERTIFICATE })
+  @ApiProperty({ description: 'Category of document being uploaded', enum: DocumentType, example: 'death_cert' })
   @IsEnum(DocumentType)
   documentType!: DocumentType;
 }

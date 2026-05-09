@@ -53,7 +53,7 @@ export class IntakeFormDto {
   @IsDateString()
   deceasedDod?: string;
 
-  @ApiProperty({ description: 'Type of funeral service requested', enum: ServiceType, example: ServiceType.BURIAL })
+  @ApiProperty({ description: 'Type of funeral service requested', enum: ServiceType, example: 'burial' })
   @IsEnum(ServiceType)
   serviceType!: ServiceType;
 
