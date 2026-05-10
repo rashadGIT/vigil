@@ -25,6 +25,7 @@ const config: Config = {
     'src/components/tasks/task-item.tsx',
     'src/components/layout/sidebar.tsx',
     'src/app/(dashboard)/page.tsx',
+    'src/lib/auth/amplify-config.ts',
   ],
   coverageThreshold: {
     global: {

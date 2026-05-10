@@ -365,6 +365,117 @@ async function seedUsers(
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
+// ---------------------------------------------------------------------------
+// Historical bulk seed — 3 years of completed cases with payments
+// ---------------------------------------------------------------------------
+const HIST_FIRST = [
+  'William','Dorothy','Harold','Betty','Eugene','Mildred','Leonard','Edna',
+  'Raymond','Vivian','Gerald','Ethel','Walter','Norma','Arthur','Gladys',
+  'Bernard','Phyllis','Clarence','Florence','Stanley','Lillian','Howard','Irene',
+  'Frederick','Beatrice','Theodore','Mabel','Albert','Agnes','Frank','Vera',
+  'George','Hazel','Charles','Bertha','Joseph','Esther','Henry','Loretta',
+  'Carl','Thelma','Louis','Ruth','Ernest','Wanda','Melvin','Pauline','Morris','Alma',
+];
+const HIST_LAST = [
+  'Harrison','Mitchell','Campbell','Stewart','Morris','Barnes','Griffin',
+  'Watson','Brooks','Kelly','Sanders','Price','Bennett','Wood','Foster',
+  'Ross','Henderson','Coleman','Jenkins','Perry','Powell','Long','Patterson',
+  'Hughes','Flores','Washington','Butler','Simmons','Gonzales','Bryant',
+  'Alexander','Russell','Diaz','Hayes','Myers','Ford','Hamilton','Graham',
+  'Sullivan','Wallace','Woods','Cole','West','Jordan','Owens','Reynolds',
+  'Fisher','Ellis','Crawford','Hoffman',
+];
+const HIST_SERVICE_TYPES: ServiceType[] = [
+  'burial','burial','cremation','cremation','cremation','graveside','memorial',
+] as ServiceType[];
+const HIST_CONTACT_NAMES = ['Spouse','Child','Sibling','Parent','Grandchild'];
+
+function seededInt(seed: number, min: number, max: number): number {
+  const s = ((seed * 1664525 + 1013904223) & 0x7fffffff);
+  return min + (s % (max - min + 1));
+}
+
+async function seedHistoricalCases(tenantId: string, assignedToId: string) {
+  // Remove any previously seeded cases with the ugly "(YYYY-MM-N)" suffix
+  await prisma.case.deleteMany({
+    where: { tenantId, deceasedName: { contains: '(' } },
+  });
+
+  const now = new Date();
+  const totalMonths = 36;
+  let seeded = 0;
+
+  for (let mIdx = 0; mIdx < totalMonths; mIdx++) {
+    const monthDate = new Date(now.getFullYear(), now.getMonth() - totalMonths + mIdx, 1);
+    const yyyy = monthDate.getFullYear();
+    const mm = monthDate.getMonth(); // 0-based
+    const monthStart = new Date(yyyy, mm, 1);
+    const monthEnd   = new Date(yyyy, mm + 1, 1);
+
+    // Growth: 3 cases/month at start → 10 at end
+    const casesThisMonth = 3 + Math.round((mIdx / (totalMonths - 1)) * 7);
+
+    for (let cIdx = 0; cIdx < casesThisMonth; cIdx++) {
+      const seed = mIdx * 100 + cIdx;
+      const firstName = HIST_FIRST[seed % HIST_FIRST.length];
+      const lastName  = HIST_LAST[(seed * 7) % HIST_LAST.length];
+      const deceasedName = `${firstName} ${lastName}`;
+
+      const existing = await prisma.case.findFirst({
+        where: { tenantId, deceasedName, createdAt: { gte: monthStart, lt: monthEnd } },
+      });
+      if (existing) continue;
+
+      const dayOfMonth = 1 + seededInt(seed, 0, 25);
+      const createdAt  = new Date(yyyy, mm, dayOfMonth, 9, 0, 0);
+      const serviceType = HIST_SERVICE_TYPES[seed % HIST_SERVICE_TYPES.length];
+      const amountPaid  = seededInt(seed * 13, 3500, 8000);
+
+      const caseRow = await prisma.case.create({
+        data: {
+          tenantId,
+          deceasedName,
+          deceasedDob: new Date(yyyy - seededInt(seed, 65, 95), seededInt(seed, 0, 11), 1),
+          deceasedDod: new Date(createdAt.getTime() - DAY_MS * seededInt(seed, 1, 3)),
+          serviceType,
+          status: 'completed' as CaseStatus,
+          assignedToId,
+          createdAt,
+        },
+      });
+
+      const contactRelationship = HIST_CONTACT_NAMES[seed % HIST_CONTACT_NAMES.length];
+      await prisma.familyContact.create({
+        data: {
+          tenantId,
+          caseId: caseRow.id,
+          name: `${HIST_FIRST[(seed + 3) % HIST_FIRST.length]} ${lastName}`,
+          relationship: contactRelationship,
+          email: `contact-${seed}@example.com`,
+          phone: `614-555-${String(1000 + seed).slice(-4)}`,
+          isPrimaryContact: true,
+        },
+      });
+
+      await prisma.payment.upsert({
+        where: { caseId: caseRow.id },
+        update: {},
+        create: {
+          tenantId,
+          caseId: caseRow.id,
+          totalAmount: amountPaid,
+          amountPaid,
+          method: ['check','cash','credit_card','insurance'][seed % 4],
+          notes: 'Paid in full.',
+        },
+      });
+
+      seeded++;
+    }
+  }
+  console.log(`[seed] historical cases: ${seeded} across ${totalMonths} months`);
+}
+
 type DemoCase = {
   deceasedName: string;
   deceasedDob: Date;
@@ -638,10 +749,14 @@ async function main() {
   await seedObituaries(tenants.sunrise.id, chen.id, abrams.id);
   await seedFollowUps(tenants.sunrise.id, abrams.id, abramsContact.id);
   await seedPreneedArrangements(tenants.sunrise.id);
+  await seedHistoricalCases(tenants.sunrise.id, director.id);
 
-  // Isolation guard — every new row must carry sunriseId, never heritage
-  const heritageLeaks = await prisma.case.count({ where: { tenantId: tenants.heritage.id } });
-  if (heritageLeaks !== 0) throw new Error(`[seed] tenant leak: heritage has ${heritageLeaks} cases`);
+  // Isolation guard — verify no Sunrise cases leaked into Heritage
+  const heritageCount = await prisma.case.count({ where: { tenantId: tenants.heritage.id } });
+  const sunriseCount  = await prisma.case.count({ where: { tenantId: tenants.sunrise.id } });
+  const leaks = await prisma.case.count({ where: { tenantId: { notIn: [tenants.sunrise.id, tenants.heritage.id] } } });
+  if (leaks !== 0) throw new Error(`[seed] tenant leak: ${leaks} cases with unknown tenantId`);
+  console.log(`[seed] isolation check passed — sunrise: ${sunriseCount}, heritage: ${heritageCount}`);
 
   console.log('[seed] Plan 11-04 complete');
 }

@@ -14,35 +14,64 @@ function formatCurrency(n: number) {
   return n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
 }
 
+const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+function getLast12Months(): string[] {
+  const months: string[] = [];
+  const now = new Date();
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+  }
+  return months;
+}
+
 function MonthlyBarChart({ data }: { data: { month: string; count: number; revenue: number }[] }) {
-  const last6 = data.slice(-6);
-  const maxCount = Math.max(...last6.map((d) => d.count), 1);
+  const dataMap = new Map(data.map((d) => [d.month, d]));
+  const slots = getLast12Months().map((month) => dataMap.get(month) ?? { month, count: 0, revenue: 0 });
+  const maxCount = Math.max(...slots.map((d) => d.count), 1);
+  const BAR_HEIGHT_PX = 128;
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-end gap-2 h-32">
-        {last6.map((d) => {
-          const heightPct = Math.round((d.count / maxCount) * 100);
+    <div className="space-y-1">
+      <div className="flex items-end gap-1" style={{ height: BAR_HEIGHT_PX }}>
+        {slots.map((d) => {
+          const [yyyy, mm] = d.month.split('-');
+          const monthLabel = MONTH_LABELS[parseInt(mm, 10) - 1] ?? mm;
+          const barHeight = Math.max(Math.round((d.count / maxCount) * BAR_HEIGHT_PX), 4);
           return (
-            <div key={d.month} className="flex-1 flex flex-col items-center gap-1">
-              <span className="text-xs text-muted-foreground">{d.count}</span>
+            <div key={d.month} className="flex-1 flex flex-col items-end relative">
               <div
-                className="w-full rounded-t-sm bg-primary/80 transition-all"
-                style={{ height: `${Math.max(heightPct, 4)}%` }}
-                title={`${d.month}: ${d.count} cases, ${formatCurrency(d.revenue)}`}
-              />
+                className={`w-full rounded-t-sm transition-all relative ${d.count > 0 ? 'bg-primary/80' : 'bg-muted'}`}
+                style={{ height: d.count > 0 ? barHeight : 4 }}
+                title={`${monthLabel} ${yyyy}: ${d.count} cases, ${formatCurrency(d.revenue)}`}
+              >
+                {d.count > 0 && (
+                  <span className="absolute -top-5 left-0 right-0 text-center text-[10px] text-muted-foreground">
+                    {d.count}
+                  </span>
+                )}
+              </div>
             </div>
           );
         })}
       </div>
-      <div className="flex gap-2">
-        {last6.map((d) => (
-          <div key={d.month} className="flex-1 text-center">
-            <span className="text-xs text-muted-foreground truncate block">
-              {d.month.length > 3 ? d.month.slice(0, 3) : d.month}
-            </span>
-          </div>
-        ))}
+      <div className="flex gap-1">
+        {slots.map((d, i) => {
+          const [yyyy, mm] = d.month.split('-');
+          const monthLabel = MONTH_LABELS[parseInt(mm, 10) - 1] ?? mm;
+          const isJan = mm === '01';
+          const prevYear = i > 0 ? slots[i - 1].month.split('-')[0] : yyyy;
+          const showYear = isJan && yyyy !== prevYear;
+          return (
+            <div key={d.month} className="flex-1 text-center overflow-hidden">
+              <span className="text-[10px] text-muted-foreground block truncate">{monthLabel}</span>
+              {showYear && (
+                <span className="text-[9px] text-muted-foreground/60 block">{yyyy}</span>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -54,12 +83,19 @@ export default function DashboardPage() {
     queryFn: getDashboardStats,
   });
 
-  const from = new Date(new Date().getFullYear(), 0, 1).toISOString();
-  const to = new Date().toISOString();
+  const now = new Date();
+  const ytdFrom = new Date(now.getFullYear(), 0, 1).toISOString();
+  const chartFrom = new Date(now.getFullYear() - 1, now.getMonth() + 1, 1).toISOString();
+  const to = now.toISOString();
 
   const { data: revenue, isLoading: revenueLoading } = useQuery({
-    queryKey: ['revenue-report'],
-    queryFn: () => getRevenueReport(from, to),
+    queryKey: ['revenue-report', ytdFrom],
+    queryFn: () => getRevenueReport(ytdFrom, to),
+  });
+
+  const { data: chartRevenue, isLoading: chartLoading } = useQuery({
+    queryKey: ['revenue-chart', chartFrom],
+    queryFn: () => getRevenueReport(chartFrom, to),
   });
 
   return (
@@ -117,6 +153,7 @@ export default function DashboardPage() {
               title="Total Revenue (YTD)"
               value={revenue?.totalRevenue}
               icon={DollarSign}
+              format="currency"
               description={
                 revenue
                   ? `Avg ${formatCurrency(revenue.averageCaseValue)}/case`
@@ -148,12 +185,10 @@ export default function DashboardPage() {
             <CardTitle className="text-base">Cases by Month</CardTitle>
           </CardHeader>
           <CardContent>
-            {revenueLoading ? (
+            {chartLoading ? (
               <Skeleton className="h-40 w-full" />
-            ) : revenue && revenue.casesByMonth.length > 0 ? (
-              <MonthlyBarChart data={revenue.casesByMonth} />
             ) : (
-              <p className="text-sm text-muted-foreground">No data available.</p>
+              <MonthlyBarChart data={chartRevenue?.casesByMonth ?? []} />
             )}
           </CardContent>
         </Card>
