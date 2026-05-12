@@ -11,24 +11,24 @@ export interface AuthUser {
 
 interface AuthState {
   user: AuthUser | null;
-  accessToken: string | null;
   isAuthenticated: boolean;
-  setUser: (user: AuthUser, accessToken?: string) => void;
+  setUser: (user: AuthUser) => void;
   clearUser: () => void;
 }
 
+// accessToken is intentionally NOT stored here.
+// It lives in an httpOnly cookie set by /api/auth/session.
+// This store only holds non-sensitive display metadata.
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       user: null,
-      accessToken: null,
       isAuthenticated: false,
-      setUser: (user, accessToken) => set({ user, accessToken: accessToken ?? null, isAuthenticated: true }),
-      clearUser: () => set({ user: null, accessToken: null, isAuthenticated: false }),
+      setUser: (user) => set({ user, isAuthenticated: true }),
+      clearUser: () => set({ user: null, isAuthenticated: false }),
     }),
     {
-      name: 'vigil-auth',
-      // Only persist on client — avoids SSR hydration mismatch
+      name: 'vigil-user',
       skipHydration: true,
     },
   ),

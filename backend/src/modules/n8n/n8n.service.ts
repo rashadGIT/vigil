@@ -3,11 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { N8nEvent } from './n8n-events.enum';
+import { PrismaService } from '../../common/prisma/prisma.service';
 
-/**
- * Explicit event → env var mapping. Do NOT use naive template interpolation
- * (`N8N_WEBHOOK_${event}`) because webhook vars in .env use different names.
- */
 const EVENT_TO_ENV_VAR: Record<N8nEvent, string> = {
   [N8nEvent.GRIEF_FOLLOWUP_SCHEDULE]: 'N8N_WEBHOOK_GRIEF_FOLLOWUP',
   [N8nEvent.STAFF_NOTIFY]: 'N8N_WEBHOOK_STAFF_NOTIFY',
@@ -23,10 +20,10 @@ export class N8nService implements OnModuleInit {
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
+    private readonly prisma: PrismaService,
   ) {}
 
   onModuleInit(): void {
-    // Log [PLACEHOLDER] warning for any unconfigured webhook (research §7)
     for (const [event, envVar] of Object.entries(EVENT_TO_ENV_VAR)) {
       const url = this.configService.get<string>(envVar);
       if (!url || url.includes('PLACEHOLDER') || url.trim() === '') {
@@ -50,17 +47,50 @@ export class N8nService implements OnModuleInit {
       await firstValueFrom(
         this.httpService.post(webhookUrl, payload, {
           headers: { 'x-vigil-key': key },
-          timeout: 5_000,
+          timeout: 2_000,
         }),
       );
       this.logger.debug(`Triggered n8n event ${event}`);
     } catch (err) {
+      // Fail open — log the error but never crash the caller
       this.logger.error(`Failed to trigger n8n event ${event}: ${(err as Error).message}`);
     }
   }
 
-  handleCallback(event: string, payload: unknown): void {
-    this.logger.log(`Received n8n callback: event=${event}, payload=${JSON.stringify(payload)}`);
-    // TODO: Route to domain service for audit logging
+  async handleCallback(event: string, payload: Record<string, unknown>): Promise<void> {
+    this.logger.log(`n8n callback: event=${event}`);
+
+    switch (event) {
+      case 'grief_followup_sent': {
+        const followUpId = payload['followUpId'] as string | undefined;
+        if (followUpId) {
+          await this.prisma.followUp.updateMany({
+            where: { id: followUpId, status: 'pending' },
+            data: { status: 'sent', sentAt: new Date() },
+          });
+          this.logger.log(`Marked follow-up ${followUpId} as sent`);
+        } else {
+          this.logger.warn('grief_followup_sent callback missing followUpId');
+        }
+        break;
+      }
+
+      case 'document_generated': {
+        const documentId = payload['documentId'] as string | undefined;
+        if (documentId) {
+          await this.prisma.document.updateMany({
+            where: { id: documentId },
+            data: { uploaded: true },
+          });
+          this.logger.log(`Marked document ${documentId} as generated`);
+        } else {
+          this.logger.warn('document_generated callback missing documentId');
+        }
+        break;
+      }
+
+      default:
+        this.logger.warn(`Unhandled n8n callback event: ${event}`);
+    }
   }
 }

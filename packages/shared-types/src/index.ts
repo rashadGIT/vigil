@@ -1,6 +1,7 @@
 // Enums
 export { ServiceType } from './enums/service-type.enum';
 export { CaseStatus } from './enums/case-status.enum';
+export { CaseStage } from './enums/case-stage.enum';
 export { UserRole } from './enums/user-role.enum';
 export { DocumentType } from './enums/document-type.enum';
 export { FollowUpTemplate } from './enums/follow-up-template.enum';

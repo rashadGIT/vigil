@@ -7,6 +7,7 @@ import {
 } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { InviteUserDto } from './dto/invite-user.dto';
 import { CurrentUser, AuthUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 
@@ -31,5 +32,14 @@ export class UsersController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   create(@CurrentUser() user: AuthUser, @Body() dto: CreateUserDto) {
     return this.usersService.create(user.tenantId, dto);
+  }
+
+  @Roles('admin')
+  @Post('invite')
+  @ApiOperation({ summary: 'Invite a staff member by email with a branded welcome email (admin only)' })
+  @ApiResponse({ status: 201, description: 'User invited and email sent' })
+  @ApiResponse({ status: 409, description: 'Email already exists' })
+  invite(@CurrentUser() user: AuthUser, @Body() dto: InviteUserDto) {
+    return this.usersService.invite(user.tenantId, dto);
   }
 }

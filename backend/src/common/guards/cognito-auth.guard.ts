@@ -79,10 +79,12 @@ export class CognitoAuthGuard implements CanActivate {
       return true;
     }
 
-    // Production: verify Cognito JWT
+    // Production: verify Cognito JWT — accept Bearer header OR httpOnly cookie
     const authHeader = request.headers.authorization as string | undefined;
-    const token = authHeader?.replace('Bearer ', '');
-    if (!token) throw new UnauthorizedException('Missing Bearer token');
+    const token =
+      authHeader?.replace('Bearer ', '') ??
+      (request.cookies?.['access_token'] as string | undefined);
+    if (!token) throw new UnauthorizedException('Missing Bearer token or access_token cookie');
 
     const verifier = this.getVerifier();
     if (!verifier) {

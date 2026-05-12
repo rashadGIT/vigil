@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { FolderOpen, AlertCircle, CalendarDays, FileSignature, DollarSign, AlertTriangle } from 'lucide-react';
+import { FolderOpen, AlertCircle, CalendarDays, FileSignature, DollarSign, AlertTriangle, Users } from 'lucide-react';
 import { PageHeader } from '@/components/layout/page-header';
 import { StatCard } from '@/components/dashboard/stat-card';
 import { RecentCasesTable } from '@/components/dashboard/recent-cases-table';
@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getDashboardStats } from '@/lib/api/dashboard';
 import { getRevenueReport } from '@/lib/api/revenue';
+import { apiClient } from '@/lib/api/client';
 
 function formatCurrency(n: number) {
   return n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
@@ -77,6 +78,8 @@ function MonthlyBarChart({ data }: { data: { month: string; count: number; reven
   );
 }
 
+type StaffWorkload = { id: string; name: string; email: string; role: string; activeCases: number; overdueTaskCount: number };
+
 export default function DashboardPage() {
   const { data: stats, isLoading } = useQuery({
     queryKey: ['dashboard-stats'],
@@ -96,6 +99,11 @@ export default function DashboardPage() {
   const { data: chartRevenue, isLoading: chartLoading } = useQuery({
     queryKey: ['revenue-chart', chartFrom],
     queryFn: () => getRevenueReport(chartFrom, to),
+  });
+
+  const { data: workload, isLoading: workloadLoading } = useQuery<StaffWorkload[]>({
+    queryKey: ['staff-workload'],
+    queryFn: () => apiClient.get('/analytics/staff-workload').then((r) => r.data),
   });
 
   return (
@@ -229,6 +237,51 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Staff workload */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            Staff Workload
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {workloadLoading ? (
+            <div className="space-y-2">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}</div>
+          ) : workload && workload.length > 0 ? (
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b">
+                  <th className="pb-2 text-left font-medium text-muted-foreground">Staff Member</th>
+                  <th className="pb-2 text-right font-medium text-muted-foreground">Active Cases</th>
+                  <th className="pb-2 text-right font-medium text-muted-foreground">Overdue Tasks</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {workload.map((member) => (
+                  <tr key={member.id}>
+                    <td className="py-2">
+                      <p className="font-medium">{member.name}</p>
+                      <p className="text-xs text-muted-foreground capitalize">{member.role}</p>
+                    </td>
+                    <td className="py-2 text-right tabular-nums">{member.activeCases}</td>
+                    <td className="py-2 text-right tabular-nums">
+                      {member.overdueTaskCount > 0 ? (
+                        <span className="text-destructive font-medium">{member.overdueTaskCount}</span>
+                      ) : (
+                        <span className="text-muted-foreground">0</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p className="text-sm text-muted-foreground">No staff members found.</p>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Recent cases table */}
       <div>

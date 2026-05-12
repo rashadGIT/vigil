@@ -11,6 +11,7 @@ import { EmailModule } from './common/email/email.module';
 import { CronModule } from './common/cron/cron.module';
 import { CognitoAuthGuard } from './common/guards/cognito-auth.guard';
 import { InternalOnlyGuard } from './common/guards/internal-only.guard';
+import { RolesGuard } from './common/guards/roles.guard';
 import { AuditLogInterceptor } from './common/interceptors/audit-log.interceptor';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
@@ -37,6 +38,7 @@ import { SettingsModule } from './modules/settings/settings.module';
 import { MerchandiseModule } from './modules/merchandise/merchandise.module';
 import { PreneedModule } from './modules/preneed/preneed.module';
 import { CemeteryModule } from './modules/cemetery/cemetery.module';
+import { NotesModule } from './modules/notes/notes.module';
 
 // Phase 2 stubs
 import { TrackingModule } from './modules/tracking/tracking.module';
@@ -84,6 +86,7 @@ import { MultiFaithModule } from './modules/multi-faith/multi-faith.module';
     MerchandiseModule,
     PreneedModule,
     CemeteryModule,
+    NotesModule,
 
     // Phase 2 stubs
     TrackingModule,
@@ -102,6 +105,7 @@ import { MultiFaithModule } from './modules/multi-faith/multi-faith.module';
     { provide: APP_GUARD, useClass: ThrottlerGuard },
     { provide: APP_GUARD, useClass: CognitoAuthGuard },
     { provide: APP_GUARD, useClass: InternalOnlyGuard },
+    { provide: APP_GUARD, useClass: RolesGuard },
     { provide: APP_INTERCEPTOR, useClass: AuditLogInterceptor },
     { provide: APP_FILTER, useClass: HttpExceptionFilter },
   ],

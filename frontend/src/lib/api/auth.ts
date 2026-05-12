@@ -1,4 +1,4 @@
-import { signIn, signOut, fetchAuthSession } from 'aws-amplify/auth';
+import { signIn, signOut } from 'aws-amplify/auth';
 import { apiClient } from './client';
 
 export interface LoginCredentials {
@@ -6,38 +6,45 @@ export interface LoginCredentials {
   password: string;
 }
 
-// DEV bypass: skip Cognito entirely, call backend /auth/login with dev header
-// Production: use Amplify signIn which handles Cognito USER_PASSWORD_AUTH flow
-export async function login(credentials: LoginCredentials) {
-  const DEV_BYPASS = process.env.NEXT_PUBLIC_DEV_AUTH_BYPASS === 'true';
-
-  if (DEV_BYPASS) {
-    // Backend CognitoAuthGuard will parse x-dev-user header injected by apiClient interceptor
-    const res = await apiClient.get<{ id: string; email: string; name: string; role: string; tenantId: string }>(
-      '/auth/me',
-    );
-    return res.data;
-  }
-
-  // Production: Amplify handles Cognito sign-in + sets tokens in memory
-  await signIn({ username: credentials.email, password: credentials.password });
-  const session = await fetchAuthSession();
-  const idToken = session.tokens?.idToken?.payload;
-
-  return {
-    id: idToken?.sub as string,
-    email: credentials.email,
-    name: (idToken?.name as string) ?? credentials.email,
-    role: (idToken?.['custom:role'] as string) ?? 'staff',
-    tenantId: idToken?.['custom:tenantId'] as string,
-  };
+export interface UserProfile {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+  tenantId: string;
 }
 
-export async function logout() {
-  const DEV_BYPASS = process.env.NEXT_PUBLIC_DEV_AUTH_BYPASS === 'true';
+const DEV_BYPASS = process.env.NEXT_PUBLIC_DEV_AUTH_BYPASS === 'true';
+
+// Login flow:
+// 1. Authenticate (Cognito in prod, no-op in dev)
+// 2. Backend sets access_token as httpOnly cookie on its /auth/login endpoint
+// 3. Fetch /auth/me to get user metadata for the Zustand store
+// The token itself never touches the browser JS context in production.
+export async function login(credentials: LoginCredentials): Promise<UserProfile> {
   if (!DEV_BYPASS) {
-    await signOut();
+    // Amplify handles Cognito USER_PASSWORD_AUTH
+    await signIn({ username: credentials.email, password: credentials.password });
+    // Exchange Cognito tokens for backend session cookie
+    await apiClient.post('/auth/login', {
+      email: credentials.email,
+      password: credentials.password,
+    });
   }
-  // Clear the httpOnly access_token cookie via backend endpoint
+  // In both dev and prod, /auth/me returns the current user from request context
+  const res = await apiClient.get<UserProfile>('/auth/me');
+  return res.data;
+}
+
+export async function logout(): Promise<void> {
+  if (!DEV_BYPASS) {
+    await signOut().catch(() => null);
+  }
+  // Clear the httpOnly access_token and refresh_token cookies via backend
   await apiClient.post('/auth/logout').catch(() => null);
+}
+
+export async function getMe(): Promise<UserProfile> {
+  const res = await apiClient.get<UserProfile>('/auth/me');
+  return res.data;
 }

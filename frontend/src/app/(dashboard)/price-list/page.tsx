@@ -1,7 +1,8 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { toast } from 'sonner';
 import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
@@ -11,8 +12,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Trash2, Plus } from 'lucide-react';
+import { Trash2, Plus, ShieldCheck } from 'lucide-react';
 import { getPriceList, createPriceListItem, deletePriceListItem } from '@/lib/api/price-list';
+import { apiClient } from '@/lib/api/client';
 import { PriceCategory } from '@vigil/shared-types';
 
 const categoryLabel: Record<PriceCategory, string> = {
@@ -26,6 +28,10 @@ const categoryLabel: Record<PriceCategory, string> = {
 export default function PriceListPage() {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    apiClient.post('/price-list/view').catch(() => {/* non-blocking */});
+  }, []);
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [category, setCategory] = useState<PriceCategory>(PriceCategory.professional_services);
@@ -59,6 +65,10 @@ export default function PriceListPage() {
         title="Price List"
         description="FTC General Price List — manage categories and items."
         action={
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/price-list/audit"><ShieldCheck className="h-4 w-4 mr-2" />Compliance Log</Link>
+            </Button>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button size="sm"><Plus className="h-4 w-4 mr-2" />Add Item</Button>
@@ -91,6 +101,7 @@ export default function PriceListPage() {
               </div>
             </DialogContent>
           </Dialog>
+          </div>
         }
       />
 

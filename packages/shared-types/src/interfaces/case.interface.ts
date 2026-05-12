@@ -1,5 +1,6 @@
 import type { ServiceType } from '../enums/service-type.enum';
 import type { CaseStatus } from '../enums/case-status.enum';
+import type { CaseStage } from '../enums/case-stage.enum';
 
 export interface ICase {
   id: string;
@@ -9,6 +10,7 @@ export interface ICase {
   deceasedDod: string | null;
   serviceType: ServiceType;
   status: CaseStatus;
+  stage: CaseStage;
   assignedToId: string | null;
   faithTradition: string | null;
   deletedAt: string | null;

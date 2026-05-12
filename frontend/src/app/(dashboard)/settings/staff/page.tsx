@@ -26,7 +26,7 @@ export default function StaffPage() {
   });
 
   const inviteMutation = useMutation({
-    mutationFn: () => apiClient.post('/auth/invite', { email, name, role: UserRole.staff }),
+    mutationFn: () => apiClient.post('/users/invite', { email, name, role: UserRole.staff }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['staff'] });
       toast.success(`Invitation sent to ${email}.`);

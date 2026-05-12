@@ -47,6 +47,20 @@ export class PriceListController {
     return this.service.update(user.tenantId, id, dto);
   }
 
+  @Post('price-list/view')
+  @ApiOperation({ summary: 'Log a GPL view event for FTC compliance audit trail' })
+  @ApiResponse({ status: 201, description: 'View event logged' })
+  logView(@CurrentUser() user: AuthUser) {
+    return this.service.logGplView(user.tenantId, user.sub);
+  }
+
+  @Get('price-list/audit')
+  @ApiOperation({ summary: 'Get GPL view/send audit log for FTC compliance' })
+  @ApiResponse({ status: 200, description: 'Returns GPL audit events' })
+  getAuditLog(@CurrentUser() user: AuthUser) {
+    return this.service.getGplAuditLog(user.tenantId);
+  }
+
   @Post('cases/:caseId/gpl/generate')
   @ApiOperation({ summary: 'Generate FTC GPL PDF for a case and upload to S3' })
   @ApiResponse({ status: 201, description: 'Returns S3 URL of generated PDF' })

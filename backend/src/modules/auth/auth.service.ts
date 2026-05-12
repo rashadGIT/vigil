@@ -32,6 +32,7 @@ export class AuthService {
         throw new UnauthorizedException('Login failed');
       }
       this.setRefreshCookie(response, auth.RefreshToken);
+      this.setAccessCookie(response, auth.AccessToken);
       return { accessToken: auth.AccessToken };
     } catch (err) {
       this.logger.warn(`Login failed for ${email}: ${(err as Error).message}`);
@@ -63,6 +64,7 @@ export class AuthService {
       this.logger.warn(`Logout swallowed error: ${(err as Error).message}`);
     }
     response.clearCookie('refresh_token', { path: '/auth' });
+    response.clearCookie('access_token', { path: '/' });
     return { ok: true };
   }
 
@@ -74,6 +76,18 @@ export class AuthService {
       domain: process.env.NODE_ENV === 'production' ? '.kelovaapp.com' : 'localhost',
       path: '/auth',
       maxAge: 30 * 24 * 60 * 60 * 1000,
+    });
+  }
+
+  private setAccessCookie(response: Response, accessToken: string): void {
+    response.cookie('access_token', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      domain: process.env.NODE_ENV === 'production' ? '.kelovaapp.com' : 'localhost',
+      path: '/',
+      // Cognito access tokens live 1 hour; cookie matches
+      maxAge: 60 * 60 * 1000,
     });
   }
 }

@@ -29,6 +29,21 @@ export class PriceListService {
     return this.prisma.forTenant(tenantId).priceListItem.update({ where: { id }, data: dto });
   }
 
+  async logGplView(tenantId: string, userId: string): Promise<void> {
+    await this.prisma.forTenant(tenantId).auditLog.create({
+      data: { tenantId, userId, action: 'gpl_view', entityType: 'price_list', entityId: tenantId },
+    });
+  }
+
+  async getGplAuditLog(tenantId: string) {
+    return this.prisma.forTenant(tenantId).auditLog.findMany({
+      where: { action: { in: ['gpl_view', 'gpl_sent'] } },
+      include: { user: { select: { id: true, name: true, email: true } } },
+      orderBy: { createdAt: 'desc' },
+      take: 200,
+    });
+  }
+
   async generateGplPdf(tenantId: string, caseId: string, userId: string): Promise<{ s3Key: string }> {
     const buffer = await this.pdfService.generateGpl(caseId, tenantId);
     const s3Key = this.s3.buildKey(tenantId, caseId, `gpl-${Date.now()}.pdf`);

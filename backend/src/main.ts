@@ -5,6 +5,20 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 
+const sentryDsn = process.env.SENTRY_DSN;
+if (sentryDsn && process.env.NODE_ENV !== 'test') {
+  // Dynamic import so Sentry + OpenTelemetry only load when DSN is configured
+  import('@sentry/node').then(({ init }) => {
+    init({
+      dsn: sentryDsn,
+      environment: process.env.NODE_ENV ?? 'development',
+      tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 0,
+    });
+  }).catch((err: unknown) => {
+    Logger.warn(`Sentry init failed: ${(err as Error).message}`, 'Bootstrap');
+  });
+}
+
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule, {
     logger: ['error', 'warn', 'log', 'debug'],

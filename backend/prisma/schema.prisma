@@ -28,6 +28,17 @@ enum CaseStatus {
   archived
 }
 
+enum CaseStage {
+  first_call
+  arrangement_scheduled
+  arrangement_complete
+  in_preparation
+  services_scheduled
+  services_complete
+  death_cert_filed
+  closed
+}
+
 enum ServiceType {
   burial
   cremation
@@ -159,6 +170,7 @@ model Tenant {
   deathCertificates       DeathCertificate[]
   firstCalls              FirstCall[]
   cremationAuthorizations CremationAuthorization[]
+  caseNotes               CaseNote[]
 
   @@map("tenants")
 }
@@ -194,6 +206,7 @@ model Case {
   deceasedDod    DateTime?   @map("deceased_dod")
   serviceType    ServiceType @map("service_type")
   status         CaseStatus  @default(new)
+  stage          CaseStage   @default(first_call) @map("stage")
   assignedToId   String?     @map("assigned_to_id")
   /// @sensitive decedentInfo
   faithTradition String?     @map("faith_tradition")
@@ -203,6 +216,7 @@ model Case {
   updatedAt      DateTime   @updatedAt @map("updated_at")
 
   tenant            Tenant             @relation(fields: [tenantId], references: [id])
+  caseNotes         CaseNote[]
   familyContacts    FamilyContact[]
   tasks             Task[]
   obituary          Obituary?
@@ -778,6 +792,24 @@ model FirstCall {
 
   @@index([tenantId])
   @@map("first_calls")
+}
+
+// Internal staff notes per case — coordination, family preferences, sensitive instructions
+model CaseNote {
+  id        String   @id @default(cuid())
+  tenantId  String   @map("tenant_id")
+  caseId    String   @map("case_id")
+  authorId  String   @map("author_id")
+  body      String
+  deletedAt DateTime? @map("deleted_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  case   Case   @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, caseId, createdAt(sort: Desc)])
+  @@map("case_notes")
 }
 
 model CremationAuthorization {

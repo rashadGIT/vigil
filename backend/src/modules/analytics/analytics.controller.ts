@@ -10,6 +10,14 @@ import { InternalOnly } from '../../common/decorators/internal-only.decorator';
 export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}
 
+  @Get('staff-workload')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get active case and overdue task counts per staff member' })
+  @ApiResponse({ status: 200, description: 'Returns workload summary per user' })
+  getStaffWorkload(@CurrentUser() user: AuthUser) {
+    return this.analyticsService.getStaffWorkload(user.tenantId);
+  }
+
   @Get('snapshot')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get analytics snapshots for the current tenant' })

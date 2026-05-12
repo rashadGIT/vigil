@@ -70,4 +70,11 @@ export class FollowUpsService {
     });
     return { updatedCount: result.count };
   }
+
+  async markSent(followUpId: string): Promise<void> {
+    await this.prisma.followUp.updateMany({
+      where: { id: followUpId, status: 'pending' },
+      data: { status: 'sent', sentAt: new Date() },
+    });
+  }
 }

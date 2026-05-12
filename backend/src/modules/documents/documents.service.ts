@@ -60,6 +60,13 @@ export class DocumentsService {
     });
   }
 
+  async markGenerated(documentId: string): Promise<void> {
+    await this.prisma.document.updateMany({
+      where: { id: documentId },
+      data: { uploaded: true },
+    });
+  }
+
   async softDelete(tenantId: string, documentId: string) {
     const doc = await this.prisma.forTenant(tenantId).document.findFirst({
       where: { id: documentId },

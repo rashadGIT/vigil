@@ -8,6 +8,7 @@ import {
 import { SettingsService } from './settings.service';
 import { UpdateSettingsDto } from './dto/update-settings.dto';
 import { CurrentUser, AuthUser } from '../../common/decorators/current-user.decorator';
+import { Roles } from '../../common/decorators/roles.decorator';
 
 @ApiTags('settings')
 @ApiBearerAuth()
@@ -23,10 +24,12 @@ export class SettingsController {
     return this.settingsService.get(user.tenantId);
   }
 
+  @Roles('admin')
   @Patch()
-  @ApiOperation({ summary: 'Update tenant settings' })
+  @ApiOperation({ summary: 'Update tenant settings (admin only)' })
   @ApiResponse({ status: 200, description: 'Settings updated' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden — admin role required' })
   update(@CurrentUser() user: AuthUser, @Body() dto: UpdateSettingsDto) {
     return this.settingsService.update(user.tenantId, dto);
   }
