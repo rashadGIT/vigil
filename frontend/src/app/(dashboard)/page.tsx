@@ -209,28 +209,30 @@ export default function DashboardPage() {
             {revenueLoading ? (
               <Skeleton className="h-40 w-full" />
             ) : revenue && revenue.revenueByServiceType.length > 0 ? (
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b">
-                    <th className="pb-2 text-left font-medium text-muted-foreground">Service Type</th>
-                    <th className="pb-2 text-right font-medium text-muted-foreground">Cases</th>
-                    <th className="pb-2 text-right font-medium text-muted-foreground">Revenue</th>
-                    <th className="pb-2 text-right font-medium text-muted-foreground">Avg</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y">
-                  {revenue.revenueByServiceType.map((row) => (
-                    <tr key={row.serviceType}>
-                      <td className="py-2 capitalize">{row.serviceType}</td>
-                      <td className="py-2 text-right">{row.count}</td>
-                      <td className="py-2 text-right">{formatCurrency(row.revenue)}</td>
-                      <td className="py-2 text-right text-muted-foreground">
-                        {row.count > 0 ? formatCurrency(row.revenue / row.count) : '—'}
-                      </td>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="pb-2 text-left font-medium text-muted-foreground">Service Type</th>
+                      <th className="pb-2 text-right font-medium text-muted-foreground">Cases</th>
+                      <th className="pb-2 text-right font-medium text-muted-foreground">Revenue</th>
+                      <th className="pb-2 text-right font-medium text-muted-foreground">Avg</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y">
+                    {revenue.revenueByServiceType.map((row) => (
+                      <tr key={row.serviceType}>
+                        <td className="py-2 capitalize">{row.serviceType}</td>
+                        <td className="py-2 text-right">{row.count}</td>
+                        <td className="py-2 text-right">{formatCurrency(row.revenue)}</td>
+                        <td className="py-2 text-right text-muted-foreground">
+                          {row.count > 0 ? formatCurrency(row.revenue / row.count) : '—'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             ) : (
               <p className="text-sm text-muted-foreground">No data available.</p>
             )}
@@ -250,33 +252,35 @@ export default function DashboardPage() {
           {workloadLoading ? (
             <div className="space-y-2">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}</div>
           ) : workload && workload.length > 0 ? (
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b">
-                  <th className="pb-2 text-left font-medium text-muted-foreground">Staff Member</th>
-                  <th className="pb-2 text-right font-medium text-muted-foreground">Active Cases</th>
-                  <th className="pb-2 text-right font-medium text-muted-foreground">Overdue Tasks</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {workload.map((member) => (
-                  <tr key={member.id}>
-                    <td className="py-2">
-                      <p className="font-medium">{member.name}</p>
-                      <p className="text-xs text-muted-foreground capitalize">{member.role}</p>
-                    </td>
-                    <td className="py-2 text-right tabular-nums">{member.activeCases}</td>
-                    <td className="py-2 text-right tabular-nums">
-                      {member.overdueTaskCount > 0 ? (
-                        <span className="text-destructive font-medium">{member.overdueTaskCount}</span>
-                      ) : (
-                        <span className="text-muted-foreground">0</span>
-                      )}
-                    </td>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="pb-2 text-left font-medium text-muted-foreground">Staff Member</th>
+                    <th className="pb-2 text-right font-medium text-muted-foreground">Active Cases</th>
+                    <th className="pb-2 text-right font-medium text-muted-foreground">Overdue Tasks</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y">
+                  {workload.map((member) => (
+                    <tr key={member.id}>
+                      <td className="py-2">
+                        <p className="font-medium">{member.name}</p>
+                        <p className="text-xs text-muted-foreground capitalize">{member.role}</p>
+                      </td>
+                      <td className="py-2 text-right tabular-nums">{member.activeCases}</td>
+                      <td className="py-2 text-right tabular-nums">
+                        {member.overdueTaskCount > 0 ? (
+                          <span className="text-destructive font-medium">{member.overdueTaskCount}</span>
+                        ) : (
+                          <span className="text-muted-foreground">0</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           ) : (
             <p className="text-sm text-muted-foreground">No staff members found.</p>
           )}

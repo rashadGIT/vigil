@@ -14,7 +14,7 @@ import {
   BookOpen,
 } from 'lucide-react';
 import { useState } from 'react';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils/cn';
 
@@ -82,6 +82,7 @@ export function MobileSidebarTrigger() {
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="w-64 p-0">
+        <SheetTitle className="sr-only">Navigation menu</SheetTitle>
         <SidebarContent onClose={() => setOpen(false)} />
       </SheetContent>
     </Sheet>

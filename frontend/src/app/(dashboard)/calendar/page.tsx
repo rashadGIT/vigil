@@ -95,7 +95,7 @@ function NewEventDialog({ onCreated }: { onCreated: (startTime: string) => void 
               </SelectContent>
             </Select>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1">
               <Label className="font-medium">Start</Label>
               <Input type="datetime-local" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
@@ -158,15 +158,17 @@ function MonthGrid({ currentMonth, events }: { currentMonth: Date; events: ICale
     eventsByDay.get(key)!.push(e);
   });
 
-  const DAY_HEADERS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const DAY_HEADERS_LONG  = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const DAY_HEADERS_SHORT = ['S',   'M',   'T',   'W',   'T',   'F',   'S'];
 
   return (
     <div className="rounded-lg border overflow-hidden">
       {/* Day-of-week header */}
       <div className="grid grid-cols-7 border-b bg-muted/50">
-        {DAY_HEADERS.map((d) => (
-          <div key={d} className="py-2 text-center text-xs font-medium text-muted-foreground">
-            {d}
+        {DAY_HEADERS_LONG.map((d, i) => (
+          <div key={i} className="py-2 text-center text-xs font-medium text-muted-foreground">
+            <span className="hidden sm:inline">{d}</span>
+            <span className="sm:hidden">{DAY_HEADERS_SHORT[i]}</span>
           </div>
         ))}
       </div>
@@ -185,7 +187,7 @@ function MonthGrid({ currentMonth, events }: { currentMonth: Date; events: ICale
             <div
               key={key}
               className={cn(
-                'min-h-[100px] p-1.5 flex flex-col gap-0.5',
+                'min-h-[64px] sm:min-h-[100px] p-1 sm:p-1.5 flex flex-col gap-0.5',
                 !inMonth && 'bg-muted/20',
               )}
             >

@@ -41,8 +41,8 @@ export function CaseWorkspaceTabs({ caseId }: { caseId: string }) {
   });
 
   return (
-    <div className="border-b mb-6">
-      <nav className="flex -mb-px">
+    <div className="border-b mb-6 overflow-x-auto">
+      <nav className="flex -mb-px min-w-max">
         {primaryTabs.map((tab) => {
           const href = `${base}${tab.href}`;
           const isActive = tab.href === '' ? pathname === base : pathname.startsWith(href);

@@ -48,7 +48,7 @@ export function CaseOverview({ caseId }: { caseId: string }) {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-start justify-between space-y-0">
+      <CardHeader className="flex flex-col sm:flex-row sm:items-start justify-between space-y-0 gap-3">
         <div>
           <CardTitle className="text-xl font-semibold">
             {caseData.deceasedName}

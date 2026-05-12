@@ -17,6 +17,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { cn } from '@/lib/utils/cn';
 import { CaseStatusBadge } from './case-status-badge';
 import { getCases, type CaseFilters } from '@/lib/api/cases';
 import { formatRelative } from '@/lib/utils/format-date';
@@ -174,7 +175,13 @@ export function CaseTable({ filter }: { filter?: string }) {
             {table.getHeaderGroups().map((hg) => (
               <TableRow key={hg.id}>
                 {hg.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead
+                    key={header.id}
+                    className={cn(
+                      (header.id === 'assignedTo' || header.id === 'updatedAt' || header.id === 'overdueTaskCount') &&
+                        'hidden sm:table-cell',
+                    )}
+                  >
                     {flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 ))}
@@ -196,7 +203,13 @@ export function CaseTable({ filter }: { filter?: string }) {
                 }}
               >
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
+                  <TableCell
+                    key={cell.id}
+                    className={cn(
+                      (cell.column.id === 'assignedTo' || cell.column.id === 'updatedAt' || cell.column.id === 'overdueTaskCount') &&
+                        'hidden sm:table-cell',
+                    )}
+                  >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}
@@ -206,7 +219,7 @@ export function CaseTable({ filter }: { filter?: string }) {
         </Table>
       </div>
 
-      <div className="flex items-center justify-between px-1">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-1">
         <p className="text-sm text-muted-foreground">
           {totalRows > 0 ? `Showing ${firstRow}–${lastRow} of ${totalRows} cases` : ''}
         </p>
