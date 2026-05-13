@@ -2,11 +2,11 @@
   "name": "vigil",
   "version": "0.0.1",
   "private": true,
-  "workspaces": [],
+  "workspaces": ["frontend", "backend"],
   "scripts": {
     "demo:reset": "docker-compose up -d && cd backend && npx prisma migrate deploy && npx prisma db seed && cd ..",
     "demo:seed": "cd backend && npx prisma db seed && cd ..",
-    "dev": "concurrently \"npm run start:dev --workspace=backend\" \"npm run dev --workspace=frontend\"",
+    "dev": "./dev.sh",
     "build": "npm run build --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "test:watch": "npm run test:watch --workspaces --if-present",
