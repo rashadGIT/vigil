@@ -24,18 +24,18 @@ export class VendorsController {
     return this.service.findAll(user.tenantId);
   }
 
-  @Roles('admin')
+  @Roles('funeral_director')
   @Post('vendors')
-  @ApiOperation({ summary: 'Create a new vendor (admin only)' })
+  @ApiOperation({ summary: 'Create a new vendor (funeral director only)' })
   @ApiResponse({ status: 201, description: 'Vendor created' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   create(@CurrentUser() user: AuthUser, @Body() dto: UpsertVendorDto) {
     return this.service.create(user.tenantId, dto);
   }
 
-  @Roles('admin')
+  @Roles('funeral_director')
   @Patch('vendors/:id')
-  @ApiOperation({ summary: 'Update a vendor (admin only)' })
+  @ApiOperation({ summary: 'Update a vendor (funeral director only)' })
   @ApiResponse({ status: 200, description: 'Vendor updated' })
   @ApiResponse({ status: 404, description: 'Vendor not found' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -43,9 +43,9 @@ export class VendorsController {
     return this.service.update(user.tenantId, id, dto);
   }
 
-  @Roles('admin')
+  @Roles('funeral_director')
   @Delete('vendors/:id')
-  @ApiOperation({ summary: 'Soft-delete a vendor (admin only)' })
+  @ApiOperation({ summary: 'Soft-delete a vendor (funeral director only)' })
   @ApiResponse({ status: 200, description: 'Vendor soft-deleted' })
   @ApiResponse({ status: 404, description: 'Vendor not found' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })

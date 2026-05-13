@@ -24,9 +24,9 @@ export class SettingsController {
     return this.settingsService.get(user.tenantId);
   }
 
-  @Roles('admin')
+  @Roles('funeral_director')
   @Patch()
-  @ApiOperation({ summary: 'Update tenant settings (admin only)' })
+  @ApiOperation({ summary: 'Update tenant settings (funeral director only)' })
   @ApiResponse({ status: 200, description: 'Settings updated' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden — admin role required' })

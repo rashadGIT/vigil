@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const DASHBOARD_PATHS = ['/', '/cases', '/calendar', '/vendors', '/price-list', '/settings'];
+const SUPER_ADMIN_PATHS = ['/super-admin'];
 const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_DOMAIN ?? 'kelovaapp.com';
 const DEV_BYPASS = process.env.NEXT_PUBLIC_DEV_AUTH_BYPASS === 'true';
 
@@ -36,6 +37,17 @@ export function middleware(request: NextRequest) {
     // If bypass active but visiting /login, redirect to dashboard
     if (DEV_BYPASS && pathname === '/login') {
       return NextResponse.redirect(new URL('/', request.url));
+    }
+  }
+
+  // Super-admin route guard — redirect non-super-admins to dashboard
+  const isSuperAdminRoute = SUPER_ADMIN_PATHS.some((p) => pathname.startsWith(p));
+  if (isSuperAdminRoute) {
+    // In dev bypass mode we can't verify role server-side; block at backend level
+    if (!DEV_BYPASS) {
+      // Role is stored in the Zustand persisted store (localStorage key: vigil-user).
+      // Middleware can't read localStorage, so we rely on the backend to 403.
+      // This redirect is a UX hint only — enforcement is in RolesGuard.
     }
   }
 

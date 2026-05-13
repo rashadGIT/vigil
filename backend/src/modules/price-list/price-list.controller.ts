@@ -24,18 +24,18 @@ export class PriceListController {
     return this.service.findAll(user.tenantId);
   }
 
-  @Roles('admin')
+  @Roles('funeral_director')
   @Post('price-list')
-  @ApiOperation({ summary: 'Add a price list item (admin only)' })
+  @ApiOperation({ summary: 'Add a price list item (funeral director only)' })
   @ApiResponse({ status: 201, description: 'Price list item created' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   create(@CurrentUser() user: AuthUser, @Body() dto: UpsertPriceListItemDto) {
     return this.service.create(user.tenantId, dto);
   }
 
-  @Roles('admin')
+  @Roles('funeral_director')
   @Patch('price-list/:id')
-  @ApiOperation({ summary: 'Update a price list item (admin only)' })
+  @ApiOperation({ summary: 'Update a price list item (funeral director only)' })
   @ApiResponse({ status: 200, description: 'Price list item updated' })
   @ApiResponse({ status: 404, description: 'Item not found' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })

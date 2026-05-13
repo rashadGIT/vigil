@@ -17,7 +17,8 @@ datasource db {
 // ============================================================
 
 enum UserRole {
-  admin
+  super_admin
+  funeral_director
   staff
 }
 
@@ -210,6 +211,11 @@ model Case {
   assignedToId   String?     @map("assigned_to_id")
   /// @sensitive decedentInfo
   faithTradition String?     @map("faith_tradition")
+  veteranStatus  Boolean     @default(false) @map("veteran_status")
+  placeOfDeath   String?     @map("place_of_death")
+  causeOfDeath   String?     @map("cause_of_death")
+  financialAckAt DateTime?   @map("financial_ack_at")
+  howHeard       String?     @map("how_heard")
   deletedAt      DateTime?  @map("deleted_at")
   archivedAt     DateTime?  @map("archived_at")
   createdAt      DateTime   @default(now()) @map("created_at")
@@ -249,9 +255,14 @@ model FamilyContact {
   relationship     String
   email            String?
   phone            String?
-  isPrimaryContact Boolean  @default(false) @map("is_primary_contact")
-  createdAt        DateTime @default(now()) @map("created_at")
-  updatedAt        DateTime @updatedAt @map("updated_at")
+  isPrimaryContact        Boolean  @default(false) @map("is_primary_contact")
+  addressLine1            String?  @map("address_line1")
+  city                    String?
+  state                   String?
+  zip                     String?
+  isFinanciallyResponsible Boolean @default(false) @map("is_financially_responsible")
+  createdAt               DateTime @default(now()) @map("created_at")
+  updatedAt               DateTime @updatedAt @map("updated_at")
 
   tenant    Tenant     @relation(fields: [tenantId], references: [id])
   case      Case       @relation(fields: [caseId], references: [id], onDelete: Cascade)

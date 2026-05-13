@@ -15,7 +15,7 @@ interface CognitoAccessTokenClaims {
   sub: string;
   username: string;
   'custom:tenantId': string;
-  'custom:role': 'admin' | 'staff';
+  'custom:role': 'super_admin' | 'funeral_director' | 'staff';
   token_use: 'access';
 }
 
@@ -70,12 +70,17 @@ export class CognitoAuthGuard implements CanActivate {
       this.logger.warn('DEV_AUTH_BYPASS active — Cognito verification skipped');
       const devUser =
         (request.headers['x-dev-user'] as string | undefined) ??
-        'dev-user-1|seed-tenant-id|admin|director@sunrise.demo';
+        'dev-user-1|seed-tenant-id|funeral_director|director@sunrise.demo';
       const [sub, tenantId, role, email] = devUser.split('|');
-      if (!sub || !tenantId || !role || !email) {
+      if (!sub || !role || !email) {
         throw new UnauthorizedException('Malformed x-dev-user header');
       }
-      request.user = { sub, tenantId, role, email };
+      // super_admin may omit tenantId in header; they can override via x-tenant-id on tenant-scoped routes
+      const effectiveTenantId =
+        role === 'super_admin'
+          ? ((request.headers['x-tenant-id'] as string | undefined) ?? '')
+          : tenantId;
+      request.user = { sub, tenantId: effectiveTenantId, role, email };
       return true;
     }
 
@@ -101,10 +106,16 @@ export class CognitoAuthGuard implements CanActivate {
         data: { cognitoSub: payload.sub },
       });
 
+      const claimedRole = payload['custom:role'];
+      // super_admin has no tenantId claim; they pass x-tenant-id header for tenant-scoped routes
+      const effectiveTenantId =
+        claimedRole === 'super_admin'
+          ? ((request.headers['x-tenant-id'] as string | undefined) ?? '')
+          : (payload['custom:tenantId'] ?? '');
       request.user = {
         sub: payload.sub,
-        tenantId: payload['custom:tenantId'],
-        role: payload['custom:role'],
+        tenantId: effectiveTenantId,
+        role: claimedRole,
         email: payload.username,
       };
       return true;

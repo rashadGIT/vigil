@@ -40,6 +40,8 @@ import { PreneedModule } from './modules/preneed/preneed.module';
 import { CemeteryModule } from './modules/cemetery/cemetery.module';
 import { NotesModule } from './modules/notes/notes.module';
 
+import { SuperAdminModule } from './modules/super-admin/super-admin.module';
+
 // Phase 2 stubs
 import { TrackingModule } from './modules/tracking/tracking.module';
 import { ReferralsModule } from './modules/referrals/referrals.module';
@@ -87,6 +89,8 @@ import { MultiFaithModule } from './modules/multi-faith/multi-faith.module';
     PreneedModule,
     CemeteryModule,
     NotesModule,
+
+    SuperAdminModule,
 
     // Phase 2 stubs
     TrackingModule,

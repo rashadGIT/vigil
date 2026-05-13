@@ -17,7 +17,7 @@ export const apiClient = axios.create({
 // Request interceptor: inject dev bypass headers only in non-production
 apiClient.interceptors.request.use((config) => {
   if (BYPASS_ACTIVE) {
-    config.headers['x-dev-user'] = `dev-admin|${DEV_TENANT_ID}|admin|director@sunrise.demo`;
+    config.headers['x-dev-user'] = `dev-admin|${DEV_TENANT_ID}|funeral_director|director@sunrise.demo`;
     config.headers['Authorization'] = 'Bearer dev-bypass-token';
   }
   // In production the httpOnly cookie is sent automatically via withCredentials.

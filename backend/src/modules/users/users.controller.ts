@@ -25,18 +25,18 @@ export class UsersController {
     return this.usersService.findAll(user.tenantId);
   }
 
-  @Roles('admin')
+  @Roles('funeral_director')
   @Post()
-  @ApiOperation({ summary: 'Create a new staff user in Cognito and the database (admin only)' })
+  @ApiOperation({ summary: 'Create a new staff user in Cognito and the database (funeral director only)' })
   @ApiResponse({ status: 201, description: 'User created' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   create(@CurrentUser() user: AuthUser, @Body() dto: CreateUserDto) {
     return this.usersService.create(user.tenantId, dto);
   }
 
-  @Roles('admin')
+  @Roles('funeral_director')
   @Post('invite')
-  @ApiOperation({ summary: 'Invite a staff member by email with a branded welcome email (admin only)' })
+  @ApiOperation({ summary: 'Invite a staff member by email with a branded welcome email (funeral director only)' })
   @ApiResponse({ status: 201, description: 'User invited and email sent' })
   @ApiResponse({ status: 409, description: 'Email already exists' })
   invite(@CurrentUser() user: AuthUser, @Body() dto: InviteUserDto) {

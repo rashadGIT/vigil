@@ -1,9 +1,11 @@
 import { Sidebar } from '@/components/layout/sidebar';
 import { TopBar } from '@/components/layout/top-bar';
+import { AuthInitializer } from '@/components/auth/auth-initializer';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background">
+      <AuthInitializer />
       {/* Desktop sidebar — fixed left rail */}
       <Sidebar />
 

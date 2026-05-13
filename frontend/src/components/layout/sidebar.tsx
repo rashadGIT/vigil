@@ -10,25 +10,25 @@ import {
   DollarSign,
   Settings,
   Menu,
-  X,
   BookOpen,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils/cn';
+import { useCurrentUser } from '@/hooks/use-current-user';
 
-const navItems = [
-  { label: 'Dashboard', href: '/', icon: LayoutDashboard, exact: true },
-  { label: 'Cases', href: '/cases', icon: FolderOpen },
-  { label: 'Calendar', href: '/calendar', icon: Calendar },
-  { label: 'Vendors', href: '/vendors', icon: Building2 },
-  { label: 'Pre-Need', href: '/preneed', icon: BookOpen },
-  { label: 'Price List', href: '/price-list', icon: DollarSign },
-  { label: 'Settings', href: '/settings', icon: Settings },
+const allNavItems = [
+  { label: 'Dashboard', href: '/', icon: LayoutDashboard, exact: true, adminOnly: false },
+  { label: 'Cases', href: '/cases', icon: FolderOpen, adminOnly: false },
+  { label: 'Calendar', href: '/calendar', icon: Calendar, adminOnly: false },
+  { label: 'Vendors', href: '/vendors', icon: Building2, adminOnly: false },
+  { label: 'Pre-Need', href: '/preneed', icon: BookOpen, adminOnly: false },
+  { label: 'Price List', href: '/price-list', icon: DollarSign, adminOnly: false },
+  { label: 'Settings', href: '/settings', icon: Settings, adminOnly: true },
 ];
 
-function NavLink({ item, onClick }: { item: (typeof navItems)[number]; onClick?: () => void }) {
+function NavLink({ item, onClick }: { item: (typeof allNavItems)[number]; onClick?: () => void }) {
   const pathname = usePathname();
   const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
   const Icon = item.icon;
@@ -52,6 +52,9 @@ function NavLink({ item, onClick }: { item: (typeof navItems)[number]; onClick?:
 }
 
 function SidebarContent({ onClose }: { onClose?: () => void }) {
+  const { canAccessSettings } = useCurrentUser();
+  const navItems = allNavItems.filter((item) => !item.adminOnly || canAccessSettings);
+
   return (
     <div className="flex flex-col h-full">
       {/* Logo / brand */}
