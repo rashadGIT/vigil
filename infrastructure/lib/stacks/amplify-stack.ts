@@ -30,10 +30,10 @@ export class AmplifyStack extends cdk.Stack {
         frontend: {
           phases: {
             preBuild: {
-              commands: ['echo "preBuild complete"'],
+              commands: ['cd frontend && npm install'],
             },
             build: {
-              commands: ['cd frontend', 'npm install', 'npm run build'],
+              commands: ['cd frontend && npm run build'],
             },
           },
           artifacts: {
