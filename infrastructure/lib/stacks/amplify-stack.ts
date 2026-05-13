@@ -16,48 +16,46 @@ export class AmplifyStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: AmplifyStackProps) {
     super(scope, id, props);
 
-    this.amplifyApp = new amplify.App(this, 'KelovaFrontendApp', {
-      appName: 'kelova-frontend',
+    this.amplifyApp = new amplify.App(this, 'VigilFrontendApp', {
+      appName: 'vigil-frontend',
       sourceCodeProvider: new amplify.GitHubSourceCodeProvider({
         owner: 'rashadGIT',
-        repository: 'Kelova',
-        oauthToken: cdk.SecretValue.secretsManager('kelova/amplify/github-token', {
+        repository: 'Vigil',
+        oauthToken: cdk.SecretValue.secretsManager('vigil/amplify/github-token', {
           jsonField: 'token',
         }),
       }),
       buildSpec: codebuild.BuildSpec.fromObjectToYaml({
-        version: '1.0',
-        applications: [
-          {
-            appRoot: 'frontend',
-            frontend: {
-              phases: {
-                preBuild: { commands: ['npm ci'] },
-                build: { commands: ['npm run build'] },
-              },
-              artifacts: {
-                baseDirectory: '.next',
-                files: ['**/*'],
-              },
-              cache: {
-                paths: ['node_modules/**/*', '.next/cache/**/*'],
-              },
+        version: '1',
+        frontend: {
+          phases: {
+            preBuild: {
+              commands: ['echo "preBuild complete"'],
+            },
+            build: {
+              commands: ['cd frontend', 'npm install', 'npm run build'],
             },
           },
-        ],
+          artifacts: {
+            baseDirectory: 'frontend/.next',
+            files: ['**/*'],
+          },
+          cache: {
+            paths: ['frontend/node_modules/**/*', 'frontend/.next/cache/**/*'],
+          },
+        },
       }),
       environmentVariables: {
-        NEXT_PUBLIC_API_URL: 'https://api.kelova.automagicly.ai',
+        NEXT_PUBLIC_API_URL: 'https://api.vigilhq.com',
       },
     });
 
-    const mainBranch = this.amplifyApp.addBranch('main', {
+    const mainBranch = this.amplifyApp.addBranch('master', {
       autoBuild: true,
       stage: 'PRODUCTION',
     });
 
-    // Custom domain — map app subdomain to main branch
-    const domain = this.amplifyApp.addDomain('kelova.automagicly.ai', {
+    const domain = this.amplifyApp.addDomain('vigilhq.com', {
       enableAutoSubdomain: true,
       autoSubdomainCreationPatterns: ['*'],
     });
@@ -66,6 +64,6 @@ export class AmplifyStack extends cdk.Stack {
 
     new cdk.CfnOutput(this, 'AmplifyAppId', { value: this.amplifyApp.appId });
     new cdk.CfnOutput(this, 'AmplifyDefaultDomain', { value: this.amplifyApp.defaultDomain });
-    new cdk.CfnOutput(this, 'FrontendUrl', { value: 'https://app.kelova.automagicly.ai' });
+    new cdk.CfnOutput(this, 'FrontendUrl', { value: 'https://app.vigilhq.com' });
   }
 }

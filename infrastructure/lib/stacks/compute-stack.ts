@@ -31,7 +31,7 @@ export class ComputeStack extends cdk.Stack {
     const stage = props.stage ?? 'production';
     const serviceSuffix = stage === 'staging' ? '-staging' : '';
 
-    this.ecrRepo = new ecr.Repository(this, 'KelovaBackendRepo', {
+    this.ecrRepo = new ecr.Repository(this, 'VigilBackendRepo', {
       repositoryName: 'vigil-backend',
       imageTagMutability: ecr.TagMutability.MUTABLE,
       imageScanOnPush: true,
@@ -39,13 +39,13 @@ export class ComputeStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.RETAIN,
     });
 
-    this.ecsCluster = new ecs.Cluster(this, 'KelovaEcsCluster', {
+    this.ecsCluster = new ecs.Cluster(this, 'VigilEcsCluster', {
       vpc: props.vpc,
       clusterName: 'vigil-cluster',
       containerInsights: true,
     });
 
-    const logGroup = new logs.LogGroup(this, 'KelovaBackendLogs', {
+    const logGroup = new logs.LogGroup(this, 'VigilBackendLogs', {
       logGroupName: `/vigil/backend${serviceSuffix}`,
       retention: logs.RetentionDays.ONE_MONTH,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
@@ -55,7 +55,7 @@ export class ComputeStack extends cdk.Stack {
 
     this.fargateService = new ecsPatterns.ApplicationLoadBalancedFargateService(
       this,
-      'KelovaFargateService',
+      'VigilFargateService',
       {
         cluster: this.ecsCluster,
         serviceName: `vigil-backend${serviceSuffix}`,
@@ -107,7 +107,7 @@ export class ComputeStack extends cdk.Stack {
     });
 
     // Migrations task definition — DATABASE_URL injected at run time via --overrides in CI
-    const migrationsTaskDef = new ecs.FargateTaskDefinition(this, 'KelovaMigrationsTaskDef', {
+    const migrationsTaskDef = new ecs.FargateTaskDefinition(this, 'VigilMigrationsTaskDef', {
       cpu: 512,
       memoryLimitMiB: 1024,
       family: `vigil-migrations${serviceSuffix}`,

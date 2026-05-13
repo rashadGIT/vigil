@@ -17,17 +17,17 @@ const env = {
   region: 'us-east-2',
 };
 
-const foundation = new FoundationStack(app, 'KelovaFoundationStack', { env });
-const network = new NetworkStack(app, 'KelovaNetworkStack', { env });
-const _auth = new AuthStack(app, 'KelovaAuthStack', { env });
+const foundation = new FoundationStack(app, 'VigilFoundationStack', { env });
+const network = new NetworkStack(app, 'VigilNetworkStack', { env });
+const _auth = new AuthStack(app, 'VigilAuthStack', { env });
 
-const data = new DataStack(app, 'KelovaDataStack', {
+const data = new DataStack(app, 'VigilDataStack', {
   env,
   vpc: network.vpc,
   rdsSg: network.rdsSg,
 });
 
-const compute = new ComputeStack(app, 'KelovaComputeStack', {
+const compute = new ComputeStack(app, 'VigilComputeStack', {
   env,
   vpc: network.vpc,
   certificate: foundation.certificate,
@@ -35,13 +35,13 @@ const compute = new ComputeStack(app, 'KelovaComputeStack', {
   dbSecret: data.dbSecret,
 });
 
-const _amplify = new AmplifyStack(app, 'KelovaAmplifyStack', {
+const _amplify = new AmplifyStack(app, 'VigilAmplifyStack', {
   env,
   hostedZone: foundation.hostedZone,
   certificate: foundation.certificate,
 });
 
-new ObservabilityStack(app, 'KelovaObservabilityStack', {
+new ObservabilityStack(app, 'VigilObservabilityStack', {
   env,
   ecsCluster: compute.ecsCluster,
   fargateService: compute.fargateService,

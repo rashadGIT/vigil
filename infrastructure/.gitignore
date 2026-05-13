@@ -1,0 +1,14 @@
+node_modules/
+cdk.out/
+cdk-obs-out/
+cdk.context.json
+*.js
+*.d.ts
+*.js.map
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log
+.planning/
+.claude/

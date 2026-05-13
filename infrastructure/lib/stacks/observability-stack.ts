@@ -22,15 +22,15 @@ export class ObservabilityStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: ObservabilityStackProps) {
     super(scope, id, props);
 
-    new logs.LogGroup(this, 'KelovaEcsAgentLogs', {
-      logGroupName: '/kelova/ecs-agent',
+    new logs.LogGroup(this, 'VigilEcsAgentLogs', {
+      logGroupName: '/vigil/ecs-agent',
       retention: logs.RetentionDays.ONE_WEEK,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
-    this.alertsTopic = new sns.Topic(this, 'KelovaAlertsTopic', {
-      topicName: 'kelova-alerts',
-      displayName: 'Kelova Infrastructure Alerts',
+    this.alertsTopic = new sns.Topic(this, 'VigilAlertsTopic', {
+      topicName: 'vigil-alerts',
+      displayName: 'Vigil Infrastructure Alerts',
     });
     this.alertsTopic.addSubscription(
       new snsSubs.EmailSubscription('rashadbarnett.ai@gmail.com'),

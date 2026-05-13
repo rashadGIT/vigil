@@ -72,8 +72,8 @@ exports.handler = async (event) => {
       }),
     );
 
-    this.userPool = new cognito.UserPool(this, 'KelovaUserPool', {
-      userPoolName: 'kelova-user-pool',
+    this.userPool = new cognito.UserPool(this, 'VigilUserPool', {
+      userPoolName: 'vigil-user-pool',
       selfSignUpEnabled: false,
       signInAliases: { email: true },
       standardAttributes: {
@@ -132,9 +132,9 @@ exports.handler = async (event) => {
       'https://app.vigilhq.com/login',
     ];
 
-    this.userPoolClient = new cognito.UserPoolClient(this, 'KelovaUserPoolClient', {
+    this.userPoolClient = new cognito.UserPoolClient(this, 'VigilUserPoolClient', {
       userPool: this.userPool,
-      userPoolClientName: 'kelova-web-client',
+      userPoolClientName: 'vigil-web-client',
       generateSecret: false,
       authFlows: {
         userPassword: true,
