@@ -4,7 +4,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { CaseStatusBadge } from '@/components/cases/case-status-badge';
-import { CaseStatus } from '@vigil/shared-types';
+import { CaseStatus } from '@/types';
 
 describe('CaseStatusBadge', () => {
   it('renders "New" for new status', () => {

@@ -1,0 +1,23 @@
+{
+  "folders": [
+    {
+      "name": "vigil (monorepo root)",
+      "path": "."
+    },
+    {
+      "name": "backend",
+      "path": "backend"
+    },
+    {
+      "name": "frontend",
+      "path": "frontend"
+    },
+    {
+      "name": "infrastructure",
+      "path": "infrastructure"
+    }
+  ],
+  "settings": {
+    "git.detectSubmodules": false
+  }
+}

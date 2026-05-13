@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import type { IPayment } from '@vigil/shared-types';
+import type { IPayment } from '@/types';
 
 export interface PaymentSummary {
   totalAmount: number;

@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Plus } from 'lucide-react';
 import { apiClient } from '@/lib/api/client';
-import { UserRole } from '@vigil/shared-types';
+import { UserRole } from '@/types';
 
 export default function StaffPage() {
   const queryClient = useQueryClient();

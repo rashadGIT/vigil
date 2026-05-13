@@ -1,6 +1,6 @@
 import { apiClient } from './client';
-import type { IPriceListItem } from '@vigil/shared-types';
-import { PriceCategory } from '@vigil/shared-types';
+import type { IPriceListItem } from '@/types';
+import { PriceCategory } from '@/types';
 
 export async function getPriceList(): Promise<IPriceListItem[]> {
   const res = await apiClient.get<IPriceListItem[]>('/price-list');

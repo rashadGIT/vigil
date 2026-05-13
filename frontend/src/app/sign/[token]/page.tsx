@@ -9,7 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 import { SignatureCapture } from '@/components/signatures/signature-canvas';
 import { publicApiClient } from '@/lib/api/public-client';
-import type { ISignature } from '@vigil/shared-types';
+import type { ISignature } from '@/types';
 
 interface SignPageProps {
   params: Promise<{ token: string }>;

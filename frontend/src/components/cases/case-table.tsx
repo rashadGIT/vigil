@@ -22,7 +22,7 @@ import { CaseStatusBadge } from './case-status-badge';
 import { getCases, type CaseFilters } from '@/lib/api/cases';
 import { formatRelative } from '@/lib/utils/format-date';
 import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
-import type { ICase } from '@vigil/shared-types';
+import type { ICase } from '@/types';
 
 const columnHelper = createColumnHelper<ICase>();
 

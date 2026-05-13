@@ -1,6 +1,6 @@
 import { apiClient } from './client';
-import type { ICalendarEvent } from '@vigil/shared-types';
-import { EventType } from '@vigil/shared-types';
+import type { ICalendarEvent } from '@/types';
+import { EventType } from '@/types';
 
 export async function getCalendarEvents(from?: string, to?: string): Promise<ICalendarEvent[]> {
   const res = await apiClient.get<ICalendarEvent[]>('/calendar/events', { params: { from, to } });

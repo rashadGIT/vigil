@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils/cn';
 import { updateTask } from '@/lib/api/tasks';
 import { formatDate, isOverdue } from '@/lib/utils/format-date';
-import type { ITask } from '@vigil/shared-types';
+import type { ITask } from '@/types';
 
 export function TaskItem({ task, caseId }: { task: ITask; caseId: string }) {
   const queryClient = useQueryClient();

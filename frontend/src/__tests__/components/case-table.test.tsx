@@ -6,7 +6,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CaseTable } from '@/components/cases/case-table';
-import { CaseStatus } from '@vigil/shared-types';
+import { CaseStatus } from '@/types';
 
 jest.mock('@/lib/api/cases', () => ({
   getCases: jest.fn(),

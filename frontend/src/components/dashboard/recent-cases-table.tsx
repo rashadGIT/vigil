@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { CaseStatusBadge } from '@/components/cases/case-status-badge';
 import { getRecentCases } from '@/lib/api/dashboard';
 import { formatRelative } from '@/lib/utils/format-date';
-import { CaseStatus } from '@vigil/shared-types';
+import { CaseStatus } from '@/types';
 import { Copy } from 'lucide-react';
 import { toast } from 'sonner';
 

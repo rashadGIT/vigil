@@ -1,4 +1,4 @@
-import { CaseStatus } from '@vigil/shared-types';
+import { CaseStatus } from '@/types';
 import { StatusPill } from '@/components/ui/status-pill';
 
 const statusToKind: Record<CaseStatus, 'new' | 'in_progress' | 'completed' | 'archived'> = {

@@ -1,6 +1,6 @@
 import { apiClient } from './client';
-import type { IVendor } from '@vigil/shared-types';
-import { VendorType } from '@vigil/shared-types';
+import type { IVendor } from '@/types';
+import { VendorType } from '@/types';
 
 export async function getVendors(): Promise<IVendor[]> {
   const res = await apiClient.get<IVendor[]>('/vendors');

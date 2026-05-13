@@ -8,7 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { CaseStatusBadge } from './case-status-badge';
 import { getCaseById, updateCaseStatus } from '@/lib/api/cases';
 import { formatDate } from '@/lib/utils/format-date';
-import { CaseStatus, ServiceType } from '@vigil/shared-types';
+import { CaseStatus, ServiceType } from '@/types';
 
 const nextStatus: Partial<Record<CaseStatus, CaseStatus>> = {
   [CaseStatus.new]: CaseStatus.in_progress,

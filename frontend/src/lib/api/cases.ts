@@ -1,6 +1,6 @@
 import { apiClient } from './client';
-import type { ICase } from '@vigil/shared-types';
-import { CaseStatus, ServiceType } from '@vigil/shared-types';
+import type { ICase } from '@/types';
+import { CaseStatus, ServiceType } from '@/types';
 
 export interface CreateCaseDto {
   deceasedFirstName: string;

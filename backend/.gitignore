@@ -1,11 +1,14 @@
-# Dependencies
 node_modules/
-
-# Build output
 dist/
-
-# Environment
 .env
-
-# Prisma
-/prisma/migrations/.DS_Store
+.env.*
+!.env.example
+*.tsbuildinfo
+.DS_Store
+*.log
+npm-debug.log*
+coverage/
+.nyc_output/
+prisma/migrations/.DS_Store
+.planning/
+.claude/

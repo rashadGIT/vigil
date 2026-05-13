@@ -1,6 +1,6 @@
 import { apiClient } from './client';
-import type { IDocument } from '@vigil/shared-types';
-import { DocumentType } from '@vigil/shared-types';
+import type { IDocument } from '@/types';
+import { DocumentType } from '@/types';
 
 export interface PresignedUrlResponse {
   uploadUrl: string;

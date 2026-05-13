@@ -5,7 +5,7 @@ import { PageHeader } from '@/components/layout/page-header';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { apiClient } from '@/lib/api/client';
-import { ServiceType } from '@vigil/shared-types';
+import { ServiceType } from '@/types';
 
 const serviceTypeLabel: Record<ServiceType, string> = {
   [ServiceType.burial]: 'Burial',

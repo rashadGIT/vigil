@@ -2,12 +2,7 @@
   "name": "vigil",
   "version": "0.0.1",
   "private": true,
-  "workspaces": [
-    "backend",
-    "frontend",
-    "packages/*",
-    "infrastructure"
-  ],
+  "workspaces": [],
   "scripts": {
     "demo:reset": "docker-compose up -d && cd backend && npx prisma migrate deploy && npx prisma db seed && cd ..",
     "demo:seed": "cd backend && npx prisma db seed && cd ..",
@@ -19,9 +14,7 @@
     "test:e2e": "npm run test:e2e --workspaces --if-present",
     "test:e2e:ui": "npm run test:e2e:ui --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
-    "type-check": "npm run type-check --workspaces --if-present",
-    "infra:synth": "npm run synth --workspace=infrastructure",
-    "infra:deploy": "npm run deploy --workspace=infrastructure"
+    "type-check": "npm run type-check --workspaces --if-present"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

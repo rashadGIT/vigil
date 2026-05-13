@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Upload } from 'lucide-react';
-import { DocumentType } from '@vigil/shared-types';
+import { DocumentType } from '@/types';
 import { getPresignedUploadUrl } from '@/lib/api/documents';
 import axios from 'axios';
 

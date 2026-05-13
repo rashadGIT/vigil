@@ -14,13 +14,13 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getCalendarEvents, createCalendarEvent } from '@/lib/api/calendar';
-import type { ICalendarEvent } from '@vigil/shared-types';
+import type { ICalendarEvent } from '@/types';
 import {
   startOfMonth, endOfMonth, startOfWeek, endOfWeek,
   eachDayOfInterval, isSameMonth, isToday, isSameDay,
   format,
 } from 'date-fns';
-import { EventType } from '@vigil/shared-types';
+import { EventType } from '@/types';
 import { cn } from '@/lib/utils/cn';
 
 const EVENT_TYPE_COLORS: Record<EventType, string> = {

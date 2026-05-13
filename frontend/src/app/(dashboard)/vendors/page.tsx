@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Trash2, Plus } from 'lucide-react';
 import { getVendors, createVendor, deleteVendor } from '@/lib/api/vendors';
-import { VendorType } from '@vigil/shared-types';
+import { VendorType } from '@/types';
 
 function AddVendorDialog({ onSuccess }: { onSuccess: () => void }) {
   const [open, setOpen] = useState(false);

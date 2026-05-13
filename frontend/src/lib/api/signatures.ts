@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import type { ISignature } from '@vigil/shared-types';
+import type { ISignature } from '@/types';
 
 export async function getCaseSignatures(caseId: string): Promise<ISignature[]> {
   const res = await apiClient.get<ISignature[]>(`/cases/${caseId}/signatures`);

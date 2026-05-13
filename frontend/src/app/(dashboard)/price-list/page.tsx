@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Trash2, Plus, ShieldCheck } from 'lucide-react';
 import { getPriceList, createPriceListItem, deletePriceListItem } from '@/lib/api/price-list';
 import { apiClient } from '@/lib/api/client';
-import { PriceCategory } from '@vigil/shared-types';
+import { PriceCategory } from '@/types';
 
 const categoryLabel: Record<PriceCategory, string> = {
   [PriceCategory.professional_services]: 'Professional Services',

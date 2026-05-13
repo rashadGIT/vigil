@@ -39,6 +39,12 @@ coverage/
 playwright-report/
 test-results/
 
+# Subfolders that live in their own repos
+infrastructure/
+backend/
+frontend/
+packages/
+
 # AWS CDK
 cdk.context.json
 

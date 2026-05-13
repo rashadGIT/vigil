@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import type { ITask } from '@vigil/shared-types';
+import type { ITask } from '@/types';
 
 export async function getCaseTasks(caseId: string): Promise<ITask[]> {
   const res = await apiClient.get<ITask[]>(`/cases/${caseId}/tasks`);
