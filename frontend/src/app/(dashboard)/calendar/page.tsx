@@ -5,22 +5,20 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, ChevronLeft, ChevronRight, LayoutGrid, LayoutList } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getCalendarEvents, createCalendarEvent } from '@/lib/api/calendar';
 import type { ICalendarEvent } from '@vigil/shared-types';
-import { formatDateTime } from '@/lib/utils/format-date';
 import {
   startOfMonth, endOfMonth, startOfWeek, endOfWeek,
-  eachDayOfInterval, isSameMonth, isToday,
-  format, addMonths, subMonths,
+  eachDayOfInterval, isSameMonth, isToday, isSameDay,
+  format,
 } from 'date-fns';
 import { EventType } from '@vigil/shared-types';
 import { cn } from '@/lib/utils/cn';
@@ -35,7 +33,19 @@ const EVENT_TYPE_COLORS: Record<EventType, string> = {
   [EventType.other]:       'bg-gray-400',
 };
 
-function NewEventDialog({ onCreated }: { onCreated: (startTime: string) => void }) {
+const MONTH_NAMES = [
+  'January','February','March','April','May','June',
+  'July','August','September','October','November','December',
+];
+
+// ─── NewEventDialog ───────────────────────────────────────────────────────────
+
+interface NewEventDialogProps {
+  onCreated: (startTime: string) => void;
+  defaultDate?: Date;
+}
+
+function NewEventDialog({ onCreated, defaultDate }: NewEventDialogProps) {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [eventType, setEventType] = useState<EventType>(EventType.other);
@@ -43,6 +53,19 @@ function NewEventDialog({ onCreated }: { onCreated: (startTime: string) => void 
   const [endTime, setEndTime] = useState('');
   const [notes, setNotes] = useState('');
   const queryClient = useQueryClient();
+
+  function handleOpenChange(val: boolean) {
+    setOpen(val);
+    if (val && defaultDate) {
+      const base = format(defaultDate, "yyyy-MM-dd");
+      setStartTime(`${base}T09:00`);
+      setEndTime(`${base}T10:00`);
+    }
+    if (!val) {
+      setTitle(''); setStartTime(''); setEndTime(''); setNotes('');
+      setEventType(EventType.other);
+    }
+  }
 
   const mutation = useMutation({
     mutationFn: () => createCalendarEvent({
@@ -57,8 +80,6 @@ function NewEventDialog({ onCreated }: { onCreated: (startTime: string) => void 
       toast.success('Event created.');
       onCreated(created.startTime as string);
       setOpen(false);
-      setTitle(''); setStartTime(''); setEndTime(''); setNotes('');
-      setEventType(EventType.other);
     },
     onError: (err: any) => {
       const msg = err?.response?.data?.message;
@@ -70,7 +91,7 @@ function NewEventDialog({ onCreated }: { onCreated: (startTime: string) => void 
   const canSubmit = title.trim() && startTime && endTime && !endBeforeStart;
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button size="sm">
           <Plus className="h-4 w-4 mr-2" />
@@ -107,7 +128,9 @@ function NewEventDialog({ onCreated }: { onCreated: (startTime: string) => void 
             </div>
           </div>
           <div className="space-y-1">
-            <Label className="font-medium">Notes <span className="text-muted-foreground font-normal">(optional)</span></Label>
+            <Label className="font-medium">
+              Notes <span className="text-muted-foreground font-normal">(optional)</span>
+            </Label>
             <Input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Any notes..." />
           </div>
           <Button
@@ -123,30 +146,20 @@ function NewEventDialog({ onCreated }: { onCreated: (startTime: string) => void 
   );
 }
 
-function EventPill({ event }: { event: ICalendarEvent }) {
-  const dot = EVENT_TYPE_COLORS[event.eventType as EventType] ?? 'bg-gray-400';
-  return (
-    <TooltipProvider delayDuration={200}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div className="flex items-center gap-1 rounded px-1 py-0.5 text-xs bg-muted hover:bg-muted/80 cursor-default min-w-0">
-            <span className={cn('h-1.5 w-1.5 rounded-full shrink-0', dot)} />
-            <span className="truncate">{event.title}</span>
-          </div>
-        </TooltipTrigger>
-        <TooltipContent side="top" className="max-w-[200px]">
-          <p className="font-medium">{event.title}</p>
-          <p className="text-xs text-muted-foreground">
-            {format(new Date(event.startTime), 'h:mm a')} – {format(new Date(event.endTime), 'h:mm a')}
-          </p>
-          <p className="text-xs capitalize text-muted-foreground">{event.eventType}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  );
+// ─── MonthGrid ────────────────────────────────────────────────────────────────
+
+const DAY_HEADERS_LONG  = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const DAY_HEADERS_SHORT = ['S',   'M',   'T',   'W',   'T',   'F',   'S'];
+
+interface MonthGridProps {
+  currentMonth: Date;
+  selectedDate: Date;
+  events: ICalendarEvent[];
+  onDayClick: (day: Date) => void;
+  onMonthChange: (month: Date) => void;
 }
 
-function MonthGrid({ currentMonth, events }: { currentMonth: Date; events: ICalendarEvent[] }) {
+function MonthGrid({ currentMonth, selectedDate, events, onDayClick, onMonthChange }: MonthGridProps) {
   const gridStart = startOfWeek(startOfMonth(currentMonth));
   const gridEnd   = endOfWeek(endOfMonth(currentMonth));
   const days      = eachDayOfInterval({ start: gridStart, end: gridEnd });
@@ -158,13 +171,29 @@ function MonthGrid({ currentMonth, events }: { currentMonth: Date; events: ICale
     eventsByDay.get(key)!.push(e);
   });
 
-  const DAY_HEADERS_LONG  = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const DAY_HEADERS_SHORT = ['S',   'M',   'T',   'W',   'T',   'F',   'S'];
-
   return (
-    <div className="rounded-lg border overflow-hidden">
-      {/* Day-of-week header */}
-      <div className="grid grid-cols-7 border-b bg-muted/50">
+    <div className="rounded-lg border bg-card overflow-hidden">
+      {/* Month navigation */}
+      <div className="flex items-center justify-between px-4 py-3 border-b bg-muted/30">
+        <Button
+          variant="ghost" size="icon" className="h-8 w-8"
+          onClick={() => onMonthChange(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <h2 className="text-sm font-semibold">
+          {MONTH_NAMES[currentMonth.getMonth()]} {currentMonth.getFullYear()}
+        </h2>
+        <Button
+          variant="ghost" size="icon" className="h-8 w-8"
+          onClick={() => onMonthChange(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+
+      {/* Day-of-week headers */}
+      <div className="grid grid-cols-7 border-b">
         {DAY_HEADERS_LONG.map((d, i) => (
           <div key={i} className="py-2 text-center text-xs font-medium text-muted-foreground">
             <span className="hidden sm:inline">{d}</span>
@@ -174,42 +203,63 @@ function MonthGrid({ currentMonth, events }: { currentMonth: Date; events: ICale
       </div>
 
       {/* Day cells */}
-      <div className="grid grid-cols-7 divide-x divide-y">
+      <div className="grid grid-cols-7 divide-x divide-y border-t">
         {days.map((day) => {
-          const key = format(day, 'yyyy-MM-dd');
-          const dayEvents = eventsByDay.get(key) ?? [];
-          const inMonth = isSameMonth(day, currentMonth);
-          const today = isToday(day);
-          const visible = dayEvents.slice(0, 3);
-          const overflow = dayEvents.length - 3;
+          const key      = format(day, 'yyyy-MM-dd');
+          const dayEvts  = eventsByDay.get(key) ?? [];
+          const inMonth  = isSameMonth(day, currentMonth);
+          const todayDay = isToday(day);
+          const selected = isSameDay(day, selectedDate);
+          const pills    = dayEvts.slice(0, 2);
+          const overflow = dayEvts.length - 2;
 
           return (
-            <div
+            <button
               key={key}
+              onClick={() => {
+                if (!inMonth) onMonthChange(new Date(day.getFullYear(), day.getMonth(), 1));
+                onDayClick(day);
+              }}
               className={cn(
-                'min-h-[64px] sm:min-h-[100px] p-1 sm:p-1.5 flex flex-col gap-0.5',
-                !inMonth && 'bg-muted/20',
+                'min-h-[72px] sm:min-h-[88px] p-1 flex flex-col text-left transition-colors',
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
+                inMonth ? 'hover:bg-muted/50' : 'bg-muted/20 hover:bg-muted/40',
+                selected && 'bg-accent/40',
               )}
             >
+              {/* Date number */}
               <span
                 className={cn(
-                  'text-xs font-medium mb-0.5 h-5 w-5 flex items-center justify-center rounded-full self-end',
-                  today && 'bg-primary text-primary-foreground',
-                  !inMonth && !today && 'text-muted-foreground/40',
-                  inMonth && !today && 'text-foreground',
+                  'text-xs font-medium h-5 w-5 flex items-center justify-center rounded-full mb-0.5 self-end',
+                  todayDay && 'bg-primary text-primary-foreground',
+                  selected && !todayDay && 'ring-2 ring-primary',
+                  !inMonth && 'text-muted-foreground/50',
+                  inMonth && !todayDay && 'text-foreground',
                 )}
               >
                 {format(day, 'd')}
               </span>
 
-              {visible.map((e) => (
-                <EventPill key={e.id} event={e} />
-              ))}
-
-              {overflow > 0 && (
-                <span className="text-xs text-muted-foreground px-1">+{overflow} more</span>
-              )}
-            </div>
+              {/* Event pills */}
+              <div className="flex flex-col gap-0.5 w-full min-w-0">
+                {pills.map((e) => (
+                  <div
+                    key={e.id}
+                    className={cn(
+                      'text-[10px] sm:text-xs px-1 py-px rounded text-white truncate leading-4',
+                      EVENT_TYPE_COLORS[e.eventType as EventType] ?? 'bg-gray-400',
+                    )}
+                  >
+                    {e.title}
+                  </div>
+                ))}
+                {overflow > 0 && (
+                  <span className="text-[10px] text-muted-foreground px-0.5 leading-4">
+                    +{overflow} more
+                  </span>
+                )}
+              </div>
+            </button>
           );
         })}
       </div>
@@ -217,9 +267,12 @@ function MonthGrid({ currentMonth, events }: { currentMonth: Date; events: ICale
   );
 }
 
+// ─── CalendarPage ─────────────────────────────────────────────────────────────
+
 export default function CalendarPage() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [view, setView] = useState<'month' | 'list'>('month');
+  const [selectedDate, setSelectedDate]  = useState(new Date());
+  const [sheetOpen, setSheetOpen]        = useState(false);
 
   const { data: events = [], isLoading } = useQuery({
     queryKey: ['calendar-events', format(currentMonth, 'yyyy-MM')],
@@ -229,107 +282,85 @@ export default function CalendarPage() {
     ),
   });
 
-  function handleCreated(startTime: string) {
-    setCurrentMonth(new Date(startTime));
+  const dayEvents = events
+    .filter((e) => isSameDay(new Date(e.startTime), selectedDate))
+    .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+
+  function handleDayClick(day: Date) {
+    setSelectedDate(day);
+    setSheetOpen(true);
   }
 
-  const monthNav = (
-    <div className="flex items-center gap-1">
-      <Select
-        value={format(currentMonth, 'M')}
-        onValueChange={(v) => {
-          const d = new Date(currentMonth);
-          d.setMonth(parseInt(v) - 1);
-          setCurrentMonth(d);
-        }}
-      >
-        <SelectTrigger className="h-7 w-[110px] text-sm border-0 shadow-none focus:ring-0 px-1">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {['January','February','March','April','May','June','July','August','September','October','November','December'].map((m, i) => (
-            <SelectItem key={i} value={String(i + 1)}>{m}</SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <div className="flex items-center gap-0.5">
-        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear() - 1, currentMonth.getMonth(), 1))}>
-          <ChevronLeft className="h-3 w-3" />
-        </Button>
-        <span className="text-sm w-10 text-center tabular-nums">{format(currentMonth, 'yyyy')}</span>
-        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear() + 1, currentMonth.getMonth(), 1))}>
-          <ChevronRight className="h-3 w-3" />
-        </Button>
-      </div>
-    </div>
-  );
+  function handleEventCreated(startTime: string) {
+    const d = new Date(startTime);
+    setCurrentMonth(new Date(d.getFullYear(), d.getMonth(), 1));
+    setSelectedDate(d);
+    queryClient.invalidateQueries({ queryKey: ['calendar-events'] });
+  }
 
-  const viewToggle = (
-    <div className="flex items-center gap-1 rounded-md border p-0.5">
-      <Button
-        variant={view === 'month' ? 'secondary' : 'ghost'}
-        size="icon"
-        className="h-6 w-6"
-        onClick={() => setView('month')}
-        title="Month view"
-      >
-        <LayoutGrid className="h-3.5 w-3.5" />
-      </Button>
-      <Button
-        variant={view === 'list' ? 'secondary' : 'ghost'}
-        size="icon"
-        className="h-6 w-6"
-        onClick={() => setView('list')}
-        title="List view"
-      >
-        <LayoutList className="h-3.5 w-3.5" />
-      </Button>
-    </div>
-  );
+  const queryClient = useQueryClient();
 
   return (
     <div className="space-y-4">
       <PageHeader
         title="Calendar"
-        description={monthNav}
-        action={
-          <div className="flex items-center gap-2">
-            {viewToggle}
-            <NewEventDialog onCreated={handleCreated} />
-          </div>
-        }
+        action={<NewEventDialog onCreated={handleEventCreated} defaultDate={selectedDate} />}
       />
 
-      {isLoading && (
-        <div className="space-y-2">
-          {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-16 w-full" />)}
-        </div>
+      {isLoading ? (
+        <Skeleton className="h-[520px] w-full rounded-lg" />
+      ) : (
+        <MonthGrid
+          currentMonth={currentMonth}
+          selectedDate={selectedDate}
+          events={events}
+          onDayClick={handleDayClick}
+          onMonthChange={setCurrentMonth}
+        />
       )}
 
-      {!isLoading && view === 'month' && (
-        <MonthGrid currentMonth={currentMonth} events={events} />
-      )}
+      {/* Day events bottom sheet */}
+      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+        <SheetContent side="bottom" className="max-h-[60vh] overflow-y-auto rounded-t-xl">
+          <SheetTitle className="text-base font-semibold">
+            {format(selectedDate, 'EEEE, MMMM d')}
+          </SheetTitle>
+          <p className="text-xs text-muted-foreground mt-0.5 mb-4">
+            {dayEvents.length === 0
+              ? 'No events'
+              : `${dayEvents.length} event${dayEvents.length !== 1 ? 's' : ''}`}
+          </p>
 
-      {!isLoading && view === 'list' && (
-        <>
-          {events.length === 0 && (
-            <p className="text-sm text-muted-foreground">No events scheduled this month.</p>
-          )}
-          <div className="space-y-2">
-            {events.map((event) => (
-              <Card key={event.id} className="hover:shadow-sm transition-shadow">
-                <CardContent className="py-3 flex items-center justify-between gap-4">
-                  <div>
-                    <p className="font-medium text-sm">{event.title}</p>
-                    <p className="text-xs text-muted-foreground">{formatDateTime(event.startTime)}</p>
+          {dayEvents.length === 0 ? (
+            <p className="text-sm text-muted-foreground py-4 text-center">
+              No events scheduled for this day.
+            </p>
+          ) : (
+            <div className="divide-y">
+              {dayEvents.map((event) => {
+                const dot = EVENT_TYPE_COLORS[event.eventType as EventType] ?? 'bg-gray-400';
+                return (
+                  <div key={event.id} className="flex items-start gap-3 py-3">
+                    <span className={cn('mt-1.5 h-2 w-2 rounded-full shrink-0', dot)} />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium leading-snug">{event.title}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {format(new Date(event.startTime), 'h:mm a')} – {format(new Date(event.endTime), 'h:mm a')}
+                      </p>
+                      <Badge variant="outline" className="text-xs mt-1.5 capitalize">
+                        {event.eventType}
+                      </Badge>
+                      {event.notes && (
+                        <p className="text-xs text-muted-foreground mt-1">{event.notes}</p>
+                      )}
+                    </div>
                   </div>
-                  <Badge variant="outline" className="text-xs shrink-0">{event.eventType}</Badge>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </>
-      )}
+                );
+              })}
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
