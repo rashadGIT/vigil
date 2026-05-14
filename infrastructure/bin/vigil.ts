@@ -5,9 +5,8 @@ import {
   NetworkStack,
   AuthStack,
   DataStack,
-  ComputeStack,
+  LambdaStack,
   AmplifyStack,
-  ObservabilityStack,
 } from '../lib';
 
 const app = new cdk.App();
@@ -27,23 +26,16 @@ const data = new DataStack(app, 'VigilDataStack', {
   rdsSg: network.rdsSg,
 });
 
-const compute = new ComputeStack(app, 'VigilComputeStack', {
+new LambdaStack(app, 'VigilLambdaStack', {
   env,
-  vpc: network.vpc,
   certificate: foundation.certificate,
   hostedZone: foundation.hostedZone,
   dbSecret: data.dbSecret,
+  apiDomain: 'api.vigil.automagicly.ai',
 });
 
-const _amplify = new AmplifyStack(app, 'VigilAmplifyStack', {
+new AmplifyStack(app, 'VigilAmplifyStack', {
   env,
   hostedZone: foundation.hostedZone,
   certificate: foundation.certificate,
-});
-
-new ObservabilityStack(app, 'VigilObservabilityStack', {
-  env,
-  ecsCluster: compute.ecsCluster,
-  fargateService: compute.fargateService,
-  rdsInstance: data.rdsInstance,
 });

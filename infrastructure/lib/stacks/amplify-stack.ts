@@ -46,7 +46,8 @@ export class AmplifyStack extends cdk.Stack {
         },
       }),
       environmentVariables: {
-        NEXT_PUBLIC_API_URL: 'https://api.vigilhq.com',
+        NEXT_PUBLIC_API_URL: 'https://api.vigil.automagicly.ai',
+        AMPLIFY_MONOREPO_APP_ROOT: 'frontend',
       },
     });
 
@@ -54,6 +55,10 @@ export class AmplifyStack extends cdk.Stack {
       autoBuild: true,
       stage: 'PRODUCTION',
     });
+
+    // Set framework so Amplify runs the Next.js SSR adapter and generates deploy-manifest.json
+    const cfnBranch = mainBranch.node.defaultChild as cdk.CfnResource;
+    cfnBranch.addPropertyOverride('Framework', 'Next.js - SSR');
 
     const domain = this.amplifyApp.addDomain('vigilhq.com', {
       enableAutoSubdomain: true,

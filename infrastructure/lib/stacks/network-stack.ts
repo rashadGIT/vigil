@@ -46,7 +46,7 @@ export class NetworkStack extends cdk.Stack {
       description: 'Vigil RDS PostgreSQL - from ECS only',
       allowAllOutbound: false,
     });
-    this.rdsSg.addIngressRule(this.ecsSg, ec2.Port.tcp(5432), 'ECS to Postgres');
+    this.rdsSg.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(5432), 'Lambda (no-VPC) to Postgres');
 
     this.redisSg = new ec2.SecurityGroup(this, 'RedisSg', {
       vpc: this.vpc,
