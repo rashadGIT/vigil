@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/auth.store';
 
 const CLIENT_ID = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID ?? '';
@@ -33,7 +33,6 @@ function parseJwt(token: string): Record<string, unknown> {
 }
 
 function AuthCallbackInner() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const setUser = useAuthStore((s) => s.setUser);
   const [error, setError] = useState<string | null>(null);
@@ -111,7 +110,7 @@ function AuthCallbackInner() {
         localStorage.removeItem(`CognitoIdentityServiceProvider.${CLIENT_ID}.oauthState`);
         localStorage.removeItem(`CognitoIdentityServiceProvider.${CLIENT_ID}.inflightOAuth`);
 
-        router.replace('/');
+        window.location.href = '/';
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
         console.error('[callback] exchange error:', msg);
@@ -120,7 +119,7 @@ function AuthCallbackInner() {
     }
 
     exchangeCode();
-  }, [router, searchParams, setUser]);
+  }, [searchParams, setUser]);
 
   if (error) {
     return (
