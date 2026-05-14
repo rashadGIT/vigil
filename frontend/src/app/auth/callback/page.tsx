@@ -102,8 +102,12 @@ function AuthCallbackInner() {
         localStorage.setItem(`${prefix}.refreshToken`, tokens.refresh_token);
         localStorage.setItem(`CognitoIdentityServiceProvider.${CLIENT_ID}.LastAuthUser`, sub);
 
-        // Set access_token cookie so the Next.js middleware auth guard passes
-        document.cookie = `access_token=${tokens.access_token}; path=/; max-age=${tokens.expires_in}; SameSite=Lax`;
+        // Set cookie server-side so Next.js middleware sees it via Set-Cookie header
+        await fetch('/api/auth/session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ accessToken: tokens.access_token, expiresIn: tokens.expires_in }),
+        });
 
         // Clean up PKCE state
         localStorage.removeItem(PKCE_KEY);
