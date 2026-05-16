@@ -53,3 +53,13 @@ backend/src/generated/
 .claude/
 n8nac-config.json
 workflows/
+
+frontend/
+backend/
+infrastructure/
+packages/
+.github/
+vigil.code-workspace
+.github/workflows/*
+.github/workflows/ci.yml
+.github/workflows/security.yml

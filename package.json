@@ -2,7 +2,10 @@
   "name": "vigil",
   "version": "0.0.1",
   "private": true,
-  "workspaces": ["frontend", "backend"],
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
   "scripts": {
     "demo:reset": "docker-compose up -d && cd backend && npx prisma migrate deploy && npx prisma db seed && cd ..",
     "demo:seed": "cd backend && npx prisma db seed && cd ..",
@@ -14,11 +17,14 @@
     "test:e2e": "npm run test:e2e --workspaces --if-present",
     "test:e2e:ui": "npm run test:e2e:ui --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
-    "type-check": "npm run type-check --workspaces --if-present"
+    "type-check": "npm run type-check --workspaces --if-present",
+    "prepare": "husky"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
-    "typescript": "^5.4.5"
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.4",
+    "typescript": "^6.0.3"
   },
   "dependencies": {
     "@sentry/nestjs": "^10.52.0",
